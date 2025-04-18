@@ -1,0 +1,329 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  TEACHER
+  APPROVER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AcademicStatus {
+  ENROLLED
+  GRADUATED
+  WITHDRAWN
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum FormType {
+  TERMINATION
+  ID_REPLACEMENT
+  TEACHER_CLEARANCE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum NotificationStatus {
+  SENT
+  READ
+}
+
+enum Semester {
+  SPRING
+  FALL
+  SUMMER
+}
+
+// Core Tables
+model User {
+  id                    String            @id @default(uuid())
+  username              String            @unique
+  passwordHash          String
+  firstName             String
+  fatherName            String
+  grandfatherName       String
+  email                 String?           @unique
+  role                  UserRole
+  status                UserStatus
+  isFirstLogin          Boolean           @default(true)
+  lastLogin             DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  // Authentication fields
+  loginAttempts         Int               @default(0)
+  isLocked              Boolean           @default(false)
+  lockCycles            Int               @default(0)
+  lockedUntil           DateTime?
+  lockedAt              DateTime?
+  
+  // Email verification
+  emailVerified         Boolean           @default(false)
+  emailVerificationSkipped Boolean        @default(false)
+  emailToken            String?
+  emailTokenExpiry      DateTime?
+  
+  // Password reset
+  resetToken            String?
+  resetTokenExpiry      DateTime?
+  
+  // Browser fingerprint for security
+  browserFingerprint    String?
+
+  // Relations
+  student               Student?
+  teacher               Teacher?
+  approver              Approver?
+  clearanceRequests     ClearanceRequest[]
+  notifications         Notification[]
+
+  @@map("users")
+}
+
+// Role-Specific Tables
+model Student {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  startDate      DateTime
+  programId      String
+  currentYear    Int
+  semester       Semester  // Use enum instead of Int
+  academicStatus AcademicStatus @default(ENROLLED)
+
+  // Relations
+  user           User      @relation(fields: [userId], references: [id])
+  program        Program   @relation(fields: [programId], references: [id])
+
+  @@map("students")
+}
+
+model Teacher {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  hireDate       DateTime
+  position       String
+  departmentId   String
+  employmentStatus EmploymentStatus
+  yearsOfService Int      // Add this field
+
+  // Relations
+  user           User     @relation(fields: [userId], references: [id])
+  department     Department @relation(fields: [departmentId], references: [id])
+
+  @@map("teachers")
+}
+
+// Academic & Department Tables
+model Program {
+  id                    String            @id @default(uuid())
+  name                  String
+  type                  String            // UNDERGRADUATE, POSTGRADUATE, DIPLOMA
+  category              String            // REGULAR, EXTENSION, SUMMER, EVENING
+
+  // Relations
+  students              Student[]
+  workflowRules         WorkflowRule[]
+
+  @@map("programs")
+}
+
+model Department {
+  id                    String            @id @default(uuid())
+  name                  String
+
+  // Relations
+  teachers              Teacher[]
+  approvers             Approver[]
+  offices               Office[]
+
+  @@map("departments")
+}
+
+// Approval Workflow Tables
+model Office {
+  id           String   @id @default(uuid())
+  officeName   String
+  departmentId String?  // Make this optional
+
+  // Relations
+  department   Department? @relation(fields: [departmentId], references: [id])
+  approvers    Approver[]
+  workflowSteps WorkflowStep[]
+
+  @@map("offices")
+}
+
+model Approver {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  officeId          String
+  departmentId      String?
+  digitalSignature  String?
+  yearsOfExperience Int      // Add this field
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id])
+  office            Office   @relation(fields: [officeId], references: [id])
+  department        Department? @relation(fields: [departmentId], references: [id])
+  approvalActions   ApprovalAction[]
+
+  @@map("approvers")
+}
+
+// Clearance Process Tables
+model ClearanceRequest {
+  id                    String            @id @default(uuid())
+  userId                String
+  formType              FormType
+  programId             String?
+  terminationReasonId   String?
+  idReplacementReasonId String?
+  teacherReason         String?
+  status                RequestStatus
+  submittedAt           DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  currentStep           Int               @default(1)
+
+  // Relations
+  user                  User              @relation(fields: [userId], references: [id])
+  terminationReason     TerminationReason? @relation(fields: [terminationReasonId], references: [id])
+  idReplacementReason   IdReplacementReason? @relation(fields: [idReplacementReasonId], references: [id])
+  approvalActions       ApprovalAction[]
+  documents             Document[]
+  notifications         Notification[]
+
+  @@map("clearance_requests")
+}
+
+model ApprovalAction {
+  id                    String            @id @default(uuid())
+  requestId             String
+  approverId            String
+  stepOrder             Int
+  status                RequestStatus
+  comment               String?
+  actionDate            DateTime          @default(now())
+
+  // Relations
+  request               ClearanceRequest  @relation(fields: [requestId], references: [id])
+  approver              Approver          @relation(fields: [approverId], references: [id])
+
+  @@map("approval_actions")
+}
+
+model TerminationReason {
+  id                    String            @id @default(uuid())
+  reason                String
+  description           String?
+
+  // Relations
+  clearanceRequests     ClearanceRequest[]
+
+  @@map("termination_reasons")
+}
+
+model IdReplacementReason {
+  id                    String            @id @default(uuid())
+  reason                String
+  description           String?
+
+  // Relations
+  clearanceRequests     ClearanceRequest[]
+
+  @@map("id_replacement_reasons")
+}
+
+// Workflow Tables
+model WorkflowRule {
+  id                    String            @id @default(uuid())
+  formType              FormType
+  programId             String?
+  description           String?
+
+  // Relations
+  program               Program?          @relation(fields: [programId], references: [id])
+  workflowSteps         WorkflowStep[]
+
+  @@map("workflow_rules")
+}
+
+model WorkflowStep {
+  id                    String            @id @default(uuid())
+  ruleId                String
+  officeId              String
+  stepOrder             Int
+  description           String?
+
+  // Relations
+  workflowRule          WorkflowRule      @relation(fields: [ruleId], references: [id])
+  office                Office            @relation(fields: [officeId], references: [id])
+
+  @@map("workflow_steps")
+}
+
+// Document & Notification Tables
+model DocumentType {
+  id                    String            @id @default(uuid())
+  name                  String
+  description           String?
+
+  // Relations
+  documents             Document[]
+
+  @@map("document_types")
+}
+
+model Document {
+  id                    String            @id @default(uuid())
+  requestId             String
+  documentTypeId        String
+  filePath              String
+  uploadedAt            DateTime          @default(now())
+
+  // Relations
+  request               ClearanceRequest  @relation(fields: [requestId], references: [id])
+  documentType          DocumentType      @relation(fields: [documentTypeId], references: [id])
+
+  @@map("documents")
+}
+
+model Notification {
+  id                    String            @id @default(uuid())
+  userId                String
+  requestId             String?
+  message               String
+  status                NotificationStatus
+  createdAt             DateTime          @default(now())
+
+  // Relations
+  user                  User              @relation(fields: [userId], references: [id])
+  request               ClearanceRequest? @relation(fields: [requestId], references: [id])
+
+  @@map("notifications")
+}
