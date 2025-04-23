@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -214,10 +214,111 @@ export default function Login() {
 	const [resetEmailSent, setResetEmailSent] = useState(false);
 	const [darkMode, setDarkMode] = useState(false);
 	const [token, setToken] = useState("");
+	const [resendCooldown, setResendCooldown] = useState(0);
+	const [resendingEmail, setResendingEmail] = useState(false);
+	const searchParams = useSearchParams();
+	const [showVerifiedMessage, setShowVerifiedMessage] = useState(false);
+	const verified = searchParams.get("verified") === "true";
+	const resetSuccess = searchParams.get("reset") === "success";
+	useEffect(() => {
+		if (verified) {
+			setShowVerifiedMessage(true);
+			// Auto-hide after 5 seconds
+			const timer = setTimeout(() => {
+				setShowVerifiedMessage(false);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [verified]);
 
+	// Replace the verified message display with this (place it before the error message section)
+	{
+		showVerifiedMessage && (
+			<motion.div
+				initial={{ opacity: 0, y: -10 }}
+				animate={{ opacity: 1, y: 0 }}
+				exit={{ opacity: 0, y: -10 }}
+				className="mb-6 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm flex items-start"
+			>
+				<CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+				<span>
+					Your email has been successfully verified! You can now log in.
+				</span>
+			</motion.div>
+		);
+	}
+	{
+		resetSuccess && (
+			<motion.div
+				initial={{ opacity: 0, y: -10 }}
+				animate={{ opacity: 1, y: 0 }}
+				exit={{ opacity: 0, y: -10 }}
+				className="mb-6 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm flex items-start"
+			>
+				<CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+				<span>
+					Password reset successful! You can now log in with your new password.
+				</span>
+			</motion.div>
+		);
+	}
+
+	// Add this to your JSX where you want to show the success message
+	{
+		verified && (
+			<div className="mb-4 p-3 bg-green-100 text-green-800 rounded">
+				Your email has been successfully verified! You can now log in.
+			</div>
+		);
+	}
 	// API base URL
 	const API_BASE_URL =
 		process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+	// Add this function to handle email resending
+	const handleResendEmail = async () => {
+		if (resendCooldown > 0 || !formData.email) return;
+
+		setResendingEmail(true);
+
+		try {
+			const response = await axios.post(
+				`${API_BASE_URL}/auth/send-verification-email`,
+				{ email: formData.email },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+
+			if (response.data.status === "success") {
+				// Start cooldown timer (60 seconds)
+				setResendCooldown(60);
+
+				// Countdown timer
+				const timer = setInterval(() => {
+					setResendCooldown((prev) => {
+						if (prev <= 1) {
+							clearInterval(timer);
+							return 0;
+						}
+						return prev - 1;
+					});
+				}, 1000);
+			}
+		} catch (err) {
+			console.error("Error resending verification email:", err);
+			let errorMessage = "Failed to resend verification email";
+
+			if (err.response && err.response.data) {
+				errorMessage = err.response.data.message || errorMessage;
+			}
+
+			setErrors({ ...errors, general: errorMessage });
+		} finally {
+			setResendingEmail(false);
+		}
+	};
 
 	// Background animation
 	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -378,6 +479,7 @@ export default function Login() {
 		return isValid;
 	};
 
+	// In the login function, update the handling of the response
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -393,24 +495,30 @@ export default function Login() {
 			});
 
 			if (response.data.status === "success") {
-				const userData = response.data.data;
-				setCurrentUser(userData.user);
-				setToken(userData.token);
-
-				// Store token in localStorage if rememberMe is checked
-				if (formData.rememberMe) {
-					localStorage.setItem("authToken", userData.token);
-				}
-
-				if (userData.isFirstLogin) {
+				// Check if it's the first login
+				if (response.data.isFirstLogin) {
+					// Store the token for the password change step
+					setToken(response.data.token);
 					setStep("changePassword");
-				} else if (
-					!userData.emailVerified &&
-					!userData.user.emailVerificationSkipped
-				) {
-					setStep("verifyEmail");
 				} else {
-					completeLogin(userData.user, userData.token);
+					// Regular login flow
+					const userData = response.data.data;
+					setCurrentUser(userData.user);
+
+					// Store token in localStorage if rememberMe is checked
+					if (formData.rememberMe) {
+						localStorage.setItem("authToken", userData.token);
+					}
+
+					if (
+						!userData.user.emailVerified &&
+						!userData.user.emailVerificationSkipped
+					) {
+						setToken(userData.token);
+						setStep("verifyEmail");
+					} else {
+						completeLogin(userData.user, userData.token);
+					}
 				}
 			}
 		} catch (err) {
@@ -448,7 +556,6 @@ export default function Login() {
 			const response = await axios.post(
 				`${API_BASE_URL}/auth/change-password`,
 				{
-					currentPassword: formData.currentPassword,
 					newPassword: formData.newPassword,
 					confirmPassword: formData.confirmPassword,
 				},
@@ -460,6 +567,9 @@ export default function Login() {
 			);
 
 			if (response.data.status === "success") {
+				// Update the token with the new one returned from the server
+				setToken(response.data.token);
+
 				// After password change, move to email verification
 				setStep("verifyEmail");
 			}
@@ -476,6 +586,7 @@ export default function Login() {
 		}
 	};
 
+	// Update the handleEmailVerification function to store the browser token
 	const handleEmailVerification = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -498,9 +609,15 @@ export default function Login() {
 			);
 
 			if (response.data.status === "success") {
-				setEmailSent(true);
+				// Store the browser token in localStorage for verification
+				if (response.data.browserToken) {
+					localStorage.setItem(
+						"verificationBrowserToken",
+						response.data.browserToken
+					);
+				}
 
-				// Wait for 2 seconds to show the success message
+				setEmailSent(true);
 				setTimeout(() => {
 					completeLogin(currentUser, token);
 				}, 2000);
@@ -813,7 +930,6 @@ export default function Login() {
 										</motion.button>
 									</form>
 								)}
-
 								{/* Change Password Form */}
 								{step === "changePassword" && (
 									<form onSubmit={handlePasswordChange} className="space-y-2">
@@ -883,48 +999,133 @@ export default function Login() {
 										</motion.button>
 									</form>
 								)}
-
 								{/* Email Verification Form */}
-								{step === "verifyEmail" && (
-									<form
-										onSubmit={handleEmailVerification}
-										className="space-y-2"
-									>
-										<AnimatedInput
-											label="Email Address"
-											type="email"
-											value={formData.email}
-											onChange={(e) =>
-												setFormData({ ...formData, email: e.target.value })
-											}
-											icon={Mail}
-											error={errors.email}
-											required
-										/>
-
-										<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-											We'll send you notifications about your clearance status
-										</p>
-
-										{emailSent && (
-											<motion.div
-												initial={{ opacity: 0, y: -10 }}
-												animate={{ opacity: 1, y: 0 }}
-												className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 mb-4"
-											>
-												<div className="flex items-center">
-													<CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
-													<p className="text-green-700 dark:text-green-400 font-medium">
-														Verification email sent!
+								{step === "verifyEmail" &&
+									(emailSent ? (
+										<div className="p-6 rounded-lg bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 mb-4 shadow-lg">
+											<div className="text-center">
+												<div className="flex justify-center mb-4">
+													<Mail className="h-12 w-12 text-blue-500 dark:text-blue-400" />
+												</div>
+												<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+													Check Your Email
+												</h3>
+												<p className="text-gray-600 dark:text-gray-300 mb-3">
+													We've sent a verification link to:
+												</p>
+												<div className="bg-gray-100 dark:bg-gray-700 rounded-lg py-2 px-4 mb-4 inline-block">
+													<p className="font-medium text-blue-600 dark:text-blue-400">
+														{formData.email}
 													</p>
 												</div>
-												<p className="text-green-600/80 dark:text-green-500/80 text-sm mt-1">
-													Please check your inbox. Redirecting to dashboard...
+												<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+													Please check your email and click the verification
+													link to complete your registration. Make sure to use
+													the same browser for verification.
 												</p>
-											</motion.div>
-										)}
 
-										<div className="space-y-3 mt-4">
+												<div className="mt-4 flex justify-center space-x-3">
+													{formData.email.includes("@gmail") && (
+														<a
+															href="https://mail.google.com"
+															target="_blank"
+															rel="noopener noreferrer"
+															className="flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-200 dark:border-gray-600"
+														>
+															<img
+																src="/icons/gmail.svg"
+																alt="Gmail"
+																className="w-5 h-5 mr-2"
+															/>
+															<span className="text-sm font-medium">
+																Open Gmail
+															</span>
+														</a>
+													)}
+													{(formData.email.includes("@outlook") ||
+														formData.email.includes("@hotmail")) && (
+														<a
+															href="https://outlook.live.com"
+															target="_blank"
+															rel="noopener noreferrer"
+															className="flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-200 dark:border-gray-600"
+														>
+															<img
+																src="/icons/outlook.svg"
+																alt="Outlook"
+																className="w-5 h-5 mr-2"
+															/>
+															<span className="text-sm font-medium">
+																Open Outlook
+															</span>
+														</a>
+													)}
+													{formData.email.includes("@yahoo") && (
+														<a
+															href="https://mail.yahoo.com"
+															target="_blank"
+															rel="noopener noreferrer"
+															className="flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-200 dark:border-gray-600"
+														>
+															<img
+																src="/icons/yahoo.svg"
+																alt="Yahoo"
+																className="w-5 h-5 mr-2"
+															/>
+															<span className="text-sm font-medium">
+																Open Yahoo Mail
+															</span>
+														</a>
+													)}
+												</div>
+
+												<div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+													<p className="text-sm text-gray-500 dark:text-gray-400">
+														Didn't receive the email? Check your spam folder or{" "}
+														<button
+															onClick={handleResendEmail}
+															className="text-blue-600 dark:text-blue-400 hover:underline ml-1 font-medium"
+															disabled={resendCooldown > 0 || resendingEmail}
+														>
+															{resendCooldown > 0
+																? `Resend in ${resendCooldown}s`
+																: resendingEmail
+																? "Sending..."
+																: "Resend"}
+														</button>
+													</p>
+												</div>
+											</div>
+										</div>
+									) : (
+										<form
+											onSubmit={handleEmailVerification}
+											className="space-y-2"
+										>
+											<AnimatedInput
+												label="Email Address"
+												type="email"
+												value={formData.email}
+												onChange={(e) =>
+													setFormData({ ...formData, email: e.target.value })
+												}
+												icon={Mail}
+												error={errors.email}
+												required
+											/>
+
+											<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+												We'll send you notifications about your clearance status
+											</p>
+											<button
+												type="button"
+												onClick={handleSkip}
+												disabled={isLoading}
+												className="w-full py-3 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+											>
+												Skip for now
+											</button>
+
 											<motion.button
 												whileHover={{ scale: 1.02 }}
 												whileTap={{ scale: 0.98 }}
@@ -937,28 +1138,12 @@ export default function Login() {
 														<Loader2 className="h-5 w-5 mr-2 animate-spin" />
 														Verifying...
 													</>
-												) : emailSent ? (
-													<>
-														<CheckCircle className="h-5 w-5 mr-2" />
-														Redirecting...
-													</>
 												) : (
 													"Verify Email"
 												)}
 											</motion.button>
-
-											<button
-												type="button"
-												onClick={handleSkip}
-												disabled={emailSent || isLoading}
-												className="w-full py-3 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-											>
-												Skip for now
-											</button>
-										</div>
-									</form>
-								)}
-
+										</form>
+									))}
 								{/* Forgot Password Form */}
 								{step === "forgotPassword" && (
 									<form onSubmit={handleForgotPassword} className="space-y-2">

@@ -2,10 +2,13 @@ import { Router } from "express";
 import {
 	login,
 	changePassword,
-	verifyEmail,
-	skipEmailVerification,
 	forgotPassword,
 	resetPassword,
+	verifyEmail,
+	sendVerificationEmailLink,
+	confirmEmailVerification,
+	skipEmailVerification,
+	checkAuthStatus,
 } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import {
@@ -33,12 +36,22 @@ router.post(
 	wrapValidation(validateResetPassword),
 	resetPassword
 );
+
+router.get("/verify-email", confirmEmailVerification); // Public route to confirm email via token
+
+// Protected routes (require authentication)
 router.post(
 	"/change-password",
 	authenticate,
 	wrapValidation(validatePasswordChange),
 	changePassword
 );
+router.post(
+	"/send-verification-email",
+	authenticate,
+	sendVerificationEmailLink
+);
+router.get("/status", authenticate, checkAuthStatus); // Check if user is logged in and email is verified
 router.post(
 	"/verify-email",
 	authenticate,

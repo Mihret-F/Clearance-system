@@ -125,6 +125,7 @@ export const createUser = async (
 									position: teacherData.position,
 									departmentId: teacherData.departmentId,
 									employmentStatus: teacherData.employmentStatus,
+									yearsOfService: teacherData.yearsOfService || 0, // Add this line
 								},
 						  }
 						: undefined,
@@ -134,7 +135,7 @@ export const createUser = async (
 								create: {
 									officeId: approverData.officeId,
 									departmentId: approverData.departmentId,
-									// Removed 'position' as it does not exist in the type
+									yearsOfExperience: approverData.yearsOfExperience || 0, // Add this line
 								},
 						  }
 						: undefined,

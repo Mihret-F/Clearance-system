@@ -10897,10 +10897,12 @@ export namespace Prisma {
 
   export type ClearanceRequestAvgAggregateOutputType = {
     currentStep: number | null
+    rejectedStep: number | null
   }
 
   export type ClearanceRequestSumAggregateOutputType = {
     currentStep: number | null
+    rejectedStep: number | null
   }
 
   export type ClearanceRequestMinAggregateOutputType = {
@@ -10915,6 +10917,8 @@ export namespace Prisma {
     submittedAt: Date | null
     updatedAt: Date | null
     currentStep: number | null
+    rejectedStep: number | null
+    rejectionReason: string | null
   }
 
   export type ClearanceRequestMaxAggregateOutputType = {
@@ -10929,6 +10933,8 @@ export namespace Prisma {
     submittedAt: Date | null
     updatedAt: Date | null
     currentStep: number | null
+    rejectedStep: number | null
+    rejectionReason: string | null
   }
 
   export type ClearanceRequestCountAggregateOutputType = {
@@ -10943,16 +10949,20 @@ export namespace Prisma {
     submittedAt: number
     updatedAt: number
     currentStep: number
+    rejectedStep: number
+    rejectionReason: number
     _all: number
   }
 
 
   export type ClearanceRequestAvgAggregateInputType = {
     currentStep?: true
+    rejectedStep?: true
   }
 
   export type ClearanceRequestSumAggregateInputType = {
     currentStep?: true
+    rejectedStep?: true
   }
 
   export type ClearanceRequestMinAggregateInputType = {
@@ -10967,6 +10977,8 @@ export namespace Prisma {
     submittedAt?: true
     updatedAt?: true
     currentStep?: true
+    rejectedStep?: true
+    rejectionReason?: true
   }
 
   export type ClearanceRequestMaxAggregateInputType = {
@@ -10981,6 +10993,8 @@ export namespace Prisma {
     submittedAt?: true
     updatedAt?: true
     currentStep?: true
+    rejectedStep?: true
+    rejectionReason?: true
   }
 
   export type ClearanceRequestCountAggregateInputType = {
@@ -10995,6 +11009,8 @@ export namespace Prisma {
     submittedAt?: true
     updatedAt?: true
     currentStep?: true
+    rejectedStep?: true
+    rejectionReason?: true
     _all?: true
   }
 
@@ -11096,6 +11112,8 @@ export namespace Prisma {
     submittedAt: Date
     updatedAt: Date
     currentStep: number
+    rejectedStep: number | null
+    rejectionReason: string | null
     _count: ClearanceRequestCountAggregateOutputType | null
     _avg: ClearanceRequestAvgAggregateOutputType | null
     _sum: ClearanceRequestSumAggregateOutputType | null
@@ -11129,6 +11147,8 @@ export namespace Prisma {
     submittedAt?: boolean
     updatedAt?: boolean
     currentStep?: boolean
+    rejectedStep?: boolean
+    rejectionReason?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
     idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
@@ -11150,6 +11170,8 @@ export namespace Prisma {
     submittedAt?: boolean
     updatedAt?: boolean
     currentStep?: boolean
+    rejectedStep?: boolean
+    rejectionReason?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
     idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
@@ -11167,6 +11189,8 @@ export namespace Prisma {
     submittedAt?: boolean
     updatedAt?: boolean
     currentStep?: boolean
+    rejectedStep?: boolean
+    rejectionReason?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
     idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
@@ -11184,9 +11208,11 @@ export namespace Prisma {
     submittedAt?: boolean
     updatedAt?: boolean
     currentStep?: boolean
+    rejectedStep?: boolean
+    rejectionReason?: boolean
   }
 
-  export type ClearanceRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "formType" | "programId" | "terminationReasonId" | "idReplacementReasonId" | "teacherReason" | "status" | "submittedAt" | "updatedAt" | "currentStep", ExtArgs["result"]["clearanceRequest"]>
+  export type ClearanceRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "formType" | "programId" | "terminationReasonId" | "idReplacementReasonId" | "teacherReason" | "status" | "submittedAt" | "updatedAt" | "currentStep" | "rejectedStep" | "rejectionReason", ExtArgs["result"]["clearanceRequest"]>
   export type ClearanceRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
@@ -11229,6 +11255,8 @@ export namespace Prisma {
       submittedAt: Date
       updatedAt: Date
       currentStep: number
+      rejectedStep: number | null
+      rejectionReason: string | null
     }, ExtArgs["result"]["clearanceRequest"]>
     composites: {}
   }
@@ -11669,6 +11697,8 @@ export namespace Prisma {
     readonly submittedAt: FieldRef<"ClearanceRequest", 'DateTime'>
     readonly updatedAt: FieldRef<"ClearanceRequest", 'DateTime'>
     readonly currentStep: FieldRef<"ClearanceRequest", 'Int'>
+    readonly rejectedStep: FieldRef<"ClearanceRequest", 'Int'>
+    readonly rejectionReason: FieldRef<"ClearanceRequest", 'String'>
   }
     
 
@@ -20930,7 +20960,9 @@ export namespace Prisma {
     status: 'status',
     submittedAt: 'submittedAt',
     updatedAt: 'updatedAt',
-    currentStep: 'currentStep'
+    currentStep: 'currentStep',
+    rejectedStep: 'rejectedStep',
+    rejectionReason: 'rejectionReason'
   };
 
   export type ClearanceRequestScalarFieldEnum = (typeof ClearanceRequestScalarFieldEnum)[keyof typeof ClearanceRequestScalarFieldEnum]
@@ -21772,6 +21804,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     updatedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     currentStep?: IntFilter<"ClearanceRequest"> | number
+    rejectedStep?: IntNullableFilter<"ClearanceRequest"> | number | null
+    rejectionReason?: StringNullableFilter<"ClearanceRequest"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     terminationReason?: XOR<TerminationReasonNullableScalarRelationFilter, TerminationReasonWhereInput> | null
     idReplacementReason?: XOR<IdReplacementReasonNullableScalarRelationFilter, IdReplacementReasonWhereInput> | null
@@ -21792,6 +21826,8 @@ export namespace Prisma {
     submittedAt?: SortOrder
     updatedAt?: SortOrder
     currentStep?: SortOrder
+    rejectedStep?: SortOrderInput | SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
     terminationReason?: TerminationReasonOrderByWithRelationInput
     idReplacementReason?: IdReplacementReasonOrderByWithRelationInput
@@ -21815,6 +21851,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     updatedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     currentStep?: IntFilter<"ClearanceRequest"> | number
+    rejectedStep?: IntNullableFilter<"ClearanceRequest"> | number | null
+    rejectionReason?: StringNullableFilter<"ClearanceRequest"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     terminationReason?: XOR<TerminationReasonNullableScalarRelationFilter, TerminationReasonWhereInput> | null
     idReplacementReason?: XOR<IdReplacementReasonNullableScalarRelationFilter, IdReplacementReasonWhereInput> | null
@@ -21835,6 +21873,8 @@ export namespace Prisma {
     submittedAt?: SortOrder
     updatedAt?: SortOrder
     currentStep?: SortOrder
+    rejectedStep?: SortOrderInput | SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
     _count?: ClearanceRequestCountOrderByAggregateInput
     _avg?: ClearanceRequestAvgOrderByAggregateInput
     _max?: ClearanceRequestMaxOrderByAggregateInput
@@ -21857,6 +21897,8 @@ export namespace Prisma {
     submittedAt?: DateTimeWithAggregatesFilter<"ClearanceRequest"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ClearanceRequest"> | Date | string
     currentStep?: IntWithAggregatesFilter<"ClearanceRequest"> | number
+    rejectedStep?: IntNullableWithAggregatesFilter<"ClearanceRequest"> | number | null
+    rejectionReason?: StringNullableWithAggregatesFilter<"ClearanceRequest"> | string | null
   }
 
   export type ApprovalActionWhereInput = {
@@ -22876,6 +22918,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
@@ -22896,6 +22940,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
@@ -22910,6 +22956,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
@@ -22930,6 +22978,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
@@ -22947,6 +22997,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
   }
 
   export type ClearanceRequestUpdateManyMutationInput = {
@@ -22958,6 +23010,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ClearanceRequestUncheckedUpdateManyInput = {
@@ -22972,6 +23026,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ApprovalActionCreateInput = {
@@ -24050,6 +24106,17 @@ export namespace Prisma {
     not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type TerminationReasonNullableScalarRelationFilter = {
     is?: TerminationReasonWhereInput | null
     isNot?: TerminationReasonWhereInput | null
@@ -24082,10 +24149,13 @@ export namespace Prisma {
     submittedAt?: SortOrder
     updatedAt?: SortOrder
     currentStep?: SortOrder
+    rejectedStep?: SortOrder
+    rejectionReason?: SortOrder
   }
 
   export type ClearanceRequestAvgOrderByAggregateInput = {
     currentStep?: SortOrder
+    rejectedStep?: SortOrder
   }
 
   export type ClearanceRequestMaxOrderByAggregateInput = {
@@ -24100,6 +24170,8 @@ export namespace Prisma {
     submittedAt?: SortOrder
     updatedAt?: SortOrder
     currentStep?: SortOrder
+    rejectedStep?: SortOrder
+    rejectionReason?: SortOrder
   }
 
   export type ClearanceRequestMinOrderByAggregateInput = {
@@ -24114,10 +24186,13 @@ export namespace Prisma {
     submittedAt?: SortOrder
     updatedAt?: SortOrder
     currentStep?: SortOrder
+    rejectedStep?: SortOrder
+    rejectionReason?: SortOrder
   }
 
   export type ClearanceRequestSumOrderByAggregateInput = {
     currentStep?: SortOrder
+    rejectedStep?: SortOrder
   }
 
   export type EnumFormTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -24138,6 +24213,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRequestStatusFilter<$PrismaModel>
     _max?: NestedEnumRequestStatusFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type ClearanceRequestScalarRelationFilter = {
@@ -25131,6 +25222,14 @@ export namespace Prisma {
     set?: $Enums.RequestStatus
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type UserUpdateOneRequiredWithoutClearanceRequestsNestedInput = {
     create?: XOR<UserCreateWithoutClearanceRequestsInput, UserUncheckedCreateWithoutClearanceRequestsInput>
     connectOrCreate?: UserCreateOrConnectWithoutClearanceRequestsInput
@@ -25838,6 +25937,33 @@ export namespace Prisma {
     _max?: NestedEnumRequestStatusFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedEnumNotificationStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.NotificationStatus | EnumNotificationStatusFieldRefInput<$PrismaModel>
     in?: $Enums.NotificationStatus[] | ListEnumNotificationStatusFieldRefInput<$PrismaModel>
@@ -25933,6 +26059,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutRequestInput
@@ -25951,6 +26079,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
@@ -26110,6 +26240,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     updatedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
     currentStep?: IntFilter<"ClearanceRequest"> | number
+    rejectedStep?: IntNullableFilter<"ClearanceRequest"> | number | null
+    rejectionReason?: StringNullableFilter<"ClearanceRequest"> | string | null
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutUserInput = {
@@ -27587,6 +27719,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
@@ -27606,6 +27740,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
   }
@@ -27658,6 +27794,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
@@ -27677,6 +27815,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
   }
@@ -27719,6 +27859,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutRequestInput
@@ -27737,6 +27879,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
@@ -27777,6 +27921,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutRequestInput
@@ -27795,6 +27941,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
@@ -28051,6 +28199,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
@@ -28070,6 +28220,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
   }
@@ -28116,6 +28268,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
@@ -28135,6 +28289,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
   }
@@ -28240,6 +28396,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
     idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
@@ -28259,6 +28417,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutRequestInput
   }
@@ -28363,6 +28523,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
@@ -28382,6 +28544,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
   }
@@ -28397,6 +28561,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
   }
 
   export type NotificationCreateManyUserInput = {
@@ -28416,6 +28582,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutRequestNestedInput
@@ -28434,6 +28602,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
@@ -28450,6 +28620,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type NotificationUpdateWithoutUserInput = {
@@ -28837,6 +29009,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
   }
 
   export type ClearanceRequestUpdateWithoutTerminationReasonInput = {
@@ -28848,6 +29022,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutRequestNestedInput
@@ -28866,6 +29042,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
@@ -28882,6 +29060,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ClearanceRequestCreateManyIdReplacementReasonInput = {
@@ -28895,6 +29075,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
+    rejectedStep?: number | null
+    rejectionReason?: string | null
   }
 
   export type ClearanceRequestUpdateWithoutIdReplacementReasonInput = {
@@ -28906,6 +29088,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutRequestNestedInput
@@ -28924,6 +29108,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
@@ -28940,6 +29126,8 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
+    rejectedStep?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type WorkflowStepCreateManyWorkflowRuleInput = {

@@ -203,7 +203,9 @@ exports.Prisma.ClearanceRequestScalarFieldEnum = {
   status: 'status',
   submittedAt: 'submittedAt',
   updatedAt: 'updatedAt',
-  currentStep: 'currentStep'
+  currentStep: 'currentStep',
+  rejectedStep: 'rejectedStep',
+  rejectionReason: 'rejectionReason'
 };
 
 exports.Prisma.ApprovalActionScalarFieldEnum = {

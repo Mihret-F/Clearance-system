@@ -56,116 +56,7 @@ import { Input } from "@/components/ui/input";
 import { ClearanceRequestForm } from "@/components/dashboard/ClearanceRequestForm";
 import { ClearanceStatusCard } from "@/components/dashboard/ClearanceStatusCard";
 import { clearanceRequests } from "@/data/clearance-requests";
-
-const clearanceStages = [
-	{
-		id: "finance",
-		name: "Finance",
-		icon: CreditCard,
-		description: "Financial clearance",
-		status: "completed",
-	},
-	{
-		id: "library",
-		name: "Library",
-		icon: Library,
-		description: "Library clearance",
-		status: "in-progress",
-	},
-	{
-		id: "hostel",
-		name: "Hostel",
-		icon: Building,
-		description: "Hostel clearance",
-		status: "pending",
-	},
-	{
-		id: "department",
-		name: "Department",
-		icon: Users,
-		description: "Departmental clearance",
-		status: "pending",
-	},
-	{
-		id: "sports",
-		name: "Sports",
-		icon: FileCheck,
-		description: "Sports equipment clearance",
-		status: "pending",
-	},
-	{
-		id: "certificates",
-		name: "Certificates",
-		icon: FileText,
-		description: "Certificate verification",
-		status: "pending",
-	},
-];
-
-const notifications = [
-	{
-		id: 1,
-		title: "Document Submitted",
-		message:
-			"Your ID card replacement documents have been submitted successfully.",
-		time: "2 hours ago",
-		read: false,
-		type: "success",
-	},
-	{
-		id: 2,
-		title: "Library Clearance",
-		message:
-			"Your library clearance is awaiting approval from the Chief Librarian.",
-		time: "1 day ago",
-		read: true,
-		type: "pending",
-	},
-	{
-		id: 3,
-		title: "Deadline Reminder",
-		message:
-			"The deadline for graduation clearance submission is May 15, 2024.",
-		time: "2 days ago",
-		read: false,
-		type: "warning",
-	},
-	{
-		id: 4,
-		title: "Finance Clearance",
-		message: "Your finance clearance has been approved.",
-		time: "1 week ago",
-		read: true,
-		type: "success",
-	},
-];
-
-const pendingDocuments = [
-	{
-		id: 1,
-		name: "Identity Card Copy",
-		status: "submitted",
-		department: "Admin",
-	},
-	{
-		id: 2,
-		name: "Hostel Clearance Form",
-		status: "pending",
-		department: "Hostel",
-	},
-	{
-		id: 3,
-		name: "Library Return Receipt",
-		status: "pending",
-		department: "Library",
-	},
-	{
-		id: 4,
-		name: "Departmental No-Dues",
-		status: "pending",
-		department: "Department",
-	},
-];
+import axios from "axios";
 
 // Updated NavItem component to use Next.js Link
 const NavItem = ({ icon: Icon, label, href, active = false }) => (
@@ -193,6 +84,8 @@ export default function RequesterDashboard() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const [darkMode, setDarkMode] = useState(false);
 	const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -204,10 +97,19 @@ export default function RequesterDashboard() {
 	const [showNewRequestForm, setShowNewRequestForm] = useState(false);
 	const [userClearanceRequests, setUserClearanceRequests] = useState([]);
 	const [userData, setUserData] = useState(null); // Added userData state
-
-	const overallProgress = 35; // Percentage of clearance completion
+	const [clearanceStages, setClearanceStages] = useState([]);
+	const [notifications, setNotifications] = useState([]);
+	const [pendingDocuments, setPendingDocuments] = useState([]);
+	const [overallProgress, setOverallProgress] = useState(0);
+	const [documentTypes, setDocumentTypes] = useState([]);
+	const [selectedDocumentType, setSelectedDocumentType] = useState("");
+	const [selectedRequestId, setSelectedRequestId] = useState("");
+	const [documentDescription, setDocumentDescription] = useState("");
 
 	useEffect(() => {
+		// Check if window is available (client-side)
+		if (typeof window === "undefined") return;
+
 		// Check if dark mode preference exists
 		const isDark = localStorage.getItem("darkMode") === "true";
 		setDarkMode(isDark);
@@ -218,15 +120,129 @@ export default function RequesterDashboard() {
 			document.documentElement.classList.remove("dark");
 		}
 
-		// Check if user is logged in
-		const storedUser = localStorage.getItem("user");
-		if (!storedUser) {
-			router.push("/login");
-			return;
-		}
+		const checkAuth = async () => {
+			try {
+				// Check if user is logged in
+				const token = localStorage.getItem("authToken");
+				if (!token) {
+					router.push("/login");
+					return;
+				}
 
-		setUser(JSON.parse(storedUser));
-		setUserData({ programType: "Regular", academicCategory: "Undergraduate" }); // Mock user data
+				// Verify token with backend
+				const API_BASE_URL =
+					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+				try {
+					// Fetch user profile
+					const userResponse = await axios.get(
+						`${API_BASE_URL}/users/profile`,
+						{
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					);
+
+					if (userResponse.data.status === "success") {
+						const userData = userResponse.data.data;
+
+						// Check if user is a student or requester
+						if (userData.role !== "STUDENT" && userData.role !== "TEACHER") {
+							if (userData.role === "ADMIN") {
+								router.push("/dashboard/admin");
+							} else if (userData.role === "APPROVER") {
+								router.push("/dashboard/approver");
+							} else {
+								router.push("/login");
+							}
+							return;
+						}
+
+						setUser(userData);
+						localStorage.setItem("user", JSON.stringify(userData));
+
+						// Try to fetch clearance requests, but don't fail if this errors
+						try {
+							const requestsResponse = await axios.get(
+								`${API_BASE_URL}/clearance/requests`,
+								{
+									headers: {
+										Authorization: `Bearer ${token}`,
+									},
+								}
+							);
+
+							if (requestsResponse.data.status === "success") {
+								setUserClearanceRequests(requestsResponse.data.data || []);
+							}
+						} catch (requestsError) {
+							console.error(
+								"Failed to fetch clearance requests:",
+								requestsError
+							);
+							// Don't fail the whole auth process for this error
+						}
+
+						// Try to fetch notifications, but don't fail if this errors
+						try {
+							const notificationsResponse = await axios.get(
+								`${API_BASE_URL}/users/notifications`,
+								{
+									headers: {
+										Authorization: `Bearer ${token}`,
+									},
+								}
+							);
+
+							if (notificationsResponse.data.status === "success") {
+								setNotifications(notificationsResponse.data.data || []);
+							}
+						} catch (notificationsError) {
+							console.error(
+								"Failed to fetch notifications:",
+								notificationsError
+							);
+							// Don't fail the whole auth process for this error
+						}
+					} else {
+						localStorage.removeItem("authToken");
+						localStorage.removeItem("user");
+						router.push("/login");
+					}
+				} catch (err) {
+					console.error("Authentication error:", err);
+					setError("Failed to authenticate. Please log in again.");
+					localStorage.removeItem("authToken");
+					localStorage.removeItem("user");
+					setTimeout(() => {
+						router.push("/login");
+					}, 2000);
+				} finally {
+					setLoading(false);
+				}
+			} catch (err) {
+				console.error("Authentication error:", err);
+				setError("Failed to authenticate. Please log in again.");
+				localStorage.removeItem("authToken");
+				localStorage.removeItem("user");
+				setTimeout(() => {
+					router.push("/login");
+				}, 2000);
+			}
+		};
+
+		// Check if user is logged in from localStorage first
+		const storedUser = localStorage.getItem("user");
+		if (storedUser) {
+			setUser(JSON.parse(storedUser));
+			setLoading(false);
+
+			// Still fetch the latest data
+			checkAuth();
+		} else {
+			checkAuth();
+		}
 
 		// Check for mobile/tablet view
 		const checkMobile = () => {
@@ -239,17 +255,6 @@ export default function RequesterDashboard() {
 
 		return () => window.removeEventListener("resize", checkMobile);
 	}, [router]);
-
-	useEffect(() => {
-		// Load clearance requests for the current user
-		if (user) {
-			// Filter requests for the current user
-			const userRequests = clearanceRequests.filter(
-				(req) => req.userId === user.id
-			);
-			setUserClearanceRequests(userRequests);
-		}
-	}, [user]);
 
 	const toggleDarkMode = () => {
 		const newMode = !darkMode;
@@ -269,40 +274,148 @@ export default function RequesterDashboard() {
 			setSelectedFile(file);
 		}
 	};
+	useEffect(() => {
+		const fetchDocumentTypes = async () => {
+			try {
+				const token = localStorage.getItem("authToken");
+				const API_BASE_URL =
+					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-	const handleUploadSubmit = () => {
+				const response = await axios.get(
+					`${API_BASE_URL}/clearance/document-types`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+
+				if (response.data.status === "success") {
+					setDocumentTypes(response.data.data || []);
+				}
+			} catch (error) {
+				console.error("Error fetching document types:", error);
+			}
+		};
+
+		if (user) {
+			fetchDocumentTypes();
+		}
+	}, [user]);
+
+	const handleUploadSubmit = async () => {
 		if (!selectedFile) return;
 
 		setUploading(true);
 		setUploadProgress(0);
 
-		// Simulate upload progress
-		const interval = setInterval(() => {
-			setUploadProgress((prev) => {
-				if (prev >= 100) {
-					clearInterval(interval);
-					setUploading(false);
-					setUploadModalOpen(false);
-					// Reset after successful upload
-					setTimeout(() => {
-						setSelectedFile(null);
-						setUploadProgress(0);
-					}, 500);
-					return 100;
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+			// Create FormData
+			const formData = new FormData();
+			formData.append("file", selectedFile);
+			formData.append("documentTypeId", selectedDocumentType);
+			formData.append("requestId", selectedRequestId);
+
+			// Simulate upload progress
+			const interval = setInterval(() => {
+				setUploadProgress((prev) => {
+					if (prev >= 90) {
+						clearInterval(interval);
+						return 90;
+					}
+					return prev + 5;
+				});
+			}, 200);
+
+			// Upload the document
+			const response = await axios.post(
+				`${API_BASE_URL}/clearance/upload-document`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "multipart/form-data",
+					},
+					onUploadProgress: (progressEvent) => {
+						const percentCompleted = Math.round(
+							(progressEvent.loaded * 100) / progressEvent.total
+						);
+						setUploadProgress(percentCompleted);
+					},
 				}
-				return prev + 5;
-			});
-		}, 200);
+			);
+
+			if (response.data.status === "success") {
+				setUploadProgress(100);
+
+				// Refresh documents list
+				if (userClearanceRequests.length > 0) {
+					const latestRequest = userClearanceRequests[0];
+					const documentsResponse = await axios.get(
+						`${API_BASE_URL}/clearance/documents/${latestRequest.id}`,
+						{
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					);
+
+					if (documentsResponse.data.status === "success") {
+						setPendingDocuments(documentsResponse.data.data || []);
+					}
+				}
+
+				// Close modal after successful upload
+				setTimeout(() => {
+					setUploadModalOpen(false);
+					setSelectedFile(null);
+					setUploadProgress(0);
+					setSelectedDocumentType("");
+					setSelectedRequestId("");
+				}, 1000);
+			}
+		} catch (error) {
+			console.error("Error uploading document:", error);
+			setUploadProgress(0);
+		} finally {
+			setUploading(false);
+		}
 	};
 
 	const handleLogout = () => {
 		localStorage.removeItem("user");
+		localStorage.removeItem("authToken");
 		router.push("/login");
 	};
 
 	const handleNewRequest = () => {
 		setShowNewRequestForm(true);
 	};
+
+	if (loading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+				<Loader2 className="h-10 w-10 animate-spin text-blue-600 dark:text-blue-400" />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+				<div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+					<p className="text-red-500 text-center">{error}</p>
+					<p className="text-gray-500 dark:text-gray-400 text-center mt-2">
+						Redirecting to login...
+					</p>
+				</div>
+			</div>
+		);
+	}
 
 	if (!user) {
 		return (
@@ -401,16 +514,18 @@ export default function RequesterDashboard() {
 						<Avatar className="h-10 w-10">
 							<AvatarImage
 								src="/placeholder.svg?height=100&width=100&text=User"
-								alt={user.name}
+								alt={user?.firstName}
 							/>
-							<AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
+							<AvatarFallback>
+								{user?.firstName.charAt(0) || "User"}
+							</AvatarFallback>
 						</Avatar>
 						<div className="flex-1 min-w-0">
 							<p className="font-medium truncate text-gray-900 dark:text-gray-100">
-								{user.name || "John Doe"}
+								{user?.firstName || "User"}
 							</p>
 							<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-								{user.id || "1"} • {user.role || "Student"}
+								{user?.username || "1"} • {user.role || ""}
 							</p>
 						</div>
 					</div>
@@ -504,7 +619,7 @@ export default function RequesterDashboard() {
 					{/* Dashboard Header */}
 					<div className="mb-6">
 						<h1 className="text-2xl font-bold">
-							Welcome back, {user.name?.split(" ")[0] || "John"}
+							Welcome back, {user?.firstName.split(" ")[0] || "USer"}
 						</h1>
 						<p className="text-gray-600 dark:text-gray-400">
 							Here's an overview of your clearance status
@@ -555,85 +670,113 @@ export default function RequesterDashboard() {
 					{/* Main Dashboard Content */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						{/* Left Column - Progress Overview */}
+
 						<Card className="p-6 bg-white dark:bg-gray-800 shadow-sm">
 							<div className="flex items-center justify-between mb-4">
 								<h2 className="text-lg font-semibold">Clearance Progress</h2>
-								<Badge className="bg-red-500 text-white px-3 py-1 rounded-full">
-									{overallProgress}% Complete
-								</Badge>
+								{userClearanceRequests.length > 0 && (
+									<Badge className="bg-red-500 text-white px-3 py-1 rounded-full">
+										{overallProgress}% Complete
+									</Badge>
+								)}
 							</div>
 
 							<div className="space-y-4">
-								<div>
-									<div className="flex justify-between text-sm mb-1">
-										<span className="text-gray-600 dark:text-gray-400">
-											Overall Progress
-										</span>
-										<span className="font-medium">{overallProgress}%</span>
-									</div>
-									<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-										<div
-											className="bg-blue-600 h-2 rounded-full"
-											style={{ width: `${overallProgress}%` }}
-										></div>
-									</div>
-								</div>
-
-								<div className="space-y-4 mt-4">
-									{clearanceStages.map((stage) => (
-										<div key={stage.id} className="flex items-center gap-3">
-											<div
-												className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-													stage.status === "completed"
-														? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-														: stage.status === "in-progress"
-														? "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-														: "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-												}`}
-											>
-												<stage.icon className="h-5 w-5" />
+								{userClearanceRequests.length > 0 ? (
+									<>
+										<div>
+											<div className="flex justify-between text-sm mb-1">
+												<span className="text-gray-600 dark:text-gray-400">
+													Overall Progress
+												</span>
+												<span className="font-medium">{overallProgress}%</span>
 											</div>
-											<div className="flex-1 min-w-0">
-												<div className="flex justify-between">
-													<p className="font-medium">{stage.name}</p>
-													<Badge
-														variant={
-															stage.status === "completed"
-																? "success"
-																: stage.status === "in-progress"
-																? "outline"
-																: "secondary"
-														}
-														className={
-															stage.status === "completed"
-																? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-																: stage.status === "in-progress"
-																? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
-																: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
-														}
-													>
-														{stage.status === "completed"
-															? "Approved"
-															: stage.status === "in-progress"
-															? "In Progress"
-															: "Pending"}
-													</Badge>
-												</div>
-												<p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-													{stage.description}
-												</p>
+											<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+												<div
+													className="bg-blue-600 h-2 rounded-full"
+													style={{ width: `${overallProgress}%` }}
+												></div>
 											</div>
 										</div>
-									))}
-								</div>
 
-								<Link
-									href="/dashboard/check-status"
-									className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center mt-2"
-								>
-									<span>View Detailed Progress</span>
-									<ChevronRight className="h-4 w-4 ml-1" />
-								</Link>
+										<div className="space-y-4 mt-4">
+											{clearanceStages.map((stage) => (
+												<div key={stage.id} className="flex items-center gap-3">
+													<div
+														className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+															stage.status === "APPROVED"
+																? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+																: stage.status === "PENDING"
+																? "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+																: "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+														}`}
+													>
+														{stage.status === "APPROVED" ? (
+															<Check className="h-5 w-5" />
+														) : stage.status === "PENDING" ? (
+															<Clock className="h-5 w-5" />
+														) : (
+															<FileText className="h-5 w-5" />
+														)}
+													</div>
+													<div className="flex-1 min-w-0">
+														<div className="flex justify-between">
+															<p className="font-medium">{stage.officeName}</p>
+															<Badge
+																variant={
+																	stage.status === "APPROVED"
+																		? "success"
+																		: stage.status === "PENDING"
+																		? "outline"
+																		: "secondary"
+																}
+																className={
+																	stage.status === "APPROVED"
+																		? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+																		: stage.status === "PENDING"
+																		? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+																		: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
+																}
+															>
+																{stage.status === "APPROVED"
+																	? "Approved"
+																	: stage.status === "PENDING"
+																	? "In Progress"
+																	: "Waiting"}
+															</Badge>
+														</div>
+														<p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+															{stage.description ||
+																`${stage.officeName} clearance`}
+														</p>
+													</div>
+												</div>
+											))}
+										</div>
+
+										<Link
+											href="/dashboard/check-status"
+											className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center mt-2"
+										>
+											<span>View Detailed Progress</span>
+											<ChevronRight className="h-4 w-4 ml-1" />
+										</Link>
+									</>
+								) : (
+									<div className="text-center py-8">
+										<FileText className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+										<h3 className="text-lg font-medium mb-2">
+											No active clearance requests
+										</h3>
+										<p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
+											You haven't submitted any clearance requests yet. Start a
+											new request to begin the clearance process.
+										</p>
+										<Button onClick={handleNewRequest}>
+											Start New Request
+										</Button>
+									</div>
+								)}
 							</div>
 						</Card>
 
@@ -695,91 +838,112 @@ export default function RequesterDashboard() {
 							</div>
 
 							<TabsContent value="documents" className="space-y-4">
-								{pendingDocuments.map((doc) => (
-									<div
-										key={doc.id}
-										className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
-									>
-										<div className="flex items-center gap-3">
-											<div
-												className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-													doc.status === "submitted"
-														? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-														: "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-												}`}
-											>
-												<FileText className="h-5 w-5" />
+								{pendingDocuments.length > 0 ? (
+									pendingDocuments.map((doc) => (
+										<div
+											key={doc.id}
+											className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+										>
+											<div className="flex items-center gap-3">
+												<div
+													className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+														doc.status === "submitted"
+															? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+															: "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+													}`}
+												>
+													<FileText className="h-5 w-5" />
+												</div>
+												<div>
+													<p className="font-medium">{doc.name}</p>
+													<p className="text-sm text-gray-600 dark:text-gray-400">
+														{doc.description} •{" "}
+														{doc.status.charAt(0).toUpperCase() +
+															doc.status.slice(1)}
+													</p>
+												</div>
 											</div>
-											<div>
-												<p className="font-medium">{doc.name}</p>
-												<p className="text-sm text-gray-600 dark:text-gray-400">
-													{doc.department} •{" "}
-													{doc.status.charAt(0).toUpperCase() +
-														doc.status.slice(1)}
-												</p>
-											</div>
-										</div>
 
-										{doc.status === "pending" ? (
-											<Button
-												size="sm"
-												className="gap-1"
-												onClick={() => setUploadModalOpen(true)}
-											>
-												<Upload className="h-3 w-3" />
-												Upload
-											</Button>
-										) : (
-											<Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-												Submitted
-											</Badge>
-										)}
+											{doc.status === "pending" ? (
+												<Button
+													size="sm"
+													className="gap-1"
+													onClick={() => setUploadModalOpen(true)}
+												>
+													<Upload className="h-3 w-3" />
+													Upload
+												</Button>
+											) : (
+												<Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+													Submitted
+												</Badge>
+											)}
+										</div>
+									))
+								) : (
+									<div className="text-center py-6">
+										<p className="text-gray-500 dark:text-gray-400">
+											No pending documents found. Start a new clearance request
+											to see required documents.
+										</p>
 									</div>
-								))}
+								)}
 							</TabsContent>
 
 							<TabsContent value="notifications" className="space-y-4">
-								{notifications.map((notification) => (
-									<div
-										key={notification.id}
-										className={`p-4 rounded-lg ${
-											notification.read
-												? "bg-gray-50 dark:bg-gray-800"
-												: "bg-blue-50 dark:bg-blue-900/10"
-										} border border-gray-200 dark:border-gray-700`}
-									>
-										<div className="flex gap-3">
-											<div
-												className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-													notification.type === "success"
-														? "bg-green-100 dark:bg-green-900/20"
-														: notification.type === "warning"
-														? "bg-yellow-100 dark:bg-yellow-900/20"
-														: "bg-blue-100 dark:bg-blue-900/20"
-												}`}
-											>
-												{notification.type === "success" && (
-													<Check className="h-5 w-5 text-green-600 dark:text-green-400" />
-												)}
-												{notification.type === "warning" && (
-													<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-												)}
-												{notification.type === "pending" && (
-													<Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-												)}
-											</div>
-											<div>
-												<h4 className="font-medium">{notification.title}</h4>
-												<p className="text-sm text-gray-600 dark:text-gray-400">
-													{notification.message}
-												</p>
-												<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-													{notification.time}
-												</p>
+								{notifications.length > 0 ? (
+									notifications.map((notification) => (
+										<div
+											key={notification.id}
+											className={`p-4 rounded-lg ${
+												notification.read
+													? "bg-gray-50 dark:bg-gray-800"
+													: "bg-blue-50 dark:bg-blue-900/10"
+											} border border-gray-200 dark:border-gray-700`}
+										>
+											<div className="flex gap-3">
+												<div
+													className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+														notification.type === "success"
+															? "bg-green-100 dark:bg-green-900/20"
+															: notification.type === "warning"
+															? "bg-yellow-100 dark:bg-yellow-900/20"
+															: "bg-blue-100 dark:bg-blue-900/20"
+													}`}
+												>
+													{notification.type === "success" && (
+														<Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+													)}
+													{notification.type === "warning" && (
+														<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+													)}
+													{notification.type === "pending" && (
+														<Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+													)}
+													{notification.type === "info" && (
+														<Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+													)}
+												</div>
+												<div>
+													<h4 className="font-medium">{notification.title}</h4>
+													<p className="text-sm text-gray-600 dark:text-gray-400">
+														{notification.message}
+													</p>
+													<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+														{notification.time}
+													</p>
+												</div>
 											</div>
 										</div>
+									))
+								) : (
+									<div className="text-center py-6">
+										<p className="text-gray-500 dark:text-gray-400">
+											No notifications yet. We'll notify you about important
+											updates here.
+										</p>
 									</div>
-								))}
+								)}
 							</TabsContent>
 
 							<TabsContent value="schedule" className="space-y-4">
@@ -834,12 +998,14 @@ export default function RequesterDashboard() {
 					<Card className="mt-6 p-6 bg-white dark:bg-gray-800 shadow-sm">
 						<div className="flex items-center justify-between mb-4">
 							<h2 className="text-lg font-semibold">My Clearance Requests</h2>
-							<Link href="/dashboard/requests">
-								<Button variant="outline" size="sm" className="gap-1">
-									<span>View All</span>
-									<ChevronRight className="h-4 w-4" />
-								</Button>
-							</Link>
+							{userClearanceRequests.length > 0 && (
+								<Link href="/dashboard/requests">
+									<Button variant="outline" size="sm" className="gap-1">
+										<span>View All</span>
+										<ChevronRight className="h-4 w-4" />
+									</Button>
+								</Link>
+							)}
 						</div>
 
 						<div className="space-y-4">
@@ -875,26 +1041,34 @@ export default function RequesterDashboard() {
 						<div className="space-y-4">
 							<div className="grid gap-2">
 								<label className="text-sm font-medium">Document Type</label>
-								<select className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2">
+								<select
+									className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2"
+									value={selectedDocumentType}
+									onChange={(e) => setSelectedDocumentType(e.target.value)}
+								>
 									<option value="">Select document type</option>
-									<option value="id-card">ID Card Copy</option>
-									<option value="library-clearance">Library Clearance</option>
-									<option value="hostel-clearance">Hostel Clearance</option>
-									<option value="finance-receipt">Finance Receipt</option>
+									{documentTypes.map((docType) => (
+										<option key={docType.id} value={docType.id}>
+											{docType.name}
+										</option>
+									))}
 								</select>
 							</div>
 
 							<div className="grid gap-2">
-								<label className="text-sm font-medium">
-									Document For Department
-								</label>
-								<select className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2">
-									<option value="">Select department</option>
-									<option value="admin">Administration</option>
-									<option value="library">Library</option>
-									<option value="hostel">Hostel</option>
-									<option value="finance">Finance</option>
-									<option value="academic">Academic Department</option>
+								<label className="text-sm font-medium">Select Request</label>
+								<select
+									className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2"
+									value={selectedRequestId}
+									onChange={(e) => setSelectedRequestId(e.target.value)}
+								>
+									<option value="">Select request</option>
+									{userClearanceRequests.map((req) => (
+										<option key={req.id} value={req.id}>
+											{req.formType.replace(/_/g, " ")} -{" "}
+											{new Date(req.submittedAt).toLocaleDateString()}
+										</option>
+									))}
 								</select>
 							</div>
 
@@ -903,6 +1077,8 @@ export default function RequesterDashboard() {
 								<textarea
 									className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 min-h-[80px]"
 									placeholder="Add a brief description of this document..."
+									value={documentDescription}
+									onChange={(e) => setDocumentDescription(e.target.value)}
 								/>
 							</div>
 
@@ -948,7 +1124,12 @@ export default function RequesterDashboard() {
 								</Button>
 								<Button
 									onClick={handleUploadSubmit}
-									disabled={!selectedFile || uploading}
+									disabled={
+										!selectedFile ||
+										!selectedDocumentType ||
+										!selectedRequestId ||
+										uploading
+									}
 								>
 									{uploading ? (
 										<Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -980,34 +1161,69 @@ export default function RequesterDashboard() {
 							<ClearanceRequestForm
 								user={user}
 								onSubmit={(data) => {
-									// Handle form submission
-									console.log("Form submitted:", data);
+									// Add the new request to the list
+									setUserClearanceRequests((prev) => [data, ...prev]);
+
+									// Close the form
 									setShowNewRequestForm(false);
 
-									// Add the new request to the list
-									const newRequest = {
-										id: `req-${Date.now()}`,
-										userId: user.id,
-										type:
-											data.requestType === "termination"
-												? `Student Termination (${
-														userData?.programType || "Regular"
-												  })`
-												: data.requestType === "id_replacement"
-												? `ID Card Replacement (${
-														(userData?.academicCategory || "",
-														userData?.programType || "Regular")
-												  })`
-												: `Faculty Clearance (${data.requestType})`,
-										status: "Pending",
-										submittedAt: new Date().toISOString(),
-										currentApprover: data.workflow[0],
-										workflow: data.workflow,
-										currentStep: 0,
-										documents: data.documents,
+									// Refresh the workflow and documents data for the new request
+									const fetchRequestDetails = async () => {
+										try {
+											const token = localStorage.getItem("authToken");
+											const API_BASE_URL =
+												process.env.NEXT_PUBLIC_API_URL ||
+												"http://localhost:5000/api";
+
+											// Fetch workflow stages for this request
+											const workflowResponse = await axios.get(
+												`${API_BASE_URL}/clearance/workflow/${data.id}`,
+												{
+													headers: {
+														Authorization: `Bearer ${token}`,
+													},
+												}
+											);
+
+											if (workflowResponse.data.status === "success") {
+												const workflow = workflowResponse.data.data;
+												setClearanceStages(workflow.steps);
+												setOverallProgress(workflow.progress);
+											}
+
+											// Fetch pending documents for this request
+											const documentsResponse = await axios.get(
+												`${API_BASE_URL}/clearance/documents/${data.id}`,
+												{
+													headers: {
+														Authorization: `Bearer ${token}`,
+													},
+												}
+											);
+
+											if (documentsResponse.data.status === "success") {
+												setPendingDocuments(documentsResponse.data.data || []);
+											}
+
+											// Refresh notifications
+											const notificationsResponse = await axios.get(
+												`${API_BASE_URL}/users/notifications`,
+												{
+													headers: {
+														Authorization: `Bearer ${token}`,
+													},
+												}
+											);
+
+											if (notificationsResponse.data.status === "success") {
+												setNotifications(notificationsResponse.data.data || []);
+											}
+										} catch (error) {
+											console.error("Error fetching request details:", error);
+										}
 									};
 
-									setUserClearanceRequests((prev) => [newRequest, ...prev]);
+									fetchRequestDetails();
 								}}
 								onCancel={() => setShowNewRequestForm(false)}
 							/>

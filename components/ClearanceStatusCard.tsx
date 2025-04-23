@@ -1,195 +1,308 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { WorkflowProgress } from "@/components/dashboard/WorkflowProgress"
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, ChevronRight } from "lucide-react"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+	Clock,
+	CheckCircle,
+	XCircle,
+	ChevronRight,
+	AlertCircle,
+	FileText,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface ClearanceStatusCardProps {
-  request: {
-    id: string | number
-    type: string
-    status: string
-    submittedAt: string
-    currentApprover: string
-    workflow: string[]
-    currentStep: number
-    rejectedStep?: number
-    rejectionReason?: string
-  }
+	request: any;
 }
 
 export function ClearanceStatusCard({ request }: ClearanceStatusCardProps) {
-  const [showDetails, setShowDetails] = useState(false)
+	const [expanded, setExpanded] = useState(false);
 
-  const getStatusBadge = () => {
-    switch (request.status) {
-      case "Approved":
-        return <Badge variant="success">Approved</Badge>
-      case "Rejected":
-        return <Badge variant="destructive">Rejected</Badge>
-      case "Pending":
-        return <Badge variant="outline">Pending</Badge>
-      default:
-        return <Badge variant="secondary">{request.status}</Badge>
-    }
-  }
+	// Format date to readable format
+	const formatDate = (dateString) => {
+		const date = new Date(dateString);
+		return new Intl.DateTimeFormat("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		}).format(date);
+	};
 
-  const getStatusIcon = () => {
-    switch (request.status) {
-      case "Approved":
-        return (
-          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-          </div>
-        )
-      case "Rejected":
-        return (
-          <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-          </div>
-        )
-      case "Pending":
-        return (
-          <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-            <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          </div>
-        )
-      default:
-        return (
-          <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          </div>
-        )
-    }
-  }
+	// Get status badge color
+	const getStatusColor = (status) => {
+		switch (status) {
+			case "APPROVED":
+				return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
+			case "REJECTED":
+				return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+			case "COMPLETED":
+				return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400";
+			default:
+				return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+		}
+	};
 
-  return (
-    <>
-      <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-        <Card className="p-4 cursor-pointer" onClick={() => setShowDetails(true)}>
-          <div className="flex items-start gap-4">
-            {getStatusIcon()}
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{request.type}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Submitted on {new Date(request.submittedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                {getStatusBadge()}
-              </div>
+	// Get status icon
+	const StatusIcon = ({ status }) => {
+		switch (status) {
+			case "APPROVED":
+				return (
+					<CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+				);
+			case "REJECTED":
+				return <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />;
+			case "COMPLETED":
+				return (
+					<CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+				);
+			default:
+				return <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />;
+		}
+	};
 
-              <div className="mt-2">
-                {request.status === "Pending" ? (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Awaiting approval from: <span className="font-medium">{request.currentApprover}</span>
-                  </p>
-                ) : request.status === "Rejected" ? (
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    Rejected by: <span className="font-medium">{request.workflow[request.rejectedStep || 0]}</span>
-                  </p>
-                ) : null}
-              </div>
+	// Get formatted request type
+	const getRequestTypeDisplay = (formType) => {
+		switch (formType) {
+			case "ID_REPLACEMENT":
+				return "ID Card Replacement";
+			case "TERMINATION":
+				return "Termination/Clearance";
+			case "TEACHER_CLEARANCE":
+				return "Faculty Clearance";
+			default:
+				return formType;
+		}
+	};
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mt-2 gap-1 text-primary"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowDetails(true)
-                }}
-              >
-                View Details <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </motion.div>
+	// Calculate progress percentage
+	const calculateProgress = () => {
+		if (!request.approvalActions || request.approvalActions.length === 0)
+			return 0;
 
-      <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Clearance Request Details</DialogTitle>
-          </DialogHeader>
+		const completedSteps = request.approvalActions.filter(
+			(action) => action.status === "APPROVED" || action.status === "REJECTED"
+		).length;
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">{request.type}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Submitted on {new Date(request.submittedAt).toLocaleDateString()}
-                </p>
-              </div>
-              {getStatusBadge()}
-            </div>
+		const totalSteps = request.approvalActions.length;
+		return Math.round((completedSteps / totalSteps) * 100);
+	};
 
-            {request.status === "Rejected" && request.rejectionReason && (
-              <div className="p-4 border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-900/20 rounded-lg">
-                <div className="flex gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-red-800 dark:text-red-300">Request Rejected</h4>
-                    <p className="text-sm text-red-700 dark:text-red-200 mt-1">{request.rejectionReason}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+	return (
+		<div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+			<div className="p-4">
+				<div className="flex justify-between items-start">
+					<div className="flex items-center gap-3">
+						<div className="flex-shrink-0">
+							<StatusIcon status={request.status} />
+						</div>
+						<div>
+							<h3 className="font-medium">
+								{getRequestTypeDisplay(request.formType)}
+							</h3>
+							<p className="text-sm text-gray-600 dark:text-gray-400">
+								Submitted on {formatDate(request.submittedAt)}
+							</p>
+						</div>
+					</div>
+					<Badge className={getStatusColor(request.status)}>
+						{request.status === "PENDING"
+							? "In Progress"
+							: request.status.charAt(0) +
+							  request.status.slice(1).toLowerCase()}
+					</Badge>
+				</div>
 
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Approval Workflow</h3>
-              <WorkflowProgress
-                steps={request.workflow}
-                currentStep={request.currentStep}
-                rejectedStep={request.rejectedStep}
-              />
-            </div>
+				<div className="mt-4">
+					<div className="flex justify-between text-sm mb-1">
+						<span className="text-gray-600 dark:text-gray-400">Progress</span>
+						<span className="font-medium">{calculateProgress()}%</span>
+					</div>
+					<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+						<div
+							className="bg-blue-600 h-2 rounded-full"
+							style={{ width: `${calculateProgress()}%` }}
+						></div>
+					</div>
+				</div>
 
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Current Status</h3>
-              <Card className="p-4 bg-gray-50 dark:bg-gray-800/50">
-                {request.status === "Pending" ? (
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <p>
-                      Your request is currently awaiting approval from{" "}
-                      <span className="font-medium">{request.currentApprover}</span>.
-                    </p>
-                  </div>
-                ) : request.status === "Approved" ? (
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    <p>Your request has been fully approved. You can now download your clearance certificate.</p>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                    <p>
-                      Your request was rejected by{" "}
-                      <span className="font-medium">{request.workflow[request.rejectedStep || 0]}</span>. Please review
-                      the rejection reason and resubmit if necessary.
-                    </p>
-                  </div>
-                )}
-              </Card>
-            </div>
+				{/* Current step information */}
+				<div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+					<p className="text-sm font-medium">
+						Current Step: {request.currentStep}
+					</p>
+					{request.approvalActions &&
+						request.approvalActions[request.currentStep - 1] && (
+							<p className="text-sm text-gray-600 dark:text-gray-400">
+								Awaiting approval from:{" "}
+								{request.approvalActions[request.currentStep - 1].approver
+									?.office?.officeName || "Unknown Office"}
+							</p>
+						)}
+				</div>
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowDetails(false)}>
-                Close
-              </Button>
-              {request.status === "Rejected" && <Button>Resubmit Request</Button>}
-              {request.status === "Approved" && <Button>Download Certificate</Button>}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
+				{/* Expand/collapse button */}
+				<Button
+					variant="ghost"
+					size="sm"
+					className="w-full mt-3 flex items-center justify-center"
+					onClick={() => setExpanded(!expanded)}
+				>
+					<span>{expanded ? "Show Less" : "Show Details"}</span>
+					<ChevronRight
+						className={`h-4 w-4 ml-1 transition-transform ${
+							expanded ? "rotate-90" : ""
+						}`}
+					/>
+				</Button>
+			</div>
+
+			{/* Expanded details */}
+			{expanded && (
+				<motion.div
+					initial={{ height: 0, opacity: 0 }}
+					animate={{ height: "auto", opacity: 1 }}
+					exit={{ height: 0, opacity: 0 }}
+					className="border-t border-gray-200 dark:border-gray-700 p-4"
+				>
+					{/* Approval Timeline */}
+					<div className="space-y-4">
+						<h4 className="font-medium text-sm">Approval Timeline</h4>
+
+						{request.approvalActions && request.approvalActions.length > 0 ? (
+							<div className="space-y-3">
+								{request.approvalActions.map((action, index) => (
+									<div key={index} className="flex items-start gap-3">
+										<div
+											className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+												action.status === "APPROVED"
+													? "bg-green-100 dark:bg-green-900/20"
+													: action.status === "REJECTED"
+													? "bg-red-100 dark:bg-red-900/20"
+													: "bg-gray-100 dark:bg-gray-800"
+											}`}
+										>
+											{action.status === "APPROVED" ? (
+												<CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+											) : action.status === "REJECTED" ? (
+												<XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+											) : (
+												<Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+											)}
+										</div>
+
+										<div className="flex-1">
+											<div className="flex justify-between">
+												<p className="text-sm font-medium">
+													{action.approver?.office?.officeName ||
+														"Unknown Office"}
+												</p>
+												<Badge
+													variant="outline"
+													className={
+														action.status === "APPROVED"
+															? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+															: action.status === "REJECTED"
+															? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+															: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
+													}
+												>
+													{action.status === "PENDING"
+														? "Pending"
+														: action.status.charAt(0) +
+														  action.status.slice(1).toLowerCase()}
+												</Badge>
+											</div>
+
+											<p className="text-xs text-gray-500 dark:text-gray-400">
+												{action.status !== "PENDING"
+													? `Processed on ${formatDate(action.actionDate)}`
+													: "Awaiting approval"}
+											</p>
+
+											{action.comment && (
+												<div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+													<p className="text-gray-700 dark:text-gray-300">
+														{action.comment}
+													</p>
+												</div>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<p className="text-sm text-gray-500 dark:text-gray-400">
+								No approval actions yet.
+							</p>
+						)}
+					</div>
+
+					{/* Documents */}
+					{request.documents && request.documents.length > 0 && (
+						<div className="mt-6 space-y-3">
+							<h4 className="font-medium text-sm">Submitted Documents</h4>
+							<div className="space-y-2">
+								{request.documents.map((doc, index) => (
+									<div
+										key={index}
+										className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700"
+									>
+										<div className="flex items-center gap-2">
+											<FileText className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+											<span className="text-sm">
+												{doc.documentType?.name || "Document"}
+											</span>
+										</div>
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() =>
+												window.open(`/api/documents/${doc.id}`, "_blank")
+											}
+										>
+											View
+										</Button>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+
+					{/* Rejection Information */}
+					{request.status === "REJECTED" && request.approvalActions && (
+						<div className="mt-6 p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg">
+							<div className="flex items-start gap-2">
+								<AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+								<div>
+									<h4 className="font-medium text-red-800 dark:text-red-400">
+										Request Rejected
+									</h4>
+									<p className="text-sm text-red-700 dark:text-red-300 mt-1">
+										{request.approvalActions.find(
+											(a) => a.status === "REJECTED"
+										)?.comment ||
+											"Your request was rejected. Please review the details and consider submitting a new request."}
+									</p>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{/* View Full Details Link */}
+					<div className="mt-6 text-center">
+						<Link href={`/dashboard/requests/${request.id}`}>
+							<Button variant="outline" size="sm">
+								View Full Details
+							</Button>
+						</Link>
+					</div>
+				</motion.div>
+			)}
+		</div>
+	);
 }

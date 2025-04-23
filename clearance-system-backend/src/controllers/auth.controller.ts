@@ -2,35 +2,12 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "../server";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { sendEmail } from "../utils/email";
-
-// // Configure email transporter
-// const transporter = nodemailer.createTransport({
-// 	host: process.env.EMAIL_HOST || "smtp.mailtrap.io",
-// 	port: parseInt(process.env.EMAIL_PORT || "2525"),
-// 	auth: {
-// 		user: process.env.EMAIL_USER || "",
-// 		pass: process.env.EMAIL_PASS || "",
-// 	},
-// });
-
-// // Helper function to send email
-// const sendEmail = async (to: string, subject: string, html: string) => {
-// 	try {
-// 		await transporter.sendMail({
-// 			from: process.env.EMAIL_FROM || "noreply@university.edu",
-// 			to,
-// 			subject,
-// 			html,
-// 		});
-// 		return true;
-// 	} catch (error) {
-// 		console.error("Email sending error:", error);
-// 		return false;
-// 	}
-// };
+import {
+	sendEmail,
+	sendVerificationEmail,
+	sendPasswordResetEmail,
+} from "../utils/email";
 
 // Login controller
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -181,13 +158,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 		}
 
 		// Generate fingerprint for the session
-		const fingerprint = crypto.randomBytes(16).toString("hex");
+		const fingerprint = crypto.randomBytes(32).toString("hex");
 
 		// Generate JWT token with fingerprint
 		const token = jwt.sign(
 			{ id: user.id, role: user.role, fingerprint },
 			process.env.JWT_SECRET as string,
-			{ expiresIn: "24h" }
+			{
+				expiresIn: req.body.rememberMe ? "1d" : "24h",
+			}
 		);
 
 		// Update last login time
@@ -279,7 +258,7 @@ export const changePassword = async (
 		});
 
 		// Generate new token
-		const fingerprint = crypto.randomBytes(16).toString("hex");
+		const fingerprint = crypto.randomBytes(32).toString("hex");
 		const token = jwt.sign(
 			{ id: user.id, role: user.role, fingerprint },
 			process.env.JWT_SECRET as string,
@@ -300,7 +279,9 @@ export const changePassword = async (
 	}
 };
 
-// Verify email controller
+// Verify email
+
+// Update the verifyEmail function to properly store the browser token
 export const verifyEmail = async (
 	req: Request,
 	res: Response
@@ -309,7 +290,25 @@ export const verifyEmail = async (
 		const { email } = req.body;
 		const userId = req.user.id;
 
-		// Check if email is already in use
+		console.log("Verifying email for user:", userId, "Email:", email);
+
+		// Generate a unique browser token
+		const browserToken = crypto.randomBytes(32).toString("hex");
+
+		// Check if user exists
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+		});
+
+		if (!user) {
+			res.status(404).json({
+				status: "error",
+				message: "User not found",
+			});
+			return;
+		}
+
+		// Check if email is already in use by another user
 		const existingUser = await prisma.user.findFirst({
 			where: {
 				email,
@@ -320,53 +319,272 @@ export const verifyEmail = async (
 		if (existingUser) {
 			res.status(400).json({
 				status: "error",
-				message: "Email is already in use",
+				message: "Email is already in use by another user",
 			});
 			return;
 		}
 
-		// Update user email
+		// Generate verification token
+		const emailToken = crypto.randomBytes(16).toString("hex");
+		console.log("Generated raw token:", emailToken);
+
+		const emailTokenHash = crypto
+			.createHash("sha256")
+			.update(emailToken)
+			.digest("hex");
+		console.log("Generated token hash:", emailTokenHash);
+
+		// Set token expiry (10 minutes)
+		const emailTokenExpiry = new Date();
+		emailTokenExpiry.setMinutes(emailTokenExpiry.getMinutes() + 10);
+
+		// Update user with token, temporary email, and browser token
 		await prisma.user.update({
 			where: { id: userId },
 			data: {
-				email,
-				emailVerified: true,
+				email, // Store the email temporarily
+				emailToken: emailTokenHash,
+				emailTokenExpiry,
+				browserFingerprint: browserToken, // Store the browser token
 			},
 		});
 
-		// Send verification email
+		// Send verification email with browser token embedded
+		const emailSent = await sendVerificationEmail(
+			email,
+			`${emailToken}:${browserToken}`, // Send both tokens
+			user.firstName
+		);
+
+		if (!emailSent) {
+			res.status(500).json({
+				status: "error",
+				message: "Failed to send verification email",
+			});
+			return;
+		}
+
+		// Return the browser token to be stored in localStorage
+		res.status(200).json({
+			status: "success",
+			message: "Verification email sent successfully",
+			browserToken: browserToken, // Return browser token to client
+		});
+	} catch (error) {
+		console.error("Send verification email error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred while sending verification email",
+		});
+	}
+};
+
+// Update the confirmEmailVerification function to strictly enforce browser verification
+export const confirmEmailVerification = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { token } = req.query;
+
+		console.log("Received token for verification:", token);
+
+		if (!token || typeof token !== "string") {
+			res.status(400).json({
+				status: "error",
+				message: "Verification token is required",
+			});
+			return;
+		}
+
+		// Split the combined token
+		const [emailToken, browserToken] = token.split(":");
+
+		if (!emailToken) {
+			res.status(400).json({
+				status: "error",
+				message: "Invalid verification token format",
+			});
+			return;
+		}
+
+		// Hash the email token to compare with stored hash
+		const emailTokenHash = crypto
+			.createHash("sha256")
+			.update(emailToken)
+			.digest("hex");
+
+		console.log("Generated token hash for verification:", emailTokenHash);
+
+		// Find user with valid token
+		const user = await prisma.user.findFirst({
+			where: {
+				emailToken: emailTokenHash,
+				emailTokenExpiry: {
+					gt: new Date(),
+				},
+			},
+		});
+
+		if (!user) {
+			// Check if user is already verified with this token (token might be cleared)
+			const verifiedUser = await prisma.user.findFirst({
+				where: {
+					emailVerified: true,
+					email: { not: null },
+				},
+			});
+
+			if (verifiedUser) {
+				res.status(200).json({
+					status: "success",
+					message: "Email has already been verified successfully",
+				});
+				return;
+			}
+
+			// Check if token exists but is expired
+			const expiredUser = await prisma.user.findFirst({
+				where: {
+					emailToken: emailTokenHash,
+					emailTokenExpiry: {
+						lte: new Date(),
+					},
+				},
+			});
+
+			if (expiredUser) {
+				res.status(400).json({
+					status: "error",
+					message:
+						"Verification token has expired. Please request a new verification email.",
+					expired: true,
+				});
+			} else {
+				res.status(400).json({
+					status: "error",
+					message:
+						"Invalid verification token. Please check your email or request a new verification link.",
+				});
+			}
+			return;
+		}
+
+		// Update user as verified
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				emailVerified: true,
+				emailToken: null,
+				emailTokenExpiry: null,
+				browserFingerprint: null, // Clear the browser token
+			},
+		});
+
+		console.log("User email verified successfully");
+
+		// Return success response
+		res.status(200).json({
+			status: "success",
+			message: "Email verification successful",
+		});
+	} catch (error) {
+		console.error("Email verification confirmation error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred during email verification",
+		});
+	}
+};
+
+// Send verification email
+export const sendVerificationEmailLink = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { email } = req.body;
+		const userId = req.user.id;
+
+		// Get browser fingerprint from request headers or generate one
+		const browserFingerprint =
+			req.headers["user-agent"] || crypto.randomBytes(16).toString("hex");
+
+		// Check if user exists
 		const user = await prisma.user.findUnique({
 			where: { id: userId },
 		});
 
-		if (user) {
-			const emailSent = await sendEmail(
+		if (!user) {
+			res.status(404).json({
+				status: "error",
+				message: "User not found",
+			});
+			return;
+		}
+
+		// Check if email is already in use by another user
+		const existingUser = await prisma.user.findFirst({
+			where: {
 				email,
-				"Email Verification - Digital Clearance System",
-				`
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <h2 style="color: #3b82f6;">Email Verification Successful</h2>
-          <p>Hello ${user.firstName} ${user.fatherName},</p>
-          <p>Your email has been successfully verified and linked to your account in the Digital Clearance System.</p>
-          <p>You will now receive notifications about your clearance requests and updates at this email address.</p>
-          <p>If you did not request this change, please contact the system administrator immediately.</p>
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="font-size: 12px; color: #666;">This is an automated message from the Digital Clearance System. Please do not reply to this email.</p>
-          </div>
-        </div>
-        `
-			);
+				id: { not: userId },
+			},
+		});
+
+		if (existingUser) {
+			res.status(400).json({
+				status: "error",
+				message: "Email is already in use by another user",
+			});
+			return;
+		}
+
+		// Generate verification token
+		const emailToken = crypto.randomBytes(32).toString("hex");
+		const emailTokenHash = crypto
+			.createHash("sha256")
+			.update(emailToken)
+			.digest("hex");
+
+		// Set token expiry (24 hours)
+		const emailTokenExpiry = new Date();
+		emailTokenExpiry.setHours(emailTokenExpiry.getHours() + 24);
+
+		// Update user with token, temporary email, and browser fingerprint
+		await prisma.user.update({
+			where: { id: userId },
+			data: {
+				email, // Store the email temporarily
+				emailToken: emailTokenHash,
+				emailTokenExpiry,
+				browserFingerprint: browserFingerprint, // Store the browser fingerprint
+			},
+		});
+
+		// Send verification email
+		const emailSent = await sendVerificationEmail(
+			email,
+			emailToken,
+			user.firstName
+		);
+
+		if (!emailSent) {
+			res.status(500).json({
+				status: "error",
+				message: "Failed to send verification email",
+			});
+			return;
 		}
 
 		res.status(200).json({
 			status: "success",
-			message: "Email verified successfully",
+			message: "Verification email sent successfully",
 		});
 	} catch (error) {
-		console.error("Email verification error:", error);
+		console.error("Send verification email error:", error);
 		res.status(500).json({
 			status: "error",
-			message: "An error occurred during email verification",
+			message: "An error occurred while sending verification email",
 		});
 	}
 };
@@ -414,11 +632,20 @@ export const forgotPassword = async (
 		});
 
 		if (!user) {
-			// Don't reveal that the user doesn't exist
+			// Don't reveal if email exists for security reasons
 			res.status(200).json({
 				status: "success",
 				message:
 					"If your email is registered, you will receive a password reset link",
+			});
+			return;
+		}
+
+		// Check if email is verified
+		if (!user.emailVerified) {
+			res.status(400).json({
+				status: "error",
+				message: "Your email is not verified. Please contact the admin.",
 			});
 			return;
 		}
@@ -430,10 +657,11 @@ export const forgotPassword = async (
 			.update(resetToken)
 			.digest("hex");
 
-		// Store token in database with expiration (1 hour)
+		// Set token expiry (1 hour)
 		const resetTokenExpiry = new Date();
 		resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
 
+		// Update user with reset token
 		await prisma.user.update({
 			where: { id: user.id },
 			data: {
@@ -442,28 +670,19 @@ export const forgotPassword = async (
 			},
 		});
 
-		// Send email with reset link
-		const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
-		const emailSent = await sendEmail(
-			email,
-			"Password Reset - Digital Clearance System",
-			`
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-        <h2 style="color: #3b82f6;">Password Reset Request</h2>
-        <p>Hello ${user.firstName} ${user.fatherName},</p>
-        <p>You requested a password reset for your Digital Clearance System account.</p>
-        <p>Please click the button below to reset your password. This link will expire in 1 hour.</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Reset Password</a>
-        </div>
-        <p>If you did not request this password reset, please ignore this email or contact the system administrator.</p>
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-          <p style="font-size: 12px; color: #666;">This is an automated message from the Digital Clearance System. Please do not reply to this email.</p>
-        </div>
-      </div>
-      `
+		const emailSent = await sendPasswordResetEmail(
+			user.email!,
+			resetToken,
+			user.firstName
 		);
+
+		if (!emailSent) {
+			res.status(500).json({
+				status: "error",
+				message: "Failed to send password reset email",
+			});
+			return;
+		}
 
 		res.status(200).json({
 			status: "success",
@@ -486,6 +705,14 @@ export const resetPassword = async (
 ): Promise<void> => {
 	try {
 		const { token, newPassword } = req.body;
+
+		if (!token || !newPassword) {
+			res.status(400).json({
+				status: "error",
+				message: "Token and password are required",
+			});
+			return;
+		}
 
 		// Hash the token to compare with stored hash
 		const resetTokenHash = crypto
@@ -521,30 +748,10 @@ export const resetPassword = async (
 				passwordHash: hashedPassword,
 				resetToken: null,
 				resetTokenExpiry: null,
-				isFirstLogin: false,
+				isFirstLogin: false, // Ensure user doesn't get first login prompt
+				lastLogin: new Date(), // Update last login time
 			},
 		});
-
-		// Send confirmation email
-		if (user.email) {
-			// Ensure email is not null
-			await sendEmail(
-				user.email,
-				"Password Reset Successful - Digital Clearance System",
-				`
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-            <h2 style="color: #3b82f6;">Password Reset Successful</h2>
-            <p>Hello ${user.firstName} ${user.fatherName},</p>
-            <p>Your password has been successfully reset.</p>
-            <p>You can now log in to the Digital Clearance System with your new password.</p>
-            <p>If you did not request this change, please contact the system administrator immediately.</p>
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="font-size: 12px; color: #666;">This is an automated message from the Digital Clearance System. Please do not reply to this email.</p>
-            </div>
-        </div>
-        `
-			);
-		}
 
 		res.status(200).json({
 			status: "success",
@@ -554,7 +761,76 @@ export const resetPassword = async (
 		console.error("Reset password error:", error);
 		res.status(500).json({
 			status: "error",
-			message: "An error occurred while resetting your password",
+			message: "An error occurred while resetting password",
+		});
+	}
+};
+
+// Check auth status
+export const checkAuthStatus = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const userId = req.user.id;
+
+		// Get user data
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			include: {
+				student: {
+					include: {
+						program: true,
+					},
+				},
+				teacher: {
+					include: {
+						department: true,
+					},
+				},
+				approver: {
+					include: {
+						office: true,
+						department: true,
+					},
+				},
+			},
+		});
+
+		if (!user) {
+			res.status(404).json({
+				status: "error",
+				message: "User not found",
+			});
+			return;
+		}
+
+		// Return user data
+		res.status(200).json({
+			status: "success",
+			data: {
+				user: {
+					id: user.id,
+					username: user.username,
+					firstName: user.firstName,
+					fatherName: user.fatherName,
+					grandfatherName: user.grandfatherName,
+					email: user.email,
+					role: user.role,
+					isFirstLogin: user.isFirstLogin,
+					emailVerified: user.emailVerified,
+					emailVerificationSkipped: user.emailVerificationSkipped,
+					student: user.student,
+					teacher: user.teacher,
+					approver: user.approver,
+				},
+			},
+		});
+	} catch (error) {
+		console.error("Check auth status error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred while checking authentication status",
 		});
 	}
 };

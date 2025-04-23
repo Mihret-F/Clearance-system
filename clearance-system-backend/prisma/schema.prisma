@@ -94,7 +94,7 @@ model User {
   resetTokenExpiry      DateTime?
   
   // Browser fingerprint for security
-  browserFingerprint    String?
+   browserFingerprint    String?
 
   // Relations
   student               Student?
@@ -209,6 +209,8 @@ model ClearanceRequest {
   submittedAt           DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   currentStep           Int               @default(1)
+  rejectedStep        Int?          // Tracks the step where the request was rejected
+  rejectionReason     String?       // Stores the reason for rejection        
 
   // Relations
   user                  User              @relation(fields: [userId], references: [id])
