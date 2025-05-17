@@ -20,9 +20,23 @@ export const getUserProfile = async (
 				email: true,
 				role: true,
 				lastLogin: true,
-				student: true,
-				teacher: true,
-				approver: true,
+				student: {
+					include: {
+						department: true,
+						program: true,
+					},
+				},
+				teacher: {
+					include: {
+						department: true,
+					},
+				},
+				approver: {
+					include: {
+						office: true,
+						department: true,
+					},
+				},
 			},
 		});
 

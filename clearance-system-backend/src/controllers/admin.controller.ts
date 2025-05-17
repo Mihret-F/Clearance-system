@@ -4,7 +4,7 @@ import { prisma } from "../server";
 
 // Get all users
 export const getAllUsers = async (
-	// Removed unused 'req' parameter
+	req: Request,
 	res: Response
 ): Promise<void> => {
 	try {
@@ -114,6 +114,7 @@ export const createUser = async (
 									currentYear: studentData.currentYear,
 									semester: studentData.semester,
 									academicStatus: studentData.academicStatus,
+									departmentId: studentData.departmentId,
 								},
 						  }
 						: undefined,
@@ -125,7 +126,7 @@ export const createUser = async (
 									position: teacherData.position,
 									departmentId: teacherData.departmentId,
 									employmentStatus: teacherData.employmentStatus,
-									yearsOfService: teacherData.yearsOfService || 0, // Add this line
+									yearsOfService: teacherData.yearsOfService || 0,
 								},
 						  }
 						: undefined,
@@ -135,7 +136,7 @@ export const createUser = async (
 								create: {
 									officeId: approverData.officeId,
 									departmentId: approverData.departmentId,
-									yearsOfExperience: approverData.yearsOfExperience || 0, // Add this line
+									yearsOfExperience: approverData.yearsOfExperience || 0,
 								},
 						  }
 						: undefined,
@@ -188,8 +189,11 @@ export const updateUser = async (
 
 		// Check if user exists
 		const existingUser = await prisma.user.findUnique({
-			where: {
-				id,
+			where: { id },
+			include: {
+				student: true,
+				teacher: true,
+				approver: true,
 			},
 		});
 
@@ -201,29 +205,27 @@ export const updateUser = async (
 			return;
 		}
 
-		// Check if email already exists (if provided and changed)
+		// Check if email is already in use by another user
 		if (email && email !== existingUser.email) {
-			const existingEmail = await prisma.user.findFirst({
+			const emailExists = await prisma.user.findFirst({
 				where: {
 					email,
 					id: { not: id },
 				},
 			});
 
-			if (existingEmail) {
+			if (emailExists) {
 				res.status(400).json({
 					status: "error",
-					message: "Email already exists",
+					message: "Email is already in use",
 				});
 				return;
 			}
 		}
 
-		// Update the user
-		await prisma.user.update({
-			where: {
-				id,
-			},
+		// Update user data
+		const updatedUser = await prisma.user.update({
+			where: { id },
 			data: {
 				firstName,
 				fatherName,
@@ -245,46 +247,81 @@ export const updateUser = async (
 
 		// Update role-specific data if provided
 		if (existingUser.role === "STUDENT" && studentData) {
-			await prisma.student.update({
-				where: {
-					userId: id,
-				},
-				data: {
-					programId: studentData.programId,
-					currentYear: studentData.currentYear,
-					semester: studentData.semester,
-					academicStatus: studentData.academicStatus,
-				},
-			});
-		} else if (existingUser.role === "TEACHER" && teacherData) {
-			await prisma.teacher.update({
-				where: {
-					userId: id,
-				},
-				data: {
-					position: teacherData.position,
-					departmentId: teacherData.departmentId,
-					employmentStatus: teacherData.employmentStatus,
-				},
-			});
-		} else if (existingUser.role === "APPROVER" && approverData) {
-			await prisma.approver.update({
-				where: {
-					userId: id,
-				},
-				data: {
-					officeId: approverData.officeId,
-					departmentId: approverData.departmentId,
-					// Removed 'position' as it does not exist in the type
-				},
-			});
+			if (existingUser.student) {
+				await prisma.student.update({
+					where: { userId: id },
+					data: {
+						programId: studentData.programId,
+						currentYear: studentData.currentYear,
+						semester: studentData.semester,
+						academicStatus: studentData.academicStatus,
+					},
+				});
+			} else {
+				await prisma.student.create({
+					data: {
+						userId: id,
+						startDate: new Date(studentData.startDate),
+						programId: studentData.programId,
+						currentYear: studentData.currentYear,
+						semester: studentData.semester,
+						academicStatus: studentData.academicStatus,
+						departmentId: studentData.departmentId,
+					},
+				});
+			}
+		}
+
+		if (existingUser.role === "TEACHER" && teacherData) {
+			if (existingUser.teacher) {
+				await prisma.teacher.update({
+					where: { userId: id },
+					data: {
+						position: teacherData.position,
+						departmentId: teacherData.departmentId,
+						employmentStatus: teacherData.employmentStatus,
+						yearsOfService: teacherData.yearsOfService || 0,
+					},
+				});
+			} else {
+				await prisma.teacher.create({
+					data: {
+						userId: id,
+						hireDate: new Date(teacherData.hireDate),
+						position: teacherData.position,
+						departmentId: teacherData.departmentId,
+						employmentStatus: teacherData.employmentStatus,
+						yearsOfService: teacherData.yearsOfService || 0,
+					},
+				});
+			}
+		}
+
+		if (existingUser.role === "APPROVER" && approverData) {
+			if (existingUser.approver) {
+				await prisma.approver.update({
+					where: { userId: id },
+					data: {
+						officeId: approverData.officeId,
+						departmentId: approverData.departmentId,
+						yearsOfExperience: approverData.yearsOfExperience || 0,
+					},
+				});
+			} else {
+				await prisma.approver.create({
+					data: {
+						userId: id,
+						officeId: approverData.officeId,
+						departmentId: approverData.departmentId,
+						yearsOfExperience: approverData.yearsOfExperience || 0,
+					},
+				});
+			}
 		}
 
 		// Get the updated user with all related data
-		const updatedUser = await prisma.user.findUnique({
-			where: {
-				id,
-			},
+		const finalUser = await prisma.user.findUnique({
+			where: { id },
 			include: {
 				student: true,
 				teacher: true,
@@ -299,7 +336,7 @@ export const updateUser = async (
 
 		res.status(200).json({
 			status: "success",
-			data: updatedUser,
+			data: finalUser,
 			message: "User updated successfully",
 		});
 		return;
@@ -323,9 +360,7 @@ export const deleteUser = async (
 
 		// Check if user exists
 		const existingUser = await prisma.user.findUnique({
-			where: {
-				id,
-			},
+			where: { id },
 		});
 
 		if (!existingUser) {
@@ -333,13 +368,31 @@ export const deleteUser = async (
 				status: "error",
 				message: "User not found",
 			});
+			return;
+		}
+
+		// Delete role-specific data first to avoid foreign key constraints
+		if (existingUser.role === "STUDENT") {
+			await prisma.student.deleteMany({
+				where: { userId: id },
+			});
+		} else if (existingUser.role === "TEACHER") {
+			await prisma.teacher.deleteMany({
+				where: { userId: id },
+			});
+		} else if (existingUser.role === "APPROVER") {
+			await prisma.approver.deleteMany({
+				where: { userId: id },
+			});
+		} else if (existingUser.role === "ADMIN") {
+			await prisma.admin.deleteMany({
+				where: { userId: id },
+			});
 		}
 
 		// Delete the user
 		await prisma.user.delete({
-			where: {
-				id,
-			},
+			where: { id },
 		});
 
 		res.status(200).json({
@@ -357,7 +410,7 @@ export const deleteUser = async (
 	}
 };
 
-// Get all clearance requests
+// Get all clearance requests for admin
 export const getAllClearanceRequests = async (
 	req: Request,
 	res: Response
@@ -372,12 +425,14 @@ export const getAllClearanceRequests = async (
 						firstName: true,
 						fatherName: true,
 						grandfatherName: true,
+						role: true,
 						student: true,
 						teacher: true,
 					},
 				},
 				terminationReason: true,
 				idReplacementReason: true,
+				teacherClearanceReason: true,
 				approvalActions: {
 					include: {
 						approver: {
@@ -391,9 +446,6 @@ export const getAllClearanceRequests = async (
 								},
 							},
 						},
-					},
-					orderBy: {
-						actionDate: "asc",
 					},
 				},
 				documents: {
@@ -422,7 +474,7 @@ export const getAllClearanceRequests = async (
 	}
 };
 
-// Get all workflow rules
+// Get workflow rules
 export const getWorkflowRules = async (
 	req: Request,
 	res: Response
@@ -439,9 +491,6 @@ export const getWorkflowRules = async (
 						stepOrder: "asc",
 					},
 				},
-			},
-			orderBy: {
-				formType: "asc",
 			},
 		});
 
@@ -466,9 +515,9 @@ export const createWorkflowRule = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { formType, programId, steps } = req.body; // Removed 'description' as it is not used
+		const { formType, programId, description, steps } = req.body;
 
-		// Check if a workflow rule already exists for this form type and program
+		// Check if a rule already exists for this form type and program
 		const existingRule = await prisma.workflowRule.findFirst({
 			where: {
 				formType,
@@ -485,12 +534,12 @@ export const createWorkflowRule = async (
 			return;
 		}
 
-		// Create the workflow rule with steps
+		// Create the workflow rule
 		const workflowRule = await prisma.workflowRule.create({
 			data: {
 				formType,
 				programId,
-				// Removed 'description' as it does not exist in the type
+				description,
 				workflowSteps: {
 					create: steps.map((step: any, index: number) => ({
 						stepOrder: index + 1,
@@ -535,12 +584,13 @@ export const updateWorkflowRule = async (
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const { steps } = req.body;
+		const { description, steps } = req.body;
 
-		// Check if workflow rule exists
+		// Check if the workflow rule exists
 		const existingRule = await prisma.workflowRule.findUnique({
-			where: {
-				id,
+			where: { id },
+			include: {
+				workflowSteps: true,
 			},
 		});
 
@@ -552,39 +602,23 @@ export const updateWorkflowRule = async (
 			return;
 		}
 
-		// Update the workflow rule
-		await prisma.workflowRule.update({
-			where: {
-				id,
-			},
-			data: {
-				// Removed 'description' as it does not exist in the type
-			},
-		});
-
 		// Delete existing steps
 		await prisma.workflowStep.deleteMany({
-			where: {
-				// Removed 'connect' as it does not exist in the type
-			},
+			where: { workflowRuleId: id },
 		});
 
-		// Create new steps
-		await prisma.workflowStep.createMany({
-			data: steps.map(
-				(step: { officeId: string; description: string }, index: number) => ({
-					workflowRuleId: id,
-					stepOrder: index + 1,
-					officeId: step.officeId,
-					description: step.description,
-				})
-			),
-		});
-
-		// Get the updated workflow rule
-		const updatedRule = await prisma.workflowRule.findUnique({
-			where: {
-				id,
+		// Update the workflow rule and create new steps
+		const updatedRule = await prisma.workflowRule.update({
+			where: { id },
+			data: {
+				description,
+				workflowSteps: {
+					create: steps.map((step: any, index: number) => ({
+						stepOrder: index + 1,
+						officeId: step.officeId,
+						description: step.description,
+					})),
+				},
 			},
 			include: {
 				program: true,
@@ -623,11 +657,9 @@ export const deleteWorkflowRule = async (
 	try {
 		const { id } = req.params;
 
-		// Check if workflow rule exists
+		// Check if the workflow rule exists
 		const existingRule = await prisma.workflowRule.findUnique({
-			where: {
-				id,
-			},
+			where: { id },
 		});
 
 		if (!existingRule) {
@@ -638,11 +670,14 @@ export const deleteWorkflowRule = async (
 			return;
 		}
 
-		// Delete the workflow rule (steps will be deleted by cascade)
+		// Delete the workflow steps first (cascade delete)
+		await prisma.workflowStep.deleteMany({
+			where: { workflowRuleId: id },
+		});
+
+		// Delete the workflow rule
 		await prisma.workflowRule.delete({
-			where: {
-				id,
-			},
+			where: { id },
 		});
 
 		res.status(200).json({

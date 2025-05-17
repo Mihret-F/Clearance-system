@@ -1,51 +1,42 @@
 import { Router } from "express";
 import {
-	createClearanceRequest,
-	getClearanceRequests,
-	getClearanceRequestById,
-	uploadDocument,
-	getRequestDocuments,
-	getRequestWorkflow,
-	getFormTypes,
-	getTerminationReasons,
-	getDocumentTypes,
-	getIdReplacementReasons,
+	getWorkflow,
+	getReasons,
 	submitClearanceRequest,
-	getUserNotifications,
+	getFormTypes,
+	getDocumentTypes,
+	getUserClearanceRequests,
+	getPendingDocuments,
+	uploadDocument,
+	handleApprovalAction,
+	getRequestWorkflow,
 } from "../controllers/clearance.controller";
-import { authenticate, authorize } from "../middleware/auth.middleware";
+import { authenticate } from "../middleware/auth.middleware";
 import { upload } from "../middleware/upload.middleware";
+import multer from "multer";
 
 const router = Router();
+// const upload = multer({ dest: "uploads/" });
 
-router.post(
-	"/request",
-	authenticate,
-	authorize(["STUDENT", "TEACHER"]),
-	createClearanceRequest
-);
-router.get("/requests", authenticate, getClearanceRequests);
-router.get("/request/:id", authenticate, getClearanceRequestById);
-router.post("/request/:id/document", authenticate, uploadDocument);
-router.get("/workflow/:requestId", authenticate, getRequestWorkflow);
-router.get("/documents/:requestId", authenticate, getRequestDocuments);
 router.get("/form-types", authenticate, getFormTypes);
-router.get("/termination-reasons", authenticate, getTerminationReasons);
-router.get("/id-replacement-reasons", authenticate, getIdReplacementReasons);
 router.get("/document-types", authenticate, getDocumentTypes);
+router.get("/reasons/:formType", authenticate, getReasons);
+router.post("/workflow", authenticate, getWorkflow);
+router.get("/workflow/:requestId", authenticate, getRequestWorkflow);
+router.get("/requests", authenticate, getUserClearanceRequests);
+router.get("/documents/:requestId", authenticate, getPendingDocuments);
 router.post(
 	"/submit-request",
 	authenticate,
 	upload.array("documents"),
 	submitClearanceRequest
 );
-router.get("/notifications", authenticate, getUserNotifications);
-// Add this route
 router.post(
 	"/upload-document",
 	authenticate,
 	upload.single("file"),
 	uploadDocument
 );
+router.post("/approve-reject", authenticate, handleApprovalAction);
 
 export default router;

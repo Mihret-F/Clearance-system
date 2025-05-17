@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
 	ChevronRight,
@@ -30,206 +29,27 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 
-// Add this CSS at the top of the file, after the imports
-// Add custom scrollbar styles
+// Custom scrollbar styles
 const customScrollbarStyles = `
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(156, 163, 175, 0.5);
   border-radius: 20px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(156, 163, 175, 0.7);
 }
-
 @media (max-width: 640px) {
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
   }
 }
 `;
-
-// Define the approval workflows for different scenarios
-const approvalWorkflows = {
-	// Student Termination (Post Graduate, Extension)
-	termination_pg_extension: [
-		"Academic Advisor",
-		"Department Head",
-		"Dormitory Head",
-		"Library (A) Chief of Circulation",
-		"Library (B) Chief of Circulation (Main)",
-		"Library (C)",
-		"Post Graduate Dean",
-		"Registrar",
-	],
-
-	// ID Card Replacement (Post Graduate, Regular)
-	id_replacement_pg_regular: [
-		"Academic Advisor",
-		"Library (A) Chief of Circulation",
-		"Library (B)",
-		"Main Library",
-		"Book Store",
-		"Campus Police",
-		"Dormitory Head",
-		"Students' Cafeteria Head",
-		"Finance Office",
-		"Registrar",
-	],
-
-	// Student Termination (Post Graduate, Regular)
-	termination_pg_regular: [
-		"Academic Advisor",
-		"Department Head",
-		"Library (A) Chief of Circulation",
-		"Library (B) Chief of Circulation (Main)",
-		"Library (C)",
-		"Post Graduate Dean",
-		"Students' Cafeteria Head",
-		"Students' Dormitory Head",
-		"Registrar",
-	],
-
-	// ID Card Replacement (Post Graduate, Extension)
-	id_replacement_pg_extension: [
-		"Academic Advisor",
-		"Continuing Education",
-		"Library (A) Chief of Circulation",
-		"Library (B)",
-		"Main Library",
-		"Book Store",
-		"Campus Police",
-		"Finance Office",
-		"Registrar",
-	],
-
-	// ID Card Replacement (Regular student)
-	id_replacement_regular: [
-		"Academic Advisor",
-		"Department Head",
-		"Library (A) Chief of Circulation",
-		"Library (B)",
-		"Main Library",
-		"Book Store",
-		"Campus Police",
-		"Dormitory Head",
-		"Students' Cafeteria Head",
-		"Registrar",
-	],
-
-	// ID Card Replacement (Summer)
-	id_replacement_summer: [
-		"Academic Advisor",
-		"Continuing Education",
-		"Library (A) Chief of Circulation",
-		"Library (B)",
-		"Main Library",
-		"Campus Police",
-		"Dormitory Head",
-		"Students' Cafeteria Head",
-		"Finance Office",
-		"Registrar",
-	],
-
-	// Student Termination (Summer)
-	termination_summer: [
-		"Academic Advisor",
-		"Department Head",
-		"Students' Dormitory Head",
-		"Library (A) Chief of Circulation",
-		"Library (B) Chief of Circulation (Main)",
-		"Main Library",
-		"Students' Cafeteria Head",
-		"Registrar",
-	],
-
-	// Faculty Clearance (Generic)
-	faculty_clearance: [
-		"Department Head",
-		"Library (Main)",
-		"Finance Office",
-		"Human Resources",
-		"Research Office",
-		"Dean's Office",
-		"Vice President's Office",
-		"President's Office",
-	],
-};
-
-// Sample static data for different user types
-const sampleStudentData = {
-	regular: {
-		id: "STD2024001",
-		name: "John Doe",
-		fathersName: "Michael Doe",
-		program: "Computer Science",
-		programType: "Regular",
-		academicCategory: "Undergraduate",
-		year: 3,
-		department: "Computer Science",
-		advisor: "Dr. Smith",
-		enrollmentDate: "2021-09-01",
-		expectedGraduationDate: "2025-06-30",
-	},
-	postgraduate_regular: {
-		id: "STD2024002",
-		name: "Jane Smith",
-		fathersName: "Robert Smith",
-		program: "Data Science",
-		programType: "Regular",
-		academicCategory: "Masters",
-		year: 2,
-		department: "Computer Science",
-		advisor: "Dr. Johnson",
-		enrollmentDate: "2022-09-01",
-		expectedGraduationDate: "2024-06-30",
-	},
-	postgraduate_extension: {
-		id: "STD2024003",
-		name: "Mike Johnson",
-		fathersName: "David Johnson",
-		program: "Artificial Intelligence",
-		programType: "Extension",
-		academicCategory: "PhD",
-		year: 1,
-		department: "Computer Science",
-		advisor: "Dr. Williams",
-		enrollmentDate: "2023-09-01",
-		expectedGraduationDate: "2027-06-30",
-	},
-	summer: {
-		id: "STD2024005",
-		name: "Tom Wilson",
-		fathersName: "James Wilson",
-		program: "Information Technology",
-		programType: "Summer",
-		academicCategory: "Undergraduate",
-		year: 2,
-		department: "Computer Science",
-		advisor: "Dr. Anderson",
-		enrollmentDate: "2022-09-01",
-		expectedGraduationDate: "2026-06-30",
-	},
-};
-
-const sampleFacultyData = {
-	id: "FAC2024001",
-	name: "Dr. James Smith",
-	position: "Associate Professor",
-	department: "Computer Science",
-	startDate: "2018-09-01",
-	tenure: "Permanent",
-	specialization: "Machine Learning",
-	officeLocation: "CS Building, Room 301",
-};
 
 interface ClearanceRequestFormProps {
 	user: any;
@@ -245,16 +65,15 @@ export function ClearanceRequestForm({
 	const [currentStep, setCurrentStep] = useState(0);
 	const [formData, setFormData] = useState({
 		requestType: "",
-		programCategory: "",
-		programType: "",
-		withdrawalReason: "",
+		reasonId: "",
 		otherReason: "",
-		idReplacementReason: "",
 		comments: "",
-		documents: [],
+		documents: [] as File[], // Store actual File objects
 		documentsRequired: false,
+		programType: "",
+		programCategory: "",
 	});
-	const [workflow, setWorkflow] = useState([]);
+	const [workflow, setWorkflow] = useState<string[]>([]);
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState(0);
@@ -262,30 +81,26 @@ export function ClearanceRequestForm({
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [hasMounted, setHasMounted] = useState(false);
 	const [formTypes, setFormTypes] = useState([]);
-	const [terminationReasons, setTerminationReasons] = useState([]);
-	const [idReplacementReasons, setIdReplacementReasons] = useState([]);
+	const [reasons, setReasons] = useState<any[]>([]);
 	const [documentTypes, setDocumentTypes] = useState([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isSubmitting, setSubmitting] = useState(false);
+	const [isLoadingReasons, setIsLoadingReasons] = useState(false);
+	const [isConfirmed, setIsConfirmed] = useState(false); // Confirmation checkbox state
 
 	useEffect(() => {
 		setHasMounted(true);
 	}, []);
 
-	// Add the style element to the component
+	// Add custom scrollbar styles
 	useEffect(() => {
-		// Add the custom scrollbar styles to the document
 		const styleElement = document.createElement("style");
 		styleElement.textContent = customScrollbarStyles;
 		document.head.appendChild(styleElement);
-
-		return () => {
-			// Clean up the style element when the component unmounts
-			document.head.removeChild(styleElement);
-		};
+		return () => document.head.removeChild(styleElement);
 	}, []);
 
-	// Determine user type and set appropriate data
+	// Fetch form types and document types
 	useEffect(() => {
 		const fetchFormData = async () => {
 			try {
@@ -293,58 +108,22 @@ export function ClearanceRequestForm({
 				const API_BASE_URL =
 					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-				// Fetch form types
 				const formTypesResponse = await axios.get(
 					`${API_BASE_URL}/clearance/form-types`,
 					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
+						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
-
 				if (formTypesResponse.data.status === "success") {
 					setFormTypes(formTypesResponse.data.data);
 				}
 
-				// Fetch termination reasons
-				const terminationReasonsResponse = await axios.get(
-					`${API_BASE_URL}/clearance/termination-reasons`,
-					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					}
-				);
-
-				if (terminationReasonsResponse.data.status === "success") {
-					setTerminationReasons(terminationReasonsResponse.data.data);
-				}
-
-				// Fetch ID replacement reasons
-				const idReplacementReasonsResponse = await axios.get(
-					`${API_BASE_URL}/clearance/id-replacement-reasons`,
-					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					}
-				);
-
-				if (idReplacementReasonsResponse.data.status === "success") {
-					setIdReplacementReasons(idReplacementReasonsResponse.data.data);
-				}
-
-				// Fetch document types
 				const documentTypesResponse = await axios.get(
 					`${API_BASE_URL}/clearance/document-types`,
 					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
+						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
-
 				if (documentTypesResponse.data.status === "success") {
 					setDocumentTypes(documentTypesResponse.data.data);
 				}
@@ -353,34 +132,55 @@ export function ClearanceRequestForm({
 				setError("Failed to load form data. Please try again.");
 			}
 		};
-
 		fetchFormData();
 	}, []);
+
+	// Fetch reasons and workflow when requestType changes
+	useEffect(() => {
+		if (!formData.requestType) return;
+
+		const fetchReasonsAndWorkflow = async () => {
+			setIsLoadingReasons(true);
+			try {
+				const token = localStorage.getItem("authToken");
+				const API_BASE_URL =
+					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+				const reasonsResponse = await axios.get(
+					`${API_BASE_URL}/clearance/reasons/${formData.requestType.toUpperCase()}`,
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				if (reasonsResponse.data.status === "success") {
+					setReasons(reasonsResponse.data.data);
+				} else {
+					setReasons([]);
+				}
+
+				await fetchWorkflow(formData.requestType);
+			} catch (error) {
+				console.error("Error fetching reasons or workflow:", error);
+				setError("Failed to load data. Please try again.");
+				setReasons([]);
+			} finally {
+				setIsLoadingReasons(false);
+			}
+		};
+		fetchReasonsAndWorkflow();
+	}, [formData.requestType]);
+
+	// Set user data and program details
 	useEffect(() => {
 		if (!user) return;
-
-		let data;
-		if (user.role === "Faculty") {
-			data = sampleFacultyData;
-		} else {
-			// Determine student type
-			if (
-				user.academicCategory === "Masters" ||
-				user.academicCategory === "PhD"
-			) {
-				if (user.programType === "Extension") {
-					data = sampleStudentData.postgraduate_extension;
-				} else {
-					data = sampleStudentData.postgraduate_regular;
-				}
-			} else if (user.programType === "Summer") {
-				data = sampleStudentData.summer;
-			} else {
-				data = sampleStudentData.regular;
-			}
+		setUserData(user);
+		if (user.role === "STUDENT" && user.student?.program) {
+			setFormData((prev) => ({
+				...prev,
+				programType: user.student.program.type || "",
+				programCategory: user.student.program.category || "",
+			}));
 		}
-
-		setUserData(data);
 	}, [user]);
 
 	const steps = [
@@ -390,10 +190,9 @@ export function ClearanceRequestForm({
 		{ id: "review", label: "Review & Submit" },
 	];
 
-	const handleInputChange = (field: string, value: any) => {
+	const handleInputChange = async (field: string, value: any) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 
-		// Clear error for this field
 		if (errors[field]) {
 			setErrors((prev) => {
 				const newErrors = { ...prev };
@@ -402,61 +201,252 @@ export function ClearanceRequestForm({
 			});
 		}
 
-		// Update workflow based on request type and program type
-		if (field === "requestType" || field === "programType") {
-			updateWorkflow();
+		if (field === "requestType") {
+			setReasons([]);
+			setFormData((prev) => ({
+				...prev,
+				reasonId: "",
+				otherReason: "",
+				documents: [],
+			}));
+			await fetchWorkflow(value);
 		}
 	};
 
-	const updateWorkflow = () => {
-		const { requestType, programType } = formData;
+	const fetchWorkflow = async (formType: string) => {
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-		if (!requestType) return;
+			const payload = {
+				username: user?.username,
+				formType: formType.toUpperCase(),
+				programType: user?.student?.program?.type || undefined,
+				programCategory: user?.student?.program?.category || undefined,
+			};
 
-		let workflowKey = "";
-
-		if (user?.role === "Faculty") {
-			workflowKey = "faculty_clearance";
-		} else {
-			// For students
-			const isTermination = requestType === "termination";
-			const isPG =
-				userData?.academicCategory === "Masters" ||
-				userData?.academicCategory === "PhD";
-			const isExtension = userData?.programType === "Extension";
-			const isSummer = userData?.programType === "Summer";
-
-			if (isTermination) {
-				if (isPG && isExtension) {
-					workflowKey = "termination_pg_extension";
-				} else if (isPG && !isExtension) {
-					workflowKey = "termination_pg_regular";
-				} else if (isSummer) {
-					workflowKey = "termination_summer";
-				} else {
-					workflowKey = "termination_regular";
+			const response = await axios.post(
+				`${API_BASE_URL}/clearance/workflow`,
+				payload,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
 				}
+			);
+
+			if (response.data) {
+				setWorkflow(response.data.steps.map((step: any) => step.officeName));
 			} else {
-				// ID Replacement
-				if (isPG && isExtension) {
-					workflowKey = "id_replacement_pg_extension";
-				} else if (isPG && !isExtension) {
-					workflowKey = "id_replacement_pg_regular";
-				} else if (isSummer) {
-					workflowKey = "id_replacement_summer";
-				} else {
-					workflowKey = "id_replacement_regular";
+				setError("Failed to fetch workflow");
+			}
+		} catch (error) {
+			console.error("Error fetching workflow:", error);
+			setError("Failed to fetch workflow. Please try again.");
+		}
+	};
+
+	const validateProgramForRequestType = (requestType: string, program: any) => {
+		if (requestType === "TERMINATION" || requestType === "ID_REPLACEMENT") {
+			return true;
+		}
+		return false;
+	};
+
+	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!e.target.files?.length) return;
+
+		const files = Array.from(e.target.files);
+		const allowedTypes = [
+			"application/pdf",
+			"image/jpeg",
+			"image/png",
+			"application/msword",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		];
+		const maxSize = 10 * 1024 * 1024; // 10MB
+
+		const validFiles = files.filter((file) => {
+			if (!allowedTypes.includes(file.type)) {
+				setErrors((prev) => ({
+					...prev,
+					documents: `Invalid file type: ${file.name}. Only PDF, JPG, PNG, DOCX allowed.`,
+				}));
+				return false;
+			}
+			if (file.size > maxSize) {
+				setErrors((prev) => ({
+					...prev,
+					documents: `File too large: ${file.name}. Max size is 10MB.`,
+				}));
+				return false;
+			}
+			return true;
+		});
+
+		if (validFiles.length === 0) return;
+
+		setSelectedFile(validFiles[0]);
+		setIsUploading(true);
+		setUploadProgress(0);
+
+		const interval = setInterval(() => {
+			setUploadProgress((prev) => {
+				if (prev >= 100) {
+					clearInterval(interval);
+					setIsUploading(false);
+					setFormData((prev) => ({
+						...prev,
+						documents: [...prev.documents, ...validFiles],
+					}));
+					setErrors((prev) => {
+						const newErrors = { ...prev };
+						delete newErrors.documents;
+						return newErrors;
+					});
+					return 0;
+				}
+				return prev + 10;
+			});
+		}, 300);
+	};
+
+	const validateStep = () => {
+		const newErrors: Record<string, string> = {};
+
+		switch (currentStep) {
+			case 0:
+				if (!formData.requestType) {
+					newErrors.requestType = "Please select a request type";
+				}
+				break;
+
+			case 1:
+				if (!formData.reasonId) {
+					newErrors.reasonId = "Please select a reason";
+				}
+				if (
+					(formData.requestType === "TERMINATION" ||
+						formData.requestType === "TEACHER_CLEARANCE") &&
+					formData.reasonId === "Others" &&
+					!formData.otherReason
+				) {
+					newErrors.otherReason = "Please specify the reason";
+				}
+				break;
+
+			case 2:
+				if (formData.documentsRequired && formData.documents.length === 0) {
+					newErrors.documents =
+						"Please upload at least one supporting document";
+				}
+				break;
+
+			case 3:
+				if (!isConfirmed) {
+					newErrors.confirmation = "Please confirm the request details";
+				}
+				break;
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
+
+	const handleNext = () => {
+		if (validateStep()) {
+			setCurrentStep((prev) => prev + 1);
+		}
+	};
+
+	const handleBack = () => {
+		setCurrentStep((prev) => prev - 1);
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (currentStep < steps.length - 1) {
+			handleNext();
+			return;
+		}
+
+		if (!validateStep()) return;
+
+		try {
+			setSubmitting(true);
+			setError(null);
+
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+			const submitFormData = new FormData();
+			submitFormData.append("formType", formData.requestType);
+			submitFormData.append("programType", formData.programType);
+			submitFormData.append("programCategory", formData.programCategory);
+
+			if (formData.requestType === "TERMINATION") {
+				if (formData.reasonId) {
+					submitFormData.append("terminationReasonId", formData.reasonId);
+				}
+				if (formData.reasonId === "Others" && formData.otherReason) {
+					submitFormData.append("terminationReason", formData.otherReason);
+				}
+			} else if (formData.requestType === "ID_REPLACEMENT") {
+				if (formData.reasonId) {
+					submitFormData.append("idReplacementReasonId", formData.reasonId);
+				}
+			} else if (formData.requestType === "TEACHER_CLEARANCE") {
+				if (formData.reasonId) {
+					submitFormData.append("teacherClearanceReasonId", formData.reasonId);
+				}
+				if (formData.reasonId === "Others" && formData.otherReason) {
+					submitFormData.append("teacherReason", formData.otherReason);
 				}
 			}
-		}
 
-		setWorkflow(approvalWorkflows[workflowKey] || []);
+			if (formData.comments) {
+				submitFormData.append("comments", formData.comments);
+			}
+
+			if (formData.documents.length > 0) {
+				formData.documents.forEach((file, index) => {
+					submitFormData.append(`documents`, file);
+				});
+			}
+
+			const response = await axios.post(
+				`${API_BASE_URL}/clearance/submit-request`,
+				submitFormData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "multipart/form-data",
+					},
+				}
+			);
+
+			if (response.data.status === "success") {
+				onSubmit(response.data.data);
+			} else {
+				setError(response.data.message || "Failed to submit request");
+			}
+		} catch (error) {
+			console.error("Error submitting request:", error);
+			setError(
+				(error as any).response?.data?.message ||
+					"Failed to submit request. Please try again."
+			);
+		} finally {
+			setSubmitting(false);
+		}
 	};
 
-	// Update the renderStepIndicator function to be more responsive
 	const renderStepIndicator = () => (
 		<div className="mb-3 sm:mb-4">
-			{/* Mobile Step Indicator - More compact for small screens */}
 			<div className="md:hidden">
 				<div className="flex items-center justify-between mb-2">
 					<span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -473,8 +463,6 @@ export function ClearanceRequestForm({
 					/>
 				</div>
 			</div>
-
-			{/* Desktop Step Indicator - Scrollable for medium screens */}
 			<div className="hidden md:block">
 				<div
 					className="flex justify-between overflow-x-auto pb-2 gap-2 sm:gap-4 custom-scrollbar"
@@ -529,207 +517,8 @@ export function ClearanceRequestForm({
 		</div>
 	);
 
-	const validateStep = () => {
-		const newErrors: Record<string, string> = {};
-
-		switch (currentStep) {
-			case 0: // Request Type
-				if (!formData.requestType) {
-					newErrors.requestType = "Please select a request type";
-				}
-
-				if (
-					formData.requestType === "ID_REPLACEMENT" &&
-					!formData.programCategory
-				) {
-					newErrors.programCategory = "Please select a program category";
-				}
-
-				if (
-					formData.requestType === "ID_REPLACEMENT" &&
-					!formData.programType
-				) {
-					newErrors.programType = "Please select a program type";
-				}
-				break;
-
-			case 1: // Request Details
-				if (
-					formData.requestType === "TERMINATION" &&
-					!formData.withdrawalReason
-				) {
-					newErrors.withdrawalReason = "Please select a withdrawal reason";
-				}
-
-				if (formData.withdrawalReason === "Others" && !formData.otherReason) {
-					newErrors.otherReason = "Please specify the reason";
-				}
-
-				if (
-					formData.requestType === "ID_REPLACEMENT" &&
-					!formData.idReplacementReason
-				) {
-					newErrors.idReplacementReason =
-						"Please select a reason for ID replacement";
-				}
-				break;
-
-			case 2: // Documents - Make this optional initially
-				// Only validate if we're explicitly requiring documents
-				if (formData.documentsRequired && formData.documents.length === 0) {
-					newErrors.documents =
-						"Please upload at least one supporting document";
-				}
-				break;
-		}
-
-		setErrors(newErrors);
-		return Object.keys(newErrors).length === 0;
-	};
-
-	const handleNext = () => {
-		if (validateStep()) {
-			setCurrentStep((prev) => prev + 1);
-		}
-	};
-
-	const handleBack = () => {
-		setCurrentStep((prev) => prev - 1);
-	};
-
-	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files?.length) return;
-
-		const file = e.target.files[0];
-		setSelectedFile(file);
-
-		const files = Array.from(e.target.files);
-		setIsUploading(true);
-		setUploadProgress(0);
-
-		// Simulate file upload
-		const interval = setInterval(() => {
-			setUploadProgress((prev) => {
-				if (prev >= 100) {
-					clearInterval(interval);
-					setIsUploading(false);
-					setFormData((prev) => ({
-						...prev,
-						documents: [
-							...prev.documents,
-							...files.map((file) => ({
-								name: file.name,
-								size: file.size,
-								type: file.type,
-								uploadedAt: new Date().toISOString(),
-							})),
-						],
-					}));
-					return 0;
-				}
-				return prev + 10;
-			});
-		}, 300);
-	};
-
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-
-		if (currentStep < steps.length - 1) {
-			handleNext();
-			return;
-		}
-
-		try {
-			setSubmitting(true);
-			setError(null);
-
-			const token = localStorage.getItem("authToken");
-			const API_BASE_URL =
-				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-
-			// Create FormData for file uploads
-			const submitFormData = new FormData();
-
-			// Add the form type (this is the request type)
-			submitFormData.append("formType", formData.requestType);
-
-			// Add reason data based on request type
-			if (formData.requestType === "TERMINATION") {
-				// Only append if it has a value
-				if (formData.withdrawalReason) {
-					submitFormData.append(
-						"terminationReasonId",
-						formData.withdrawalReason
-					);
-				}
-
-				if (formData.withdrawalReason === "Others" && formData.otherReason) {
-					submitFormData.append("teacherReason", formData.otherReason);
-				}
-			} else if (formData.requestType === "ID_REPLACEMENT") {
-				// Only append if it has a value
-				if (formData.idReplacementReason) {
-					submitFormData.append(
-						"idReplacementReasonId",
-						formData.idReplacementReason
-					);
-				}
-			} else if (formData.requestType === "TEACHER_CLEARANCE") {
-				if (formData.comments) {
-					submitFormData.append("teacherReason", formData.comments);
-				}
-			}
-
-			// Add uploaded files if any
-			if (formData.documents && formData.documents.length > 0) {
-				formData.documents.forEach((doc, index) => {
-					if (doc instanceof File) {
-						submitFormData.append(`documents`, doc);
-					}
-				});
-			}
-
-			console.log("Submitting request with data:", {
-				formType: formData.requestType,
-				terminationReasonId: formData.withdrawalReason || undefined,
-				idReplacementReasonId: formData.idReplacementReason || undefined,
-				teacherReason: formData.otherReason || formData.comments || undefined,
-				documentsCount: formData.documents?.length || 0,
-			});
-
-			const response = await axios.post(
-				`${API_BASE_URL}/clearance/submit-request`,
-				submitFormData,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "multipart/form-data",
-					},
-				}
-			);
-
-			if (response.data.status === "success") {
-				// Pass the new request back to parent component
-				onSubmit(response.data.data);
-			} else {
-				setError(response.data.message || "Failed to submit request");
-			}
-		} catch (error) {
-			console.error("Error submitting request:", error);
-			setError(
-				error.response?.data?.message ||
-					"Failed to submit request. Please try again."
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	// Update the renderRequestTypeStep function to be more compact on mobile
 	const renderRequestTypeStep = () => (
 		<div className="space-y-3 sm:space-y-6">
-			{/* Auto-filled User Information */}
 			<Card className="p-3 sm:p-6 bg-gray-50 dark:bg-gray-800/50">
 				<h3 className="text-base sm:text-lg font-medium mb-2 sm:mb-4 text-gray-900 dark:text-white">
 					User Information
@@ -740,30 +529,75 @@ export function ClearanceRequestForm({
 							Full Name
 						</Label>
 						<Input
-							value={user?.firstName + " " + user?.fatherName}
+							value={`${user?.firstName || ""} ${user?.fatherName || ""} ${
+								user?.grandfatherName || ""
+							}`}
 							disabled
 							className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 						/>
 					</div>
 					<div>
-						<Label className="text-gray-700 dark:text-gray-300">
-							ID Number
-						</Label>
+						<Label className="text-gray-700 dark:text-gray-300">Username</Label>
 						<Input
 							value={user?.username || ""}
 							disabled
 							className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 						/>
 					</div>
-
-					{user?.role === "Student" ? (
+					<div>
+						<Label className="text-gray-700 dark:text-gray-300">Email</Label>
+						<Input
+							value={user?.email || ""}
+							disabled
+							className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+						/>
+					</div>
+					<div>
+						<Label className="text-gray-700 dark:text-gray-300">Role</Label>
+						<Input
+							value={user?.role || ""}
+							disabled
+							className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+						/>
+					</div>
+					{user?.role === "STUDENT" && user?.student && (
 						<>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Academic Status
+								</Label>
+								<Input
+									value={user?.student?.academicStatus || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Current Year
+								</Label>
+								<Input
+									value={user?.student?.currentYear || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Semester
+								</Label>
+								<Input
+									value={user?.student?.semester || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
 							<div>
 								<Label className="text-gray-700 dark:text-gray-300">
 									Department
 								</Label>
 								<Input
-									value={userData?.department || ""}
+									value={user?.student?.department?.name || ""}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
@@ -773,17 +607,7 @@ export function ClearanceRequestForm({
 									Program
 								</Label>
 								<Input
-									value={userData?.program || ""}
-									disabled
-									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-								/>
-							</div>
-							<div>
-								<Label className="text-gray-700 dark:text-gray-300">
-									Academic Category
-								</Label>
-								<Input
-									value={userData?.academicCategory || ""}
+									value={user?.student?.program?.name || ""}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
@@ -793,50 +617,17 @@ export function ClearanceRequestForm({
 									Program Type
 								</Label>
 								<Input
-									value={userData?.programType || ""}
+									value={user?.student?.program?.type || ""}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
 							</div>
 							<div>
 								<Label className="text-gray-700 dark:text-gray-300">
-									Year of Study
+									Program Category
 								</Label>
 								<Input
-									value={userData?.year || ""}
-									disabled
-									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-								/>
-							</div>
-							<div>
-								<Label className="text-gray-700 dark:text-gray-300">
-									Academic Advisor
-								</Label>
-								<Input
-									value={userData?.advisor || ""}
-									disabled
-									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-								/>
-							</div>
-						</>
-					) : (
-						<>
-							<div>
-								<Label className="text-gray-700 dark:text-gray-300">
-									Department
-								</Label>
-								<Input
-									value={userData?.department || ""}
-									disabled
-									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-								/>
-							</div>
-							<div>
-								<Label className="text-gray-700 dark:text-gray-300">
-									Position
-								</Label>
-								<Input
-									value={userData?.position || ""}
+									value={user?.student?.program?.category || ""}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
@@ -846,17 +637,69 @@ export function ClearanceRequestForm({
 									Start Date
 								</Label>
 								<Input
-									value={userData?.startDate || ""}
+									value={
+										user?.student?.startDate
+											? new Date(user.student.startDate).toLocaleDateString()
+											: ""
+									}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+						</>
+					)}
+					{user?.role === "TEACHER" && user?.teacher && (
+						<>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Position
+								</Label>
+								<Input
+									value={user?.teacher?.position || ""}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
 							</div>
 							<div>
 								<Label className="text-gray-700 dark:text-gray-300">
-									Office Location
+									Department
 								</Label>
 								<Input
-									value={userData?.officeLocation || ""}
+									value={user?.teacher?.department?.name || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Employment Status
+								</Label>
+								<Input
+									value={user?.teacher?.employmentStatus || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Years of Service
+								</Label>
+								<Input
+									value={user?.teacher?.yearsOfService || ""}
+									disabled
+									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+								/>
+							</div>
+							<div>
+								<Label className="text-gray-700 dark:text-gray-300">
+									Hire Date
+								</Label>
+								<Input
+									value={
+										user?.teacher?.hireDate
+											? new Date(user.teacher.hireDate).toLocaleDateString()
+											: ""
+									}
 									disabled
 									className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
 								/>
@@ -865,8 +708,6 @@ export function ClearanceRequestForm({
 					)}
 				</div>
 			</Card>
-
-			{/* Request Type Selection */}
 			<div className="space-y-2">
 				<Label
 					htmlFor="requestType"
@@ -903,136 +744,45 @@ export function ClearanceRequestForm({
 					<p className="text-sm text-red-500">{errors.requestType}</p>
 				)}
 			</div>
-
-			{/* Program Category (for ID Replacement only) */}
-			{formData.requestType === "ID_REPLACEMENT" && (
-				<div className="space-y-2">
-					<Label
-						htmlFor="programCategory"
-						className="text-gray-700 dark:text-gray-300"
-					>
-						Program Category <span className="text-red-500">*</span>
-					</Label>
-					<Select
-						value={formData.programCategory}
-						onValueChange={(value) =>
-							handleInputChange("programCategory", value)
-						}
-					>
-						<SelectTrigger
-							id="programCategory"
-							className={errors.programCategory ? "border-red-500" : ""}
-						>
-							<SelectValue placeholder="Select program category" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="degree">Degree</SelectItem>
-							<SelectItem value="diploma">Diploma</SelectItem>
-						</SelectContent>
-					</Select>
-					{errors.programCategory && (
-						<p className="text-sm text-red-500">{errors.programCategory}</p>
-					)}
-				</div>
-			)}
-
-			{/* Program Type (for ID Replacement only) */}
-			{formData.requestType === "ID_REPLACEMENT" &&
-				formData.programCategory && (
-					<div className="space-y-2">
-						<Label
-							htmlFor="programType"
-							className="text-gray-700 dark:text-gray-300"
-						>
-							Program Type <span className="text-red-500">*</span>
-						</Label>
-						<Select
-							value={formData.programType}
-							onValueChange={(value) => handleInputChange("programType", value)}
-						>
-							<SelectTrigger
-								id="programType"
-								className={errors.programType ? "border-red-500" : ""}
-							>
-								<SelectValue placeholder="Select program type" />
-							</SelectTrigger>
-							<SelectContent>
-								{formData.programCategory === "degree" ? (
-									<>
-										<SelectItem value="regular">Regular</SelectItem>
-										<SelectItem value="extension">Extension</SelectItem>
-										<SelectItem value="summer">Summer</SelectItem>
-									</>
-								) : (
-									<>
-										<SelectItem value="evening">Evening</SelectItem>
-										<SelectItem value="summer">Summer</SelectItem>
-									</>
-								)}
-							</SelectContent>
-						</Select>
-						{errors.programType && (
-							<p className="text-sm text-red-500">{errors.programType}</p>
-						)}
-					</div>
-				)}
 		</div>
 	);
 
 	const renderDetailsStep = () => (
 		<div className="space-y-4 sm:space-y-6">
-			{formData.requestType === "termination" && (
-				<>
-					<div className="space-y-2">
-						<Label
-							htmlFor="withdrawalReason"
-							className="text-gray-700 dark:text-gray-300"
-						>
-							Reason for Withdrawal <span className="text-red-500">*</span>
-						</Label>
-						<RadioGroup
-							value={formData.withdrawalReason}
-							onValueChange={(value) =>
-								handleInputChange("withdrawalReason", value)
-							}
-							className="grid grid-cols-1 md:grid-cols-2 gap-2"
-						>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="Graduated" id="graduated" />
+			<div className="space-y-2">
+				<Label className="text-gray-700 dark:text-gray-300">
+					Reason for Request <span className="text-red-500">*</span>
+				</Label>
+				{isLoadingReasons ? (
+					<div className="flex items-center gap-2">
+						<Loader2 className="h-5 w-5 animate-spin text-gray-700 dark:text-gray-300" />
+						<span className="text-gray-700 dark:text-gray-300">
+							Loading reasons...
+						</span>
+					</div>
+				) : reasons.length === 0 ? (
+					<p className="text-sm text-gray-500 dark:text-gray-400">
+						No reasons available for this request type.
+					</p>
+				) : (
+					<RadioGroup
+						value={formData.reasonId}
+						onValueChange={(value) => handleInputChange("reasonId", value)}
+						className="grid grid-cols-1 md:grid-cols-2 gap-2"
+					>
+						{reasons.map((reason) => (
+							<div key={reason.id} className="flex items-center space-x-2">
+								<RadioGroupItem value={reason.id} id={reason.id} />
 								<Label
-									htmlFor="graduated"
+									htmlFor={reason.id}
 									className="cursor-pointer text-gray-700 dark:text-gray-300"
 								>
-									Graduated
+									{reason.reason}
 								</Label>
 							</div>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="ADR" id="adr" />
-								<Label
-									htmlFor="adr"
-									className="cursor-pointer text-gray-700 dark:text-gray-300"
-								>
-									Academic Dismissal with Readmission (ADR)
-								</Label>
-							</div>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="AD" id="ad" />
-								<Label
-									htmlFor="ad"
-									className="cursor-pointer text-gray-700 dark:text-gray-300"
-								>
-									Academic Dismissal (AD)
-								</Label>
-							</div>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="Vacation" id="vacation" />
-								<Label
-									htmlFor="vacation"
-									className="cursor-pointer text-gray-700 dark:text-gray-300"
-								>
-									Vacation
-								</Label>
-							</div>
+						))}
+						{(formData.requestType === "TERMINATION" ||
+							formData.requestType === "TEACHER_CLEARANCE") && (
 							<div className="flex items-center space-x-2">
 								<RadioGroupItem value="Others" id="others" />
 								<Label
@@ -1042,118 +792,37 @@ export function ClearanceRequestForm({
 									Others (Please specify)
 								</Label>
 							</div>
-						</RadioGroup>
-						{errors.withdrawalReason && (
-							<p className="text-sm text-red-500">{errors.withdrawalReason}</p>
 						)}
-					</div>
-
-					{formData.withdrawalReason === "Others" && (
-						<div className="space-y-2">
-							<Label
-								htmlFor="otherReason"
-								className="text-gray-700 dark:text-gray-300"
-							>
-								Please specify reason <span className="text-red-500">*</span>
-							</Label>
-							<Textarea
-								id="otherReason"
-								value={formData.otherReason}
-								onChange={(e) =>
-									handleInputChange("otherReason", e.target.value)
-								}
-								placeholder="Please specify your reason for withdrawal"
-								className={`text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 ${
-									errors.otherReason ? "border-red-500" : ""
-								}`}
-							/>
-							{errors.otherReason && (
-								<p className="text-sm text-red-500">{errors.otherReason}</p>
-							)}
-						</div>
-					)}
-				</>
-			)}
-
-			{formData.requestType === "ID_REPLACEMENT" && (
-				<div className="space-y-2">
-					<Label
-						htmlFor="idReplacementReason"
-						className="text-gray-700 dark:text-gray-300"
-					>
-						Reason for ID Replacement <span className="text-red-500">*</span>
-					</Label>
-					<RadioGroup
-						value={formData.idReplacementReason}
-						onValueChange={(value) =>
-							handleInputChange("idReplacementReason", value)
-						}
-						className="grid grid-cols-1 md:grid-cols-2 gap-2"
-					>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="Lost" id="lost" />
-							<Label
-								htmlFor="lost"
-								className="cursor-pointer text-gray-700 dark:text-gray-300"
-							>
-								Lost ID Card
-							</Label>
-						</div>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="Damaged" id="damaged" />
-							<Label
-								htmlFor="damaged"
-								className="cursor-pointer text-gray-700 dark:text-gray-300"
-							>
-								Damaged ID Card
-							</Label>
-						</div>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="Expired" id="expired" />
-							<Label
-								htmlFor="expired"
-								className="cursor-pointer text-gray-700 dark:text-gray-300"
-							>
-								Expired ID Card
-							</Label>
-						</div>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="NameChange" id="nameChange" />
-							<Label
-								htmlFor="nameChange"
-								className="cursor-pointer text-gray-700 dark:text-gray-300"
-							>
-								Name Change
-							</Label>
-						</div>
 					</RadioGroup>
-					{errors.idReplacementReason && (
-						<p className="text-sm text-red-500">{errors.idReplacementReason}</p>
-					)}
-				</div>
-			)}
+				)}
+				{errors.reasonId && (
+					<p className="text-sm text-red-500">{errors.reasonId}</p>
+				)}
+			</div>
 
-			{(formData.requestType === "clearance" ||
-				formData.requestType === "sabbatical" ||
-				formData.requestType === "resignation") && (
+			{formData.reasonId === "Others" && (
 				<div className="space-y-2">
 					<Label
-						htmlFor="comments"
+						htmlFor="otherReason"
 						className="text-gray-700 dark:text-gray-300"
 					>
-						Additional Comments
+						Please specify reason <span className="text-red-500">*</span>
 					</Label>
 					<Textarea
-						id="comments"
-						value={formData.comments}
-						onChange={(e) => handleInputChange("comments", e.target.value)}
-						placeholder="Please provide any additional information relevant to your request"
-						className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800"
+						id="otherReason"
+						value={formData.otherReason}
+						onChange={(e) => handleInputChange("otherReason", e.target.value)}
+						placeholder="Please specify your reason"
+						className={`text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 ${
+							errors.otherReason ? "border-red-500" : ""
+						}`}
 					/>
+					{errors.otherReason && (
+						<p className="text-sm text-red-500">{errors.otherReason}</p>
+					)}
 				</div>
 			)}
 
-			{/* Workflow Preview */}
 			{workflow.length > 0 && (
 				<div className="mt-6">
 					<Label className="block mb-2 text-gray-700 dark:text-gray-300">
@@ -1161,14 +830,11 @@ export function ClearanceRequestForm({
 					</Label>
 					<Card className="p-4 bg-gray-50 dark:bg-gray-800/50">
 						<div className="relative">
-							{/* Progress Line */}
 							<div className="absolute top-5 left-5 right-5 h-0.5 bg-gray-200 dark:bg-gray-700" />
 							<div
 								className="absolute top-5 left-5 h-0.5 bg-primary transition-all duration-500"
 								style={{ width: `0%` }}
 							/>
-
-							{/* Steps - Make this scrollable for small screens */}
 							<div
 								className="relative flex overflow-x-auto pb-2 custom-scrollbar"
 								style={{ scrollbarWidth: "thin" }}
@@ -1206,7 +872,7 @@ export function ClearanceRequestForm({
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
 					{formData.documentsRequired
 						? "Please upload the required documents to proceed with your request."
-						: "Document upload is optional at this stage. You can add documents now or later if requested."}
+						: "Document upload is optional. Supported formats: PDF, JPG, PNG, DOCX (max 10MB)."}
 				</p>
 				<div
 					className={`border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer ${
@@ -1222,6 +888,7 @@ export function ClearanceRequestForm({
 						className="hidden"
 						onChange={handleFileUpload}
 						multiple
+						accept=".pdf,.jpg,.jpeg,.png,.docx,.doc"
 					/>
 					<Upload className="h-10 w-10 mx-auto text-gray-400" />
 					<p className="mt-2 font-medium text-gray-700 dark:text-gray-300">
@@ -1232,7 +899,7 @@ export function ClearanceRequestForm({
 					<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
 						{selectedFile
 							? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`
-							: "PDF, PNG, JPG or DOCX up to 10MB"}
+							: "PDF, JPG, PNG, DOCX up to 10MB"}
 					</p>
 				</div>
 				{errors.documents && (
@@ -1275,7 +942,7 @@ export function ClearanceRequestForm({
 										</p>
 										<p className="text-xs text-gray-500 dark:text-gray-400">
 											{(doc.size / 1024 / 1024).toFixed(2)} MB • Uploaded{" "}
-											{new Date(doc.uploadedAt).toLocaleTimeString()}
+											{new Date().toLocaleTimeString()}
 										</p>
 									</div>
 								</div>
@@ -1322,7 +989,6 @@ export function ClearanceRequestForm({
 				<h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-gray-900 dark:text-white">
 					Request Summary
 				</h3>
-
 				<div className="space-y-4">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
@@ -1334,66 +1000,41 @@ export function ClearanceRequestForm({
 									? "Student Termination"
 									: formData.requestType === "ID_REPLACEMENT"
 									? "ID Card Replacement"
-									: formData.requestType === "TEACHER_CLEARANCE"
-									? "Teacher Clearance"
-									: ""}
+									: "Teacher Clearance"}
 							</p>
 						</div>
-
-						{formData.requestType === "ID_REPLACEMENT" && (
+						<div>
+							<Label className="text-sm text-gray-500 dark:text-gray-400">
+								Reason
+							</Label>
+							<p className="font-medium text-gray-900 dark:text-white">
+								{formData.reasonId === "Others"
+									? formData.otherReason
+									: reasons.find((r) => r.id === formData.reasonId)?.reason ||
+									  ""}
+							</p>
+						</div>
+						{user?.role === "STUDENT" && (
 							<>
-								<div>
-									<Label className="text-sm text-gray-500 dark:text-gray-400">
-										Program Category
-									</Label>
-									<p className="font-medium text-gray-900 dark:text-white">
-										{formData.programCategory === "degree"
-											? "Degree"
-											: "Diploma"}
-									</p>
-								</div>
 								<div>
 									<Label className="text-sm text-gray-500 dark:text-gray-400">
 										Program Type
 									</Label>
 									<p className="font-medium text-gray-900 dark:text-white">
-										{formData.programType === "regular"
-											? "Regular"
-											: formData.programType === "extension"
-											? "Extension"
-											: formData.programType === "summer"
-											? "Summer"
-											: "Evening"}
+										{formData.programType}
+									</p>
+								</div>
+								<div>
+									<Label className="text-sm text-gray-500 dark:text-gray-400">
+										Program Category
+									</Label>
+									<p className="font-medium text-gray-900 dark:text-white">
+										{formData.programCategory}
 									</p>
 								</div>
 							</>
 						)}
-
-						{formData.requestType === "termination" && (
-							<div>
-								<Label className="text-sm text-gray-500 dark:text-gray-400">
-									Withdrawal Reason
-								</Label>
-								<p className="font-medium text-gray-900 dark:text-white">
-									{formData.withdrawalReason}
-									{formData.withdrawalReason === "Others" &&
-										`: ${formData.otherReason}`}
-								</p>
-							</div>
-						)}
-
-						{formData.requestType === "ID_REPLACEMENT" && (
-							<div>
-								<Label className="text-sm text-gray-500 dark:text-gray-400">
-									ID Replacement Reason
-								</Label>
-								<p className="font-medium text-gray-900 dark:text-white">
-									{formData.idReplacementReason}
-								</p>
-							</div>
-						)}
 					</div>
-
 					{formData.comments && (
 						<div>
 							<Label className="text-sm text-gray-500 dark:text-gray-400">
@@ -1404,7 +1045,6 @@ export function ClearanceRequestForm({
 							</p>
 						</div>
 					)}
-
 					<div>
 						<Label className="text-sm text-gray-500 dark:text-gray-400">
 							Supporting Documents
@@ -1425,21 +1065,17 @@ export function ClearanceRequestForm({
 					</div>
 				</div>
 			</Card>
-
 			<div className="space-y-2">
 				<Label className="text-gray-700 dark:text-gray-300">
 					Approval Workflow
 				</Label>
 				<Card className="p-4 bg-gray-50 dark:bg-gray-800/50">
 					<div className="relative">
-						{/* Progress Line */}
 						<div className="absolute top-5 left-5 right-5 h-0.5 bg-gray-200 dark:bg-gray-700" />
 						<div
 							className="absolute top-5 left-5 h-0.5 bg-primary transition-all duration-500"
 							style={{ width: `0%` }}
 						/>
-
-						{/* Steps - Make this scrollable for small screens */}
 						<div className="relative flex justify-between overflow-x-auto pb-2">
 							{workflow.map((step, index) => (
 								<div
@@ -1458,7 +1094,6 @@ export function ClearanceRequestForm({
 					</div>
 				</Card>
 			</div>
-
 			<div className="p-4 border border-yellow-200 bg-yellow-50 dark:border-yellow-900/50 dark:bg-yellow-900/20 rounded-lg">
 				<div className="flex gap-3">
 					<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
@@ -1475,9 +1110,12 @@ export function ClearanceRequestForm({
 					</div>
 				</div>
 			</div>
-
 			<div className="flex items-center gap-2">
-				<Checkbox id="terms" />
+				<Checkbox
+					id="terms"
+					checked={isConfirmed}
+					onCheckedChange={(checked) => setIsConfirmed(!!checked)}
+				/>
 				<Label
 					htmlFor="terms"
 					className="text-sm text-gray-700 dark:text-gray-300"
@@ -1486,6 +1124,9 @@ export function ClearanceRequestForm({
 					the clearance process.
 				</Label>
 			</div>
+			{errors.confirmation && (
+				<p className="text-sm text-red-500">{errors.confirmation}</p>
+			)}
 		</div>
 	);
 
@@ -1504,16 +1145,13 @@ export function ClearanceRequestForm({
 		}
 	};
 
-	// Update the main container to be more responsive with better scrolling
 	return (
 		<div className="w-full max-w-3xl mx-auto px-2 sm:px-4">
 			{renderStepIndicator()}
-
 			<div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 text-gray-900 dark:text-gray-100 overflow-hidden">
 				<div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar">
 					{renderCurrentStep()}
 				</div>
-
 				<div className="flex justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 sticky bottom-0 bg-white dark:bg-gray-900">
 					{currentStep > 0 ? (
 						<Button variant="outline" onClick={handleBack} className="gap-2">
@@ -1524,7 +1162,6 @@ export function ClearanceRequestForm({
 							Cancel
 						</Button>
 					)}
-
 					{currentStep < steps.length - 1 ? (
 						<Button onClick={handleNext} className="gap-2">
 							Next <ChevronRight className="h-4 w-4" />

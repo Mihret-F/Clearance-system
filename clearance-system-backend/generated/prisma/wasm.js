@@ -117,6 +117,74 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.TerminationReasonScalarFieldEnum = {
+  id: 'id',
+  clearanceRequestId: 'clearanceRequestId',
+  reason: 'reason',
+  description: 'description'
+};
+
+exports.Prisma.IdReplacementReasonScalarFieldEnum = {
+  id: 'id',
+  clearanceRequestId: 'clearanceRequestId',
+  reason: 'reason',
+  description: 'description'
+};
+
+exports.Prisma.TeacherClearanceReasonScalarFieldEnum = {
+  id: 'id',
+  clearanceRequestId: 'clearanceRequestId',
+  reason: 'reason'
+};
+
+exports.Prisma.DocumentScalarFieldEnum = {
+  id: 'id',
+  clearanceRequestId: 'clearanceRequestId',
+  documentTypeId: 'documentTypeId',
+  filePath: 'filePath',
+  uploadedAt: 'uploadedAt'
+};
+
+exports.Prisma.DocumentTypeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  requiredFor: 'requiredFor'
+};
+
+exports.Prisma.CertificateScalarFieldEnum = {
+  id: 'id',
+  clearanceRequestId: 'clearanceRequestId',
+  filePath: 'filePath',
+  qrCode: 'qrCode',
+  signatures: 'signatures',
+  issuedAt: 'issuedAt'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clearanceRequestId: 'clearanceRequestId',
+  title: 'title',
+  message: 'message',
+  emailSubject: 'emailSubject',
+  type: 'type',
+  status: 'status',
+  read: 'read',
+  sentAt: 'sentAt',
+  emailSentAt: 'emailSentAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clearanceRequestId: 'clearanceRequestId',
+  adminId: 'adminId',
+  action: 'action',
+  details: 'details',
+  timestamp: 'timestamp'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   username: 'username',
@@ -133,11 +201,9 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   loginAttempts: 'loginAttempts',
   isLocked: 'isLocked',
-  lockCycles: 'lockCycles',
   lockedUntil: 'lockedUntil',
   lockedAt: 'lockedAt',
   emailVerified: 'emailVerified',
-  emailVerificationSkipped: 'emailVerificationSkipped',
   emailToken: 'emailToken',
   emailTokenExpiry: 'emailTokenExpiry',
   resetToken: 'resetToken',
@@ -152,7 +218,8 @@ exports.Prisma.StudentScalarFieldEnum = {
   programId: 'programId',
   currentYear: 'currentYear',
   semester: 'semester',
-  academicStatus: 'academicStatus'
+  academicStatus: 'academicStatus',
+  departmentId: 'departmentId'
 };
 
 exports.Prisma.TeacherScalarFieldEnum = {
@@ -165,21 +232,32 @@ exports.Prisma.TeacherScalarFieldEnum = {
   yearsOfService: 'yearsOfService'
 };
 
-exports.Prisma.ProgramScalarFieldEnum = {
+exports.Prisma.AdminScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  type: 'type',
-  category: 'category'
+  userId: 'userId',
+  permissions: 'permissions'
 };
 
 exports.Prisma.DepartmentScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  code: 'code',
+  description: 'description'
+};
+
+exports.Prisma.ProgramScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  category: 'category',
+  departmentId: 'departmentId',
+  description: 'description'
 };
 
 exports.Prisma.OfficeScalarFieldEnum = {
   id: 'id',
-  officeName: 'officeName',
+  name: 'name',
+  description: 'description',
   departmentId: 'departmentId'
 };
 
@@ -187,47 +265,9 @@ exports.Prisma.ApproverScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   officeId: 'officeId',
-  departmentId: 'departmentId',
   digitalSignature: 'digitalSignature',
-  yearsOfExperience: 'yearsOfExperience'
-};
-
-exports.Prisma.ClearanceRequestScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  formType: 'formType',
-  programId: 'programId',
-  terminationReasonId: 'terminationReasonId',
-  idReplacementReasonId: 'idReplacementReasonId',
-  teacherReason: 'teacherReason',
-  status: 'status',
-  submittedAt: 'submittedAt',
-  updatedAt: 'updatedAt',
-  currentStep: 'currentStep',
-  rejectedStep: 'rejectedStep',
-  rejectionReason: 'rejectionReason'
-};
-
-exports.Prisma.ApprovalActionScalarFieldEnum = {
-  id: 'id',
-  requestId: 'requestId',
-  approverId: 'approverId',
-  stepOrder: 'stepOrder',
-  status: 'status',
-  comment: 'comment',
-  actionDate: 'actionDate'
-};
-
-exports.Prisma.TerminationReasonScalarFieldEnum = {
-  id: 'id',
-  reason: 'reason',
-  description: 'description'
-};
-
-exports.Prisma.IdReplacementReasonScalarFieldEnum = {
-  id: 'id',
-  reason: 'reason',
-  description: 'description'
+  yearsOfExperience: 'yearsOfExperience',
+  departmentId: 'departmentId'
 };
 
 exports.Prisma.WorkflowRuleScalarFieldEnum = {
@@ -239,38 +279,47 @@ exports.Prisma.WorkflowRuleScalarFieldEnum = {
 
 exports.Prisma.WorkflowStepScalarFieldEnum = {
   id: 'id',
-  ruleId: 'ruleId',
-  officeId: 'officeId',
+  workflowRuleId: 'workflowRuleId',
   stepOrder: 'stepOrder',
+  officeId: 'officeId',
   description: 'description'
 };
 
-exports.Prisma.DocumentTypeScalarFieldEnum = {
+exports.Prisma.ApprovalActionScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  description: 'description'
+  clearanceRequestId: 'clearanceRequestId',
+  approverId: 'approverId',
+  status: 'status',
+  comment: 'comment',
+  actionDate: 'actionDate',
+  finalizedAt: 'finalizedAt',
+  actionDueBy: 'actionDueBy'
 };
 
-exports.Prisma.DocumentScalarFieldEnum = {
-  id: 'id',
-  requestId: 'requestId',
-  documentTypeId: 'documentTypeId',
-  filePath: 'filePath',
-  uploadedAt: 'uploadedAt'
-};
-
-exports.Prisma.NotificationScalarFieldEnum = {
+exports.Prisma.ClearanceRequestScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  requestId: 'requestId',
-  message: 'message',
+  formType: 'formType',
+  programId: 'programId',
   status: 'status',
-  createdAt: 'createdAt'
+  rejectionReason: 'rejectionReason',
+  resubmissionCount: 'resubmissionCount',
+  submittedAt: 'submittedAt',
+  updatedAt: 'updatedAt',
+  currentStep: 'currentStep',
+  terminationReasonId: 'terminationReasonId',
+  idReplacementReasonId: 'idReplacementReasonId',
+  teacherClearanceReasonId: 'teacherClearanceReasonId'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -282,6 +331,31 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.FormType = exports.$Enums.FormType = {
+  TERMINATION: 'TERMINATION',
+  ID_REPLACEMENT: 'ID_REPLACEMENT',
+  TEACHER_CLEARANCE: 'TEACHER_CLEARANCE'
+};
+
+exports.NotificationType = exports.$Enums.NotificationType = {
+  INFO: 'INFO',
+  ACTION_REQUIRED: 'ACTION_REQUIRED',
+  SYSTEM: 'SYSTEM',
+  EMAIL: 'EMAIL'
+};
+
+exports.NotificationStatus = exports.$Enums.NotificationStatus = {
+  SENT: 'SENT',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
 exports.UserRole = exports.$Enums.UserRole = {
   STUDENT: 'STUDENT',
   TEACHER: 'TEACHER',
@@ -292,12 +366,6 @@ exports.UserRole = exports.$Enums.UserRole = {
 exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE'
-};
-
-exports.Semester = exports.$Enums.Semester = {
-  SPRING: 'SPRING',
-  FALL: 'FALL',
-  SUMMER: 'SUMMER'
 };
 
 exports.AcademicStatus = exports.$Enums.AcademicStatus = {
@@ -312,41 +380,61 @@ exports.EmploymentStatus = exports.$Enums.EmploymentStatus = {
   TERMINATED: 'TERMINATED'
 };
 
-exports.FormType = exports.$Enums.FormType = {
-  TERMINATION: 'TERMINATION',
-  ID_REPLACEMENT: 'ID_REPLACEMENT',
-  TEACHER_CLEARANCE: 'TEACHER_CLEARANCE'
+exports.Permission = exports.$Enums.Permission = {
+  MANAGE_USERS: 'MANAGE_USERS',
+  REASSIGN_REQUESTS: 'REASSIGN_REQUESTS',
+  APPROVE_REQUESTS: 'APPROVE_REQUESTS',
+  MANAGE_WORKFLOWS: 'MANAGE_WORKFLOWS'
+};
+
+exports.ProgramType = exports.$Enums.ProgramType = {
+  UNDERGRADUATE: 'UNDERGRADUATE',
+  POSTGRADUATE: 'POSTGRADUATE',
+  DIPLOMA: 'DIPLOMA'
+};
+
+exports.ProgramCategory = exports.$Enums.ProgramCategory = {
+  REGULAR: 'REGULAR',
+  EXTENSION: 'EXTENSION',
+  SUMMER: 'SUMMER',
+  EVENING: 'EVENING'
+};
+
+exports.ApprovalStatus = exports.$Enums.ApprovalStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 };
 
 exports.RequestStatus = exports.$Enums.RequestStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
+  RESUBMITTED: 'RESUBMITTED',
   COMPLETED: 'COMPLETED'
 };
 
-exports.NotificationStatus = exports.$Enums.NotificationStatus = {
-  SENT: 'SENT',
-  READ: 'READ'
-};
-
 exports.Prisma.ModelName = {
+  TerminationReason: 'TerminationReason',
+  IdReplacementReason: 'IdReplacementReason',
+  TeacherClearanceReason: 'TeacherClearanceReason',
+  Document: 'Document',
+  DocumentType: 'DocumentType',
+  Certificate: 'Certificate',
+  Notification: 'Notification',
+  AuditLog: 'AuditLog',
   User: 'User',
   Student: 'Student',
   Teacher: 'Teacher',
-  Program: 'Program',
+  Admin: 'Admin',
   Department: 'Department',
+  Program: 'Program',
   Office: 'Office',
   Approver: 'Approver',
-  ClearanceRequest: 'ClearanceRequest',
-  ApprovalAction: 'ApprovalAction',
-  TerminationReason: 'TerminationReason',
-  IdReplacementReason: 'IdReplacementReason',
   WorkflowRule: 'WorkflowRule',
   WorkflowStep: 'WorkflowStep',
-  DocumentType: 'DocumentType',
-  Document: 'Document',
-  Notification: 'Notification'
+  ApprovalAction: 'ApprovalAction',
+  ClearanceRequest: 'ClearanceRequest'
 };
 
 /**

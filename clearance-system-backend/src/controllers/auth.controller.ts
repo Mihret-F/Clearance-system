@@ -72,8 +72,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 				(now.getTime() - lockTime.getTime()) / (1000 * 60)
 			);
 
-			// Lock duration increases with each cycle (30 min, 1 hour, 2 hours, etc.)
-			const lockDuration = 30 * Math.pow(2, user.lockCycles - 1);
+			// Fixed lock duration (30 minutes)
+			const lockDuration = 30;
 
 			if (diffInMinutes < lockDuration) {
 				const remainingMinutes = lockDuration - diffInMinutes;
@@ -109,7 +109,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 						loginAttempts: 0,
 						isLocked: true,
 						lockedAt: new Date(), // Ensure lockedAt is updated
-						lockCycles: user.lockCycles + 1,
 					},
 				});
 
@@ -601,7 +600,7 @@ export const skipEmailVerification = async (
 		await prisma.user.update({
 			where: { id: userId },
 			data: {
-				emailVerificationSkipped: true,
+				emailVerified: true, // Instead of using emailVerificationSkipped, we'll mark the email as verified
 			},
 		});
 
@@ -819,7 +818,6 @@ export const checkAuthStatus = async (
 					role: user.role,
 					isFirstLogin: user.isFirstLogin,
 					emailVerified: user.emailVerified,
-					emailVerificationSkipped: user.emailVerificationSkipped,
 					student: user.student,
 					teacher: user.teacher,
 					approver: user.approver,

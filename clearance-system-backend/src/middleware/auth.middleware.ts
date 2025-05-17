@@ -6,6 +6,7 @@ interface JwtPayload {
 	id: string;
 	role: string;
 	fingerprint: string;
+	username: string;
 }
 
 // Extend the Express Request interface to include user
@@ -23,7 +24,6 @@ export const authenticate = async (
 	next: NextFunction
 ): Promise<void> => {
 	try {
-		// Get token from header
 		const authHeader = req.headers.authorization;
 
 		if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -36,13 +36,14 @@ export const authenticate = async (
 
 		const token = authHeader.split(" ")[1];
 
-		// Verify token
 		const decoded = jwt.verify(
 			token,
 			process.env.JWT_SECRET as string
 		) as JwtPayload;
 
-		// Check if user exists
+		// Log the decoded JWT payload
+		console.log("Decoded JWT payload:", decoded);
+
 		const user = await prisma.user.findUnique({
 			where: { id: decoded.id },
 		});
@@ -55,7 +56,6 @@ export const authenticate = async (
 			return;
 		}
 
-		// Check if user is active
 		if (user.status === "INACTIVE") {
 			res.status(403).json({
 				status: "error",
@@ -64,7 +64,6 @@ export const authenticate = async (
 			return;
 		}
 
-		// Set user in request object
 		req.user = decoded;
 		next();
 	} catch (error) {
@@ -76,7 +75,6 @@ export const authenticate = async (
 	}
 };
 
-// Role-based authorization middleware
 export const authorize = (roles: string[]) => {
 	return (req: Request, res: Response, next: NextFunction): void => {
 		if (!req.user) {

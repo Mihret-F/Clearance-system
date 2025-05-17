@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { prisma } from "../server";
-import { FormType } from "../../generated/prisma";
+import {
+	FormType,
+	ApprovalStatus,
+	NotificationType,
+	NotificationStatus,
+} from "../../generated/prisma";
 
 // Get pending requests for an approver
 export const getPendingRequests = async (
@@ -46,8 +51,8 @@ export const getPendingRequests = async (
 						workflowRule: { formType: FormType; programId: string | null };
 						stepOrder: number;
 					}) => ({
-						formType: step.workflowRule.formType, // Already of type FormType
-						programId: step.workflowRule.programId, // Handle string | null
+						formType: step.workflowRule.formType,
+						programId: step.workflowRule.programId || undefined, // Convert null to undefined
 						currentStep: step.stepOrder,
 						status: "PENDING",
 					})
@@ -67,6 +72,7 @@ export const getPendingRequests = async (
 				},
 				terminationReason: true,
 				idReplacementReason: true,
+				teacherClearanceReason: true,
 				approvalActions: {
 					include: {
 						approver: {
@@ -186,11 +192,12 @@ export const approveRequest = async (
 		// Create approval action
 		await prisma.approvalAction.create({
 			data: {
-				requestId: id,
+				clearanceRequestId: id,
 				approverId: approver.id,
-				stepOrder: clearanceRequest.currentStep,
 				status: "APPROVED",
 				comment,
+				actionDate: new Date(),
+				finalizedAt: new Date(),
 			},
 		});
 
@@ -215,11 +222,15 @@ export const approveRequest = async (
 		await prisma.notification.create({
 			data: {
 				userId: clearanceRequest.userId,
-				requestId: id,
+				clearanceRequestId: id,
+				title: isLastStep
+					? "Clearance Request Completed"
+					: "Clearance Request Approved",
 				message: isLastStep
 					? `Your clearance request has been fully approved and completed.`
-					: `Your clearance request has been approved by ${approver.office.officeName} and moved to the next step.`,
-				status: "SENT",
+					: `Your clearance request has been approved by ${approver.office.name} and moved to the next step.`,
+				type: NotificationType.INFO,
+				status: NotificationStatus.SENT,
 			},
 		});
 
@@ -242,9 +253,11 @@ export const approveRequest = async (
 				await prisma.notification.create({
 					data: {
 						userId: nextApprover.userId,
-						requestId: id,
+						clearanceRequestId: id,
+						title: "Action Required: New Clearance Request",
 						message: `A clearance request requires your approval.`,
-						status: "SENT",
+						type: NotificationType.ACTION_REQUIRED,
+						status: NotificationStatus.SENT,
 					},
 				});
 			}
@@ -363,11 +376,12 @@ export const rejectRequest = async (
 		// Create rejection action
 		await prisma.approvalAction.create({
 			data: {
-				requestId: id,
+				clearanceRequestId: id,
 				approverId: approver.id,
-				stepOrder: clearanceRequest.currentStep,
 				status: "REJECTED",
 				comment,
+				actionDate: new Date(),
+				finalizedAt: new Date(),
 			},
 		});
 
@@ -378,6 +392,7 @@ export const rejectRequest = async (
 			},
 			data: {
 				status: "REJECTED",
+				rejectionReason: comment,
 			},
 		});
 
@@ -385,9 +400,11 @@ export const rejectRequest = async (
 		await prisma.notification.create({
 			data: {
 				userId: clearanceRequest.userId,
-				requestId: id,
-				message: `Your clearance request has been rejected by ${approver.office.officeName}. Reason: ${comment}`,
-				status: "SENT",
+				clearanceRequestId: id,
+				title: "Clearance Request Rejected",
+				message: `Your clearance request has been rejected by ${approver.office.name}. Reason: ${comment}`,
+				type: NotificationType.INFO,
+				status: NotificationStatus.SENT,
 			},
 		});
 

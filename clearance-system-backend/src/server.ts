@@ -41,30 +41,30 @@ app.use(
 );
 
 // Rate limiting
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // limit each IP to 100 requests per windowMs
-	standardHeaders: true,
-	legacyHeaders: false,
-	message: "Too many requests from this IP, please try again after 15 minutes",
-});
+// const limiter = rateLimit({
+// 	windowMs: 15 * 60 * 1000, // 15 minutes
+// 	max: 100, // limit each IP to 100 requests per windowMs
+// 	standardHeaders: true,
+// 	legacyHeaders: false,
+// 	message: "Too many requests from this IP, please try again after 15 minutes",
+// });
 
-// Apply rate limiting to all requests
-app.use(limiter);
+// // Apply rate limiting to all requests
+// app.use(limiter);
 
-// Apply stricter rate limits to authentication endpoints
-const authLimiter = rateLimit({
-	windowMs: 60 * 60 * 1000, // 1 hour
-	max: 10, // limit each IP to 10 login attempts per hour
-	standardHeaders: true,
-	legacyHeaders: false,
-	message:
-		"Too many login attempts from this IP, please try again after an hour",
-});
+// // Apply stricter rate limits to authentication endpoints
+// const authLimiter = rateLimit({
+// 	windowMs: 60 * 60 * 1000, // 1 hour
+// 	max: 10, // limit each IP to 10 login attempts per hour
+// 	standardHeaders: true,
+// 	legacyHeaders: false,
+// 	message:
+// 		"Too many login attempts from this IP, please try again after an hour",
+// });
 
 // Routes
-app.use("/api/auth/login", authLimiter); // Apply stricter rate limit to login
-app.use("/api/auth/forgot-password", authLimiter); // Apply stricter rate limit to password reset
+// app.use("/api/auth/login", authLimiter); // Apply stricter rate limit to login
+// app.use("/api/auth/forgot-password", authLimiter); // Apply stricter rate limit to password reset
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/clearance", clearanceRoutes);
