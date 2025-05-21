@@ -9,7 +9,6 @@ datasource db {
 }
 
 // Enums
-// User roles in the system
 enum UserRole {
   STUDENT
   TEACHER
@@ -17,34 +16,29 @@ enum UserRole {
   ADMIN
 }
 
-// User account status
 enum UserStatus {
   ACTIVE
   INACTIVE
 }
 
-// Student academic status
 enum AcademicStatus {
   ENROLLED
   GRADUATED
   WITHDRAWN
 }
 
-// Teacher employment status
 enum EmploymentStatus {
   ACTIVE
   ON_LEAVE
   TERMINATED
 }
 
-// Clearance request types
 enum FormType {
   TERMINATION
   ID_REPLACEMENT
   TEACHER_CLEARANCE
 }
 
-// Clearance request status
 enum RequestStatus {
   PENDING
   APPROVED
@@ -53,7 +47,6 @@ enum RequestStatus {
   COMPLETED
 }
 
-// Notification types (in-app or email)
 enum NotificationType {
   INFO
   ACTION_REQUIRED
@@ -61,21 +54,18 @@ enum NotificationType {
   EMAIL
 }
 
-// Notification delivery status
 enum NotificationStatus {
   SENT
   READ
   FAILED
 }
 
-// Program types (e.g., Undergraduate, Postgraduate)
 enum ProgramType {
   UNDERGRADUATE
   POSTGRADUATE
   DIPLOMA
 }
 
-// Program categories (e.g., Regular, Summer)
 enum ProgramCategory {
   REGULAR
   EXTENSION
@@ -83,14 +73,12 @@ enum ProgramCategory {
   EVENING
 }
 
-// Approval action status
 enum ApprovalStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-// Admin permissions
 enum Permission {
   MANAGE_USERS
   REASSIGN_REQUESTS
@@ -99,300 +87,284 @@ enum Permission {
 }
 
 // Supporting Models
-// Reason for termination clearance request (e.g., vacation, graduation)
 model TerminationReason {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String           @unique // Links to one clearance request
-  clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
-  reason             String // Selected reason (e.g., VACATION)
-  description        String? // Optional details
+  id                String             @id @default(uuid())
+  reason            String
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  clearanceRequests ClearanceRequest[] @relation("TerminationReason") // Many-to-one
 }
 
-// Reason for ID replacement request (e.g., lost, damaged)
 model IdReplacementReason {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String           @unique // Links to one clearance request
-  clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
-  reason             String // Selected reason (e.g., LOST)
-  description        String? // Optional details
+  id                String             @id @default(uuid())
+  reason            String
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  clearanceRequests ClearanceRequest[] @relation("IdReplacementReason") // Many-to-one
 }
 
-// Reason for teacher clearance request (free-text)
 model TeacherClearanceReason {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String           @unique // Links to one clearance request
-  clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
-  reason             String // Teacher-provided reason
+  id                String             @id @default(uuid())
+  reason            String
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  clearanceRequests ClearanceRequest[] @relation("TeacherClearanceReason") // Many-to-one
 }
 
-// Uploaded document for a clearance request
 model Document {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String // Links to clearance request
-  documentTypeId     String // Links to document type
-  filePath           String // File storage path
-  uploadedAt         DateTime         @default(now()) // Upload timestamp
+  id                 String           @id @default(uuid())
+  clearanceRequestId String
+  documentTypeId     String
+  filePath           String
+  uploadedAt         DateTime         @default(now())
   clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
   documentType       DocumentType     @relation(fields: [documentTypeId], references: [id])
 }
 
-// Document type (e.g., payment receipt)
 model DocumentType {
-  id          String     @id @default(uuid()) // Unique ID
-  name        String // Document name
-  description String? // Optional description
-  requiredFor FormType[] // Required for specific form types
-  documents   Document[] // Associated documents
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  requiredFor FormType[]
+  documents   Document[]
 }
 
-// Digital clearance certificate
 model Certificate {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String           @unique // Links to one clearance request
+  id                 String           @id @default(uuid())
+  clearanceRequestId String           @unique
   clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
-  filePath           String // Certificate file path
-  qrCode             String // QR code for verification
-  signatures         Json? // Approver signatures
-  issuedAt           DateTime         @default(now()) // Issue timestamp
+  filePath           String
+  qrCode             String
+  signatures         Json?
+  issuedAt           DateTime         @default(now())
 }
 
-// Notification (in-app or email)
 model Notification {
-  id                 String             @id @default(uuid()) // Unique ID
-  userId             String // Recipient user
-  clearanceRequestId String? // Related clearance request (optional)
-  title              String // Notification title
-  message            String // Notification content
-  emailSubject       String? // Email subject (if email)
-  type               NotificationType // Notification type
-  status             NotificationStatus // Delivery status
-  read               Boolean            @default(false) // Read status
-  sentAt             DateTime           @default(now()) // Sent timestamp
-  emailSentAt        DateTime? // Email sent timestamp
+  id                 String             @id @default(uuid())
+  userId             String
+  clearanceRequestId String?
+  title              String
+  message            String
+  emailSubject       String?
+  type               NotificationType
+  status             NotificationStatus
+  read               Boolean            @default(false)
+  sentAt             DateTime           @default(now())
+  emailSentAt        DateTime?
   user               User               @relation(fields: [userId], references: [id])
   clearanceRequest   ClearanceRequest?  @relation(fields: [clearanceRequestId], references: [id])
 
-  @@index([userId, read, status]) // Index for user queries
-  @@index([clearanceRequestId]) // Index for request queries
+  @@index([userId, read, status])
+  @@index([clearanceRequestId])
 }
 
-// Audit log for system actions
 model AuditLog {
-  id                 String            @id @default(uuid()) // Unique ID
-  userId             String // User performing action
-  clearanceRequestId String? // Related clearance request (optional)
-  adminId            String? // Admin performing action (optional)
-  action             String // Action type (e.g., REASSIGN)
-  details            String // Action details
-  timestamp          DateTime          @default(now()) // Action timestamp
+  id                 String            @id @default(uuid())
+  userId             String
+  clearanceRequestId String?
+  adminId            String?
+  action             String
+  details            String
+  timestamp          DateTime          @default(now())
   user               User              @relation(fields: [userId], references: [id])
   clearanceRequest   ClearanceRequest? @relation(fields: [clearanceRequestId], references: [id])
   admin              Admin?            @relation(fields: [adminId], references: [id])
 
-  @@index([clearanceRequestId]) // Index for request queries
-  @@index([adminId]) // Index for admin queries
+  @@index([clearanceRequestId])
+  @@index([adminId])
 }
 
 // Core Models
-// System user (student, teacher, approver, admin)
 model User {
-  id                 String             @id @default(uuid()) // Unique ID
-  username           String             @unique // Unique username
-  passwordHash       String // Hashed password
-  firstName          String // User's first name
-  fatherName         String // User's father name
-  grandfatherName    String // User's grandfather name
-  email              String?            @unique // Optional email
-  role               UserRole // User role
-  status             UserStatus         @default(ACTIVE) // Account status
-  isFirstLogin       Boolean            @default(true) // First login flag
-  lastLogin          DateTime? // Last login timestamp
-  createdAt          DateTime           @default(now()) // Creation timestamp
-  updatedAt          DateTime           @updatedAt // Update timestamp
-  loginAttempts      Int                @default(0) // Failed login attempts
-  isLocked           Boolean            @default(false) // Account lock status
-  lockedUntil        DateTime? // Lock expiration
-  lockedAt           DateTime? // Lock timestamp
-  emailVerified      Boolean            @default(false) // Email verification status
-  emailToken         String? // Email verification token
-  emailTokenExpiry   DateTime? // Token expiration
-  resetToken         String? // Password reset token
-  resetTokenExpiry   DateTime? // Reset token expiration
-  browserFingerprint String? // Browser fingerprint (optional)
-  student            Student? // Student details (if student)
-  teacher            Teacher? // Teacher details (if teacher)
-  approver           Approver? // Approver details (if approver)
-  admin              Admin? // Admin details (if admin)
-  notifications      Notification[] // User notifications
-  clearanceRequests  ClearanceRequest[] // User clearance requests
-  auditLogs          AuditLog[] // User audit logs
+  id                 String             @id @default(uuid())
+  username           String             @unique
+  passwordHash       String
+  firstName          String
+  fatherName         String
+  grandfatherName    String
+  email              String?            @unique
+  role               UserRole
+  status             UserStatus         @default(ACTIVE)
+  isFirstLogin       Boolean            @default(true)
+  lastLogin          DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  loginAttempts      Int                @default(0)
+  isLocked           Boolean            @default(false)
+  lockedUntil        DateTime?
+  lockedAt           DateTime?
+  emailVerified      Boolean            @default(false)
+  emailToken         String?
+  emailTokenExpiry   DateTime?
+  resetToken         String?
+  resetTokenExpiry   DateTime?
+  browserFingerprint String?
+  student            Student?
+  teacher            Teacher?
+  approver           Approver?
+  admin              Admin?
+  notifications      Notification[]
+  clearanceRequests  ClearanceRequest[]
+  auditLogs          AuditLog[]
 
-  @@index([email]) // Index for email queries
-  @@index([role, status]) // Index for role/status queries
+  @@index([email])
+  @@index([role, status])
 }
 
-// Student details
 model Student {
-  id             String         @id @default(uuid()) // Unique ID
-  userId         String         @unique // Links to user
-  startDate      DateTime // Program start date
-  programId      String // Links to program
-  currentYear    Int // Current academic year
-  semester       Int // Current semester
-  academicStatus AcademicStatus @default(ENROLLED) // Academic status
+  id             String         @id @default(uuid())
+  userId         String         @unique
+  startDate      DateTime
+  programId      String
+  currentYear    Int
+  semester       Int
+  academicStatus AcademicStatus @default(ENROLLED)
   user           User           @relation(fields: [userId], references: [id])
   program        Program        @relation(fields: [programId], references: [id])
-  departmentId   String // Links to department
+  departmentId   String
   department     Department     @relation(fields: [departmentId], references: [id])
 }
 
-// Teacher details
 model Teacher {
-  id               String           @id @default(uuid()) // Unique ID
-  userId           String           @unique // Links to user
-  hireDate         DateTime // Hire date
-  position         String // Job position
-  departmentId     String // Links to department
-  employmentStatus EmploymentStatus // Employment status
-  yearsOfService   Int              @default(0) // Years of service
+  id               String           @id @default(uuid())
+  userId           String           @unique
+  hireDate         DateTime
+  position         String
+  departmentId     String
+  employmentStatus EmploymentStatus
+  yearsOfService   Int              @default(0)
   user             User             @relation(fields: [userId], references: [id])
   department       Department       @relation(fields: [departmentId], references: [id])
 }
 
-// Admin details
 model Admin {
-  id          String       @id @default(uuid()) // Unique ID
-  userId      String       @unique // Links to user
-  permissions Permission[] // Admin permissions
+  id          String       @id @default(uuid())
+  userId      String       @unique
+  permissions Permission[]
   user        User         @relation(fields: [userId], references: [id])
-  auditLogs   AuditLog[] // Admin audit logs
+  auditLogs   AuditLog[]
 }
 
-// Academic department
 model Department {
-  id          String     @id @default(uuid()) // Unique ID
-  name        String     @unique // Department name
-  code        String     @unique // Department code
-  description String? // Optional description
-  teachers    Teacher[] // Associated teachers
-  students    Student[] // Associated students
-  approvers   Approver[] // Associated approvers
-  offices     Office[] // Associated offices
-  programs    Program[] // Associated programs
+  id          String     @id @default(uuid())
+  name        String     @unique
+  code        String     @unique
+  description String?
+  teachers    Teacher[]
+  students    Student[]
+  approvers   Approver[]
+  offices     Office[]
+  programs    Program[]
 }
 
-// Academic program (e.g., Postgraduate Regular)
 model Program {
-  id                String             @id @default(uuid()) // Unique ID
-  name              String // Program name
-  type              ProgramType // Program type
-  category          ProgramCategory // Program category
-  departmentId      String // Links to department
-  description       String? // Optional description
+  id                String             @id @default(uuid())
+  name              String
+  type              ProgramType
+  category          ProgramCategory
+  departmentId      String
+  description       String?
   department        Department         @relation(fields: [departmentId], references: [id])
-  students          Student[] // Associated students
-  workflowRules     WorkflowRule[] // Associated workflow rules
-  clearanceRequests ClearanceRequest[] // Associated clearance requests
+  students          Student[]
+  workflowRules     WorkflowRule[]
+  clearanceRequests ClearanceRequest[]
 
-  @@index([type, category]) // Index for program queries
+  @@index([type, category])
 }
 
-// Approval office (e.g., Library A)
 model Office {
-  id            String         @id @default(uuid()) // Unique ID
-  name          String         @unique // Office name
-  description   String? // Optional description
-  departmentId  String? // Links to department (optional)
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+  departmentId  String?
   department    Department?    @relation(fields: [departmentId], references: [id])
-  approvers     Approver[] // Associated approvers
-  workflowSteps WorkflowStep[] // Associated workflow steps
+  approvers     Approver[]
+  workflowSteps WorkflowStep[]
 }
 
-// Approver details
 model Approver {
-  id                String           @id @default(uuid()) // Unique ID
-  userId            String           @unique // Links to user
-  officeId          String // Links to office
-  digitalSignature  String? // Digital signature for certificates
-  yearsOfExperience Int              @default(0) // Years of experience
+  id                String           @id @default(uuid())
+  userId            String           @unique
+  officeId          String
+  digitalSignature  String?
+  yearsOfExperience Int              @default(0)
   user              User             @relation(fields: [userId], references: [id])
   office            Office           @relation(fields: [officeId], references: [id])
-  departmentId      String? // Links to department (optional)
+  departmentId      String?
   department        Department?      @relation(fields: [departmentId], references: [id])
-  approvalActions   ApprovalAction[] // Associated approval actions
+  approvalActions   ApprovalAction[]
 }
 
-// Workflow rule for clearance approval
 model WorkflowRule {
-  id            String         @id @default(uuid()) // Unique ID
-  formType      FormType // Form type (e.g., TERMINATION)
-  programId     String? // Links to program (optional)
-  description   String? // Optional description
+  id            String         @id @default(uuid())
+  formType      FormType
+  programId     String?
+  description   String?
   program       Program?       @relation(fields: [programId], references: [id])
-  workflowSteps WorkflowStep[] // Associated workflow steps
+  workflowSteps WorkflowStep[]
 
-  @@unique([formType, programId]) // Unique form type and program
+  @@unique([formType, programId])
 }
 
-// Workflow step in approval process
 model WorkflowStep {
-  id             String       @id @default(uuid()) // Unique ID
-  workflowRuleId String // Links to workflow rule
-  stepOrder      Int // Step order in workflow
-  officeId       String // Links to office
-  description    String? // Optional description
+  id             String       @id @default(uuid())
+  workflowRuleId String
+  stepOrder      Int
+  officeId       String
+  description    String?
   workflowRule   WorkflowRule @relation(fields: [workflowRuleId], references: [id])
   office         Office       @relation(fields: [officeId], references: [id])
 
-  @@unique([workflowRuleId, stepOrder]) // Unique step order
-  @@index([workflowRuleId, stepOrder]) // Index for step queries
+  @@unique([workflowRuleId, stepOrder])
+  @@index([workflowRuleId, stepOrder])
 }
 
-// Approval action for a clearance request
 model ApprovalAction {
-  id                 String           @id @default(uuid()) // Unique ID
-  clearanceRequestId String // Links to clearance request
-  approverId         String // Links to approver
-  status             ApprovalStatus   @default(PENDING) // Action status
-  comment            String? // Optional comment
-  actionDate         DateTime? // Action timestamp
-  finalizedAt        DateTime? // Finalization timestamp
-  actionDueBy        DateTime? // Action deadline
+  id                 String           @id @default(uuid())
+  clearanceRequestId String
+  approverId         String
+  status             ApprovalStatus   @default(PENDING)
+  comment            String?
+  actionDate         DateTime?
+  finalizedAt        DateTime?
+  actionDueBy        DateTime?
   clearanceRequest   ClearanceRequest @relation(fields: [clearanceRequestId], references: [id])
   approver           Approver         @relation(fields: [approverId], references: [id])
 
-  @@unique([clearanceRequestId, approverId]) // Unique action per request and approver
-  @@index([clearanceRequestId]) // Index for request queries
-  @@index([approverId, status]) // Index for approver queries
+  @@unique([clearanceRequestId, approverId])
+  @@index([clearanceRequestId])
+  @@index([approverId, status])
 }
 
-// Clearance request (termination, ID replacement, teacher clearance)
 model ClearanceRequest {
-  id                       String                  @id @default(uuid()) // Unique ID
-  userId                   String // Links to user
-  formType                 FormType // Request type
-  programId                String // Links to program
-  status                   RequestStatus           @default(PENDING) // Request status
-  rejectionReason          String? // Rejection reason (if rejected)
-  resubmissionCount        Int                     @default(0) // Resubmission count
-  submittedAt              DateTime                @default(now()) // Submission timestamp
-  updatedAt                DateTime                @updatedAt // Update timestamp
-  currentStep              Int                     @default(1) // Current workflow step
-  terminationReasonId      String? // Links to termination reason
-  idReplacementReasonId    String? // Links to ID replacement reason
-  teacherClearanceReasonId String? // Links to teacher clearance reason
+  id                       String                  @id @default(uuid())
+  userId                   String
+  formType                 FormType
+  programId                String
+  status                   RequestStatus           @default(PENDING)
+  rejectionReason          String?
+  resubmissionCount        Int                     @default(0)
+  submittedAt              DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  currentStep              Int                     @default(1)
+  terminationReasonId      String?
+  idReplacementReasonId    String?
+  teacherClearanceReasonId String?
   user                     User                    @relation(fields: [userId], references: [id])
   program                  Program                 @relation(fields: [programId], references: [id])
-  terminationReason        TerminationReason?      @relation // Links to termination reason
-  idReplacementReason      IdReplacementReason?    @relation // Links to ID replacement reason
-  teacherClearanceReason   TeacherClearanceReason? @relation // Links to teacher clearance reason
-  approvalActions          ApprovalAction[] // Associated approval actions
-  documents                Document[] // Associated documents
-  notifications            Notification[] // Associated notifications
-  certificate              Certificate? // Associated certificate
-  auditLogs                AuditLog[] // Associated audit logs
+  terminationReason        TerminationReason?      @relation("TerminationReason", fields: [terminationReasonId], references: [id])
+  idReplacementReason      IdReplacementReason?    @relation("IdReplacementReason", fields: [idReplacementReasonId], references: [id])
+  teacherClearanceReason   TeacherClearanceReason? @relation("TeacherClearanceReason", fields: [teacherClearanceReasonId], references: [id])
+  approvalActions          ApprovalAction[]
+  documents                Document[]
+  notifications            Notification[]
+  certificate              Certificate?
+  auditLogs                AuditLog[]
 
-  @@index([formType, programId]) // Index for form/program queries
-  @@index([userId, status]) // Index for user/status queries
-  @@index([currentStep]) // Index for step queries
+  @@index([formType, programId])
+  @@index([userId, status])
+  @@index([currentStep])
 }

@@ -384,7 +384,7 @@ async function main() {
 				firstName: "Bob",
 				fatherName: "Johnson",
 				grandfatherName: "Davis",
-				email: "student4@example.com",
+				email: "judemike787@gmail.com",
 				role: "STUDENT",
 				status: "ACTIVE",
 				isFirstLogin: false,
@@ -2295,10 +2295,66 @@ async function main() {
 			],
 		});
 
-		// Step 12: Create Clearance Requests
+		// Step 12: Create Reasons
+		console.log("Creating reasons...");
+		await prisma.terminationReason.createMany({
+			data: [
+				{
+					id: "tr1",
+					reason: "VACATION",
+					description: "Student leaving for vacation",
+				},
+				{
+					id: "tr2",
+					reason: "GRADUATION",
+					description: "Student completed program",
+				},
+				{
+					id: "tr3",
+					reason: "TRANSFER",
+					description: "Student transferring to another institution",
+				},
+				{
+					id: "tr4",
+					reason: "TRANSFER",
+					description: "Student transferring to another institution",
+				},
+			],
+		});
+		await prisma.teacherClearanceReason.createMany({
+			data: [
+				{ id: "tcr1", reason: "RETIREMENT" },
+				{ id: "tcr2", reason: "RESIGNATION" },
+				{ id: "tcr3", reason: "TRANSFER" },
+				{ id: "tcr4", reason: "END_OF_CONTRACT" },
+			],
+		});
+		await prisma.idReplacementReason.createMany({
+			data: [
+				{
+					id: "idr1",
+					reason: "LOST_ID",
+					description: "ID card was lost",
+				},
+				{
+					id: "idr2",
+					reason: "DAMAGED_ID",
+					description: "ID card was damaged",
+				},
+				{
+					id: "idr3",
+					reason: "STOLEN_ID",
+					description: "ID card was stolen",
+				},
+			],
+		});
+
+		// Step 13: Create Clearance Requests
+		// Step 13: Create Clearance Requests
 		console.log("Creating clearance requests...");
 		await prisma.clearanceRequest.createMany({
 			data: [
+				// Existing Requests
 				{
 					id: "req1",
 					userId: "user1",
@@ -2309,6 +2365,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					terminationReasonId: "tr1",
 				},
 				{
 					id: "req2",
@@ -2320,6 +2377,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					terminationReasonId: "tr2",
 				},
 				{
 					id: "req3",
@@ -2331,7 +2389,8 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
-				}, // Updated to TERMINATION
+					terminationReasonId: "tr3",
+				},
 				{
 					id: "req4",
 					userId: "user4",
@@ -2342,6 +2401,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					terminationReasonId: "tr4",
 				},
 				{
 					id: "req5",
@@ -2353,6 +2413,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr1",
 				},
 				{
 					id: "req6",
@@ -2364,6 +2425,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr2",
 				},
 				{
 					id: "req7",
@@ -2375,6 +2437,7 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr3",
 				},
 				{
 					id: "req8",
@@ -2386,69 +2449,104 @@ async function main() {
 					updatedAt: new Date(),
 					currentStep: 1,
 					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr4",
 				},
-			],
-		});
-
-		// Step 13: Create Reasons
-		console.log("Creating reasons...");
-		await prisma.$transaction([
-			prisma.terminationReason.createMany({
-				data: [
-					{
-						id: "tr1",
-						clearanceRequestId: "req1",
-						reason: "VACATION",
-						description: "Student leaving for vacation",
-					},
-					{
-						id: "tr2",
-						clearanceRequestId: "req2",
-						reason: "GRADUATION",
-						description: "Student completed program",
-					},
-					{
-						id: "tr3",
-						clearanceRequestId: "req3",
-						reason: "TRANSFER",
-						description: "Student transferring to another institution",
-					},
-					{
-						id: "tr4",
-						clearanceRequestId: "req4",
-						reason: "TRANSFER",
-						description: "Student transferring to another institution",
-					},
-				],
-			}),
-			prisma.teacherClearanceReason.createMany({
-				data: [
-					{ id: "tcr1", clearanceRequestId: "req5", reason: "RETIREMENT" },
-					{ id: "tcr2", clearanceRequestId: "req6", reason: "RESIGNATION" },
-					{ id: "tcr3", clearanceRequestId: "req7", reason: "TRANSFER" },
-					{ id: "tcr4", clearanceRequestId: "req8", reason: "END_OF_CONTRACT" },
-				],
-			}),
-		]);
-		await prisma.idReplacementReason.createMany({
-			data: [
+				// Additional Requests
 				{
-					id: "idr1",
-					clearanceRequestId: "req1", // Adjust based on existing clearance requests
-					reason: "LOST_ID",
-					description: "ID card was lost",
+					id: "req9",
+					userId: "user1",
+					formType: "ID_REPLACEMENT",
+					programId: "prog2",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					idReplacementReasonId: "idr1",
 				},
 				{
-					id: "idr2",
-					clearanceRequestId: "req2",
-					reason: "DAMAGED_ID",
-					description: "ID card was damaged",
+					id: "req10",
+					userId: "user2",
+					formType: "ID_REPLACEMENT",
+					programId: "prog2",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					idReplacementReasonId: "idr2",
 				},
 				{
-					id: "idr3",
-					clearanceRequestId: "req3",
-					reason: "STOLEN_ID",
-					description: "ID card was stolen",
+					id: "req11",
+					userId: "user3",
+					formType: "ID_REPLACEMENT",
+					programId: "prog1",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					idReplacementReasonId: "idr1",
+				},
+				{
+					id: "req12",
+					userId: "user4",
+					formType: "ID_REPLACEMENT",
+					programId: "prog3",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					idReplacementReasonId: "idr3",
+				},
+				{
+					id: "req13",
+					userId: "user1",
+					formType: "TERMINATION",
+					programId: "prog2",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					terminationReasonId: "tr2",
+				},
+				{
+					id: "req14",
+					userId: "user3",
+					formType: "TERMINATION",
+					programId: "prog1",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					terminationReasonId: "tr1",
+				},
+				{
+					id: "req15",
+					userId: "user5",
+					formType: "TEACHER_CLEARANCE",
+					programId: "prog1",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr3",
+				},
+				{
+					id: "req16",
+					userId: "user6",
+					formType: "TEACHER_CLEARANCE",
+					programId: "prog2",
+					status: "PENDING",
+					submittedAt: new Date(),
+					updatedAt: new Date(),
+					currentStep: 1,
+					resubmissionCount: 0,
+					teacherClearanceReasonId: "tcr1",
 				},
 			],
 		});

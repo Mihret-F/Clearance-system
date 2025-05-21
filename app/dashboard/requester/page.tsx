@@ -33,6 +33,15 @@ import {
 	Settings,
 	Moon,
 	Plus,
+	Book,
+	User,
+	HomeIcon,
+	DollarSign,
+	Shield,
+	Coffee,
+	BookOpen,
+	Scale,
+	Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -55,10 +64,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { ClearanceRequestForm } from "@/components/dashboard/ClearanceRequestForm";
 import { ClearanceStatusCard } from "@/components/dashboard/ClearanceStatusCard";
-import { clearanceRequests } from "@/data/clearance-requests";
 import axios from "axios";
+import { io } from "socket.io-client";
 
-// Updated NavItem component to use Next.js Link
 const NavItem = ({ icon: Icon, label, href, active = false }) => (
 	<Link href={href} className="block w-full">
 		<motion.div whileHover={{ x: 5 }}>
@@ -79,7 +87,45 @@ const NavItem = ({ icon: Icon, label, href, active = false }) => (
 	</Link>
 );
 
-// Update the component to ensure proper dark mode support
+export const officeIconMap = {
+	"Academic Advisor": User,
+	"Department Head": Building,
+	"Dormitory Head": HomeIcon,
+	"Library (A) Chief of Circulation": Library,
+	"Library (B) Chief of Circulation (Main)": Library,
+	"Library (C)": Library,
+	"Library (B)": Library,
+	"Main Library": Library,
+	"Post Graduate Dean": FileCheck,
+	Registrar: FileCheck,
+	"Students' Cafeteria Head": Coffee,
+	"Finance Office": DollarSign,
+	"Campus Police": Shield,
+	"Book Store": Book,
+	"Continuing Education": BookOpen,
+	"College Community Service and Postgraduate Program Coordinator": Users,
+	"Director of Research and Technology Transfer Directorate": Briefcase,
+	"Director of Industry Liaison and Technology Transfer": Briefcase,
+	"Director of Community Service": Users,
+	"Senior Staff for Research and Community Service": User,
+	"Library Equipment Store": Library,
+	"Property Group": Building,
+	"Chief Cashier": DollarSign,
+	"Assistant Cashier": DollarSign,
+	"College Dean": FileCheck,
+	"College Accounting Staff": DollarSign,
+	"College Cashier": DollarSign,
+	"Collecting Accounting Staff": DollarSign,
+	IBE: Building,
+	"Revenue Collection Specialist": DollarSign,
+	"General Service Directorate": Building,
+	"Immediate Supervisor": User,
+	Auditor: FileCheck,
+	"Legal Service": Scale,
+	"Teachers and Staff Cooperative Association": Users,
+	"Ethics and Anti-Corruption Directorate": Scale,
+};
+
 export default function RequesterDashboard() {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -96,130 +142,154 @@ export default function RequesterDashboard() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showNewRequestForm, setShowNewRequestForm] = useState(false);
 	const [userClearanceRequests, setUserClearanceRequests] = useState([]);
-	const [userData, setUserData] = useState(null); // Added userData state
+	const [userData, setUserData] = useState(null);
 	const [clearanceStages, setClearanceStages] = useState([]);
 	const [notifications, setNotifications] = useState([]);
 	const [pendingDocuments, setPendingDocuments] = useState([]);
+	const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
 	const [overallProgress, setOverallProgress] = useState(0);
 	const [documentTypes, setDocumentTypes] = useState([]);
 	const [selectedDocumentType, setSelectedDocumentType] = useState("");
 	const [selectedRequestId, setSelectedRequestId] = useState("");
 	const [documentDescription, setDocumentDescription] = useState("");
+	const [socket, setSocket] = useState(null);
+	const [currentRequestIndex, setCurrentRequestIndex] = useState(0);
+	const [unreadCount, setUnreadCount] = useState(0);
 
 	useEffect(() => {
-		// Check if window is available (client-side)
 		if (typeof window === "undefined") return;
 
-		// Check if dark mode preference exists
 		const isDark = localStorage.getItem("darkMode") === "true";
 		setDarkMode(isDark);
-
 		if (isDark) {
 			document.documentElement.classList.add("dark");
 		} else {
 			document.documentElement.classList.remove("dark");
 		}
+		const fetchNotifications = async () => {
+			try {
+				const token = localStorage.getItem("authToken");
+				const API_BASE_URL =
+					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+				const notificationsResponse = await axios.get(
+					`${API_BASE_URL}/clearance/notifications`,
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				if (notificationsResponse.data.status === "success") {
+					const fetchedNotifications = notificationsResponse.data.data || [];
+					const uniqueNotifications = fetchedNotifications.filter(
+						(n, index, self) => index === self.findIndex((t) => t.id === n.id)
+					);
+					setNotifications(
+						uniqueNotifications.map((n) => ({
+							...n,
+							clearanceRequestId: n.clearanceRequestId || null,
+							read: n.read ?? false,
+						}))
+					);
+					setUnreadCount(uniqueNotifications.filter((n) => !n.read).length);
+				}
+			} catch (error) {
+				console.error("Error fetching notifications:", error);
+			}
+		};
 
 		const checkAuth = async () => {
+			fetchNotifications();
 			try {
-				// Check if user is logged in
 				const token = localStorage.getItem("authToken");
 				if (!token) {
 					router.push("/login");
 					return;
 				}
 
-				// Verify token with backend
 				const API_BASE_URL =
 					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-				try {
-					// Fetch user profile
-					const userResponse = await axios.get(
-						`${API_BASE_URL}/users/profile`,
-						{
-							headers: {
-								Authorization: `Bearer ${token}`,
-							},
+				const userResponse = await axios.get(`${API_BASE_URL}/users/profile`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+
+				if (userResponse.data.status === "success") {
+					const userData = userResponse.data.data;
+					if (userData.role !== "STUDENT" && userData.role !== "TEACHER") {
+						if (userData.role === "ADMIN") {
+							router.push("/dashboard/admin");
+						} else if (userData.role === "APPROVER") {
+							router.push("/dashboard/approver");
+						} else {
+							router.push("/login");
 						}
-					);
-
-					if (userResponse.data.status === "success") {
-						const userData = userResponse.data.data;
-
-						// Check if user is a student or requester
-						if (userData.role !== "STUDENT" && userData.role !== "TEACHER") {
-							if (userData.role === "ADMIN") {
-								router.push("/dashboard/admin");
-							} else if (userData.role === "APPROVER") {
-								router.push("/dashboard/approver");
-							} else {
-								router.push("/login");
-							}
-							return;
-						}
-
-						setUser(userData);
-						localStorage.setItem("user", JSON.stringify(userData));
-
-						// Try to fetch clearance requests, but don't fail if this errors
-						try {
-							const requestsResponse = await axios.get(
-								`${API_BASE_URL}/clearance/requests`,
-								{
-									headers: {
-										Authorization: `Bearer ${token}`,
-									},
-								}
-							);
-
-							if (requestsResponse.data.status === "success") {
-								setUserClearanceRequests(requestsResponse.data.data || []);
-							}
-						} catch (requestsError) {
-							console.error(
-								"Failed to fetch clearance requests:",
-								requestsError
-							);
-							// Don't fail the whole auth process for this error
-						}
-
-						// Try to fetch notifications, but don't fail if this errors
-						try {
-							const notificationsResponse = await axios.get(
-								`${API_BASE_URL}/users/notifications`,
-								{
-									headers: {
-										Authorization: `Bearer ${token}`,
-									},
-								}
-							);
-
-							if (notificationsResponse.data.status === "success") {
-								setNotifications(notificationsResponse.data.data || []);
-							}
-						} catch (notificationsError) {
-							console.error(
-								"Failed to fetch notifications:",
-								notificationsError
-							);
-							// Don't fail the whole auth process for this error
-						}
-					} else {
-						localStorage.removeItem("authToken");
-						localStorage.removeItem("user");
-						router.push("/login");
+						return;
 					}
-				} catch (err) {
-					console.error("Authentication error:", err);
-					setError("Failed to authenticate. Please log in again.");
+
+					setUser(userData);
+					localStorage.setItem("user", JSON.stringify(userData));
+
+					try {
+						const requestsResponse = await axios.get(
+							`${API_BASE_URL}/clearance/requests`,
+							{
+								headers: { Authorization: `Bearer ${token}` },
+							}
+						);
+						if (requestsResponse.data.status === "success") {
+							const requests = requestsResponse.data.data || [];
+							setUserClearanceRequests(requests);
+
+							if (requests.length > 0) {
+								const latestRequest = requests[0];
+								await fetchRequestDetails(latestRequest.id);
+							}
+						}
+					} catch (requestsError) {
+						console.error("Failed to fetch clearance requests:", requestsError);
+					}
+
+					try {
+						const notificationsResponse = await axios.get(
+							`${API_BASE_URL}/clearance/notifications`,
+							{
+								headers: { Authorization: `Bearer ${token}` },
+							}
+						);
+						if (notificationsResponse.data.status === "success") {
+							const fetchedNotifications =
+								notificationsResponse.data.data || [];
+							setNotifications(
+								fetchedNotifications.map((n) => ({
+									...n,
+									clearanceRequestId: n.clearanceRequestId || null,
+									read: n.read ?? false,
+								}))
+							);
+							setUnreadCount(
+								fetchedNotifications.filter((n) => !n.read).length
+							);
+						}
+					} catch (notificationsError) {
+						console.error("Failed to fetch notifications:", notificationsError);
+					}
+
+					try {
+						const deadlinesResponse = await axios.get(
+							`${API_BASE_URL}/clearance/deadlines`,
+							{
+								headers: { Authorization: `Bearer ${token}` },
+							}
+						);
+						if (deadlinesResponse.data.status === "success") {
+							setUpcomingDeadlines(deadlinesResponse.data.data || []);
+						}
+					} catch (deadlinesError) {
+						console.error("Failed to fetch deadlines:", deadlinesError);
+					}
+				} else {
 					localStorage.removeItem("authToken");
 					localStorage.removeItem("user");
-					setTimeout(() => {
-						router.push("/login");
-					}, 2000);
-				} finally {
-					setLoading(false);
+					router.push("/login");
 				}
 			} catch (err) {
 				console.error("Authentication error:", err);
@@ -229,22 +299,73 @@ export default function RequesterDashboard() {
 				setTimeout(() => {
 					router.push("/login");
 				}, 2000);
+			} finally {
+				setLoading(false);
 			}
 		};
 
-		// Check if user is logged in from localStorage first
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
 			setUser(JSON.parse(storedUser));
 			setLoading(false);
-
-			// Still fetch the latest data
 			checkAuth();
 		} else {
 			checkAuth();
 		}
 
-		// Check for mobile/tablet view
+		const newSocket = io(
+			process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+			{
+				auth: { token: localStorage.getItem("authToken") },
+				reconnection: true,
+				reconnectionAttempts: 5,
+				reconnectionDelay: 1000,
+			}
+		);
+		setSocket(newSocket);
+
+		newSocket.on("connect", () => {
+			console.log("Connected to WebSocket server");
+			newSocket.emit("join", JSON.parse(storedUser || "{}").id);
+		});
+
+		newSocket.on("notification:new", (notification) => {
+			setNotifications((prev) => {
+				const exists = prev.some((n) => n.id === notification.id);
+				if (exists) return prev;
+				const updatedNotifications = [
+					{
+						...notification,
+						read: notification.read ?? false,
+						clearanceRequestId: notification.clearanceRequestId || null,
+					},
+					...prev,
+				];
+				setUnreadCount(updatedNotifications.filter((n) => !n.read).length);
+				return updatedNotifications;
+			});
+		});
+
+		newSocket.on("request:assigned", (request) => {
+			setUserClearanceRequests((prev) => {
+				if (prev.some((r) => r.id === request.id)) return prev;
+				return [request, ...prev];
+			});
+		});
+
+		newSocket.on("request:status-updated", async (data) => {
+			setUserClearanceRequests((prev) =>
+				prev.map((req) =>
+					req.id === data.id
+						? { ...req, status: data.status, currentStep: data.currentStep }
+						: req
+				)
+			);
+			if (userClearanceRequests[currentRequestIndex]?.id === data.id) {
+				await fetchRequestDetails(data.id);
+			}
+		});
+
 		const checkMobile = () => {
 			const isMobile = window.innerWidth < 1024;
 			setSidebarOpen(!isMobile);
@@ -253,27 +374,42 @@ export default function RequesterDashboard() {
 		checkMobile();
 		window.addEventListener("resize", checkMobile);
 
-		return () => window.removeEventListener("resize", checkMobile);
+		return () => {
+			window.removeEventListener("resize", checkMobile);
+			newSocket.disconnect();
+		};
 	}, [router]);
 
-	const toggleDarkMode = () => {
-		const newMode = !darkMode;
-		setDarkMode(newMode);
-		localStorage.setItem("darkMode", newMode.toString());
+	const fetchRequestDetails = async (requestId) => {
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-		if (newMode) {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
+			const workflowResponse = await axios.get(
+				`${API_BASE_URL}/clearance/workflow/${requestId}`,
+				{ headers: { Authorization: `Bearer ${token}` } }
+			);
+
+			if (workflowResponse.data.status === "success") {
+				const workflow = workflowResponse.data.data;
+				setClearanceStages(workflow.steps);
+				setOverallProgress(workflow.progress);
+			}
+
+			const documentsResponse = await axios.get(
+				`${API_BASE_URL}/clearance/documents/${requestId}`,
+				{ headers: { Authorization: `Bearer ${token}` } }
+			);
+
+			if (documentsResponse.data.status === "success") {
+				setPendingDocuments(documentsResponse.data.data || []);
+			}
+		} catch (error) {
+			console.error("Error fetching request details:", error);
 		}
 	};
 
-	const handleFileUpload = (e) => {
-		const file = e.target.files[0];
-		if (file) {
-			setSelectedFile(file);
-		}
-	};
 	useEffect(() => {
 		const fetchDocumentTypes = async () => {
 			try {
@@ -284,9 +420,7 @@ export default function RequesterDashboard() {
 				const response = await axios.get(
 					`${API_BASE_URL}/clearance/document-types`,
 					{
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
+						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
 
@@ -303,6 +437,34 @@ export default function RequesterDashboard() {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		if (
+			userClearanceRequests.length > 0 &&
+			currentRequestIndex >= 0 &&
+			currentRequestIndex < userClearanceRequests.length
+		) {
+			fetchRequestDetails(userClearanceRequests[currentRequestIndex].id);
+		}
+	}, [currentRequestIndex, userClearanceRequests]);
+
+	const toggleDarkMode = () => {
+		const newMode = !darkMode;
+		setDarkMode(newMode);
+		localStorage.setItem("darkMode", newMode.toString());
+		if (newMode) {
+			document.documentElement.classList.add("dark");
+		} else {
+			document.documentElement.classList.remove("dark");
+		}
+	};
+
+	const handleFileUpload = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			setSelectedFile(file);
+		}
+	};
+
 	const handleUploadSubmit = async () => {
 		if (!selectedFile) return;
 
@@ -314,13 +476,11 @@ export default function RequesterDashboard() {
 			const API_BASE_URL =
 				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-			// Create FormData
 			const formData = new FormData();
 			formData.append("file", selectedFile);
 			formData.append("documentTypeId", selectedDocumentType);
 			formData.append("requestId", selectedRequestId);
 
-			// Simulate upload progress
 			const interval = setInterval(() => {
 				setUploadProgress((prev) => {
 					if (prev >= 90) {
@@ -331,7 +491,6 @@ export default function RequesterDashboard() {
 				});
 			}, 200);
 
-			// Upload the document
 			const response = await axios.post(
 				`${API_BASE_URL}/clearance/upload-document`,
 				formData,
@@ -352,24 +511,11 @@ export default function RequesterDashboard() {
 			if (response.data.status === "success") {
 				setUploadProgress(100);
 
-				// Refresh documents list
 				if (userClearanceRequests.length > 0) {
 					const latestRequest = userClearanceRequests[0];
-					const documentsResponse = await axios.get(
-						`${API_BASE_URL}/clearance/documents/${latestRequest.id}`,
-						{
-							headers: {
-								Authorization: `Bearer ${token}`,
-							},
-						}
-					);
-
-					if (documentsResponse.data.status === "success") {
-						setPendingDocuments(documentsResponse.data.data || []);
-					}
+					await fetchRequestDetails(latestRequest.id);
 				}
 
-				// Close modal after successful upload
 				setTimeout(() => {
 					setUploadModalOpen(false);
 					setSelectedFile(null);
@@ -394,6 +540,50 @@ export default function RequesterDashboard() {
 
 	const handleNewRequest = () => {
 		setShowNewRequestForm(true);
+	};
+
+	const markNotificationAsRead = async (notificationId) => {
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+			await axios.post(
+				`${API_BASE_URL}/clearance/notifications/read`,
+				{ notificationId },
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
+			setNotifications((prev) =>
+				prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+			);
+			setUnreadCount((prev) => prev - 1);
+		} catch (error) {
+			console.error("Error marking notification as read:", error);
+		}
+	};
+
+	const markAllNotificationsAsRead = async () => {
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+			await axios.post(
+				`${API_BASE_URL}/clearance/notifications/read-all`,
+				{},
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
+			setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+			setUnreadCount(0);
+		} catch (error) {
+			console.error("Error marking all notifications as read:", error);
+		}
 	};
 
 	if (loading) {
@@ -462,7 +652,11 @@ export default function RequesterDashboard() {
 									aria-label="Notifications"
 								>
 									<Bell className="h-6 w-6" />
-									<span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+									{unreadCount > 0 && (
+										<span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+											{unreadCount}
+										</span>
+									)}
 								</button>
 							</TooltipTrigger>
 							<TooltipContent>Notifications</TooltipContent>
@@ -485,7 +679,6 @@ export default function RequesterDashboard() {
 					sidebarOpen ? "translate-x-0" : "-translate-x-full"
 				}`}
 			>
-				{/* Sidebar Header */}
 				<div className="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
 					<Link
 						href="/dashboard/requester"
@@ -508,7 +701,6 @@ export default function RequesterDashboard() {
 					</button>
 				</div>
 
-				{/* User Profile */}
 				<div className="p-4 border-b border-gray-200 dark:border-gray-700">
 					<div className="flex items-center gap-3">
 						<Avatar className="h-10 w-10">
@@ -531,7 +723,6 @@ export default function RequesterDashboard() {
 					</div>
 				</div>
 
-				{/* Navigation */}
 				<nav className="p-3 space-y-1 overflow-y-auto flex-grow">
 					<NavItem
 						icon={Home}
@@ -577,7 +768,6 @@ export default function RequesterDashboard() {
 					/>
 				</nav>
 
-				{/* Sidebar Footer */}
 				<div className="p-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
 					<button
 						onClick={toggleDarkMode}
@@ -601,7 +791,6 @@ export default function RequesterDashboard() {
 				</div>
 			</aside>
 
-			{/* Sidebar Backdrop - Mobile Only */}
 			{sidebarOpen && (
 				<div
 					className="fixed inset-0 z-30 bg-black/50 lg:hidden"
@@ -609,17 +798,15 @@ export default function RequesterDashboard() {
 				/>
 			)}
 
-			{/* Main Content */}
 			<main
 				className={`transition-all duration-300 ${
 					sidebarOpen ? "lg:ml-7" : "lg:ml-0"
 				} pt-16 lg:pt-0`}
 			>
 				<div className="max-w-7xl mx-auto px-2 py-4">
-					{/* Dashboard Header */}
 					<div className="mb-6">
 						<h1 className="text-2xl font-bold">
-							Welcome back, {user?.firstName.split(" ")[0] || "USer"}
+							Welcome back, {user?.firstName.split(" ")[0] || "User"}
 						</h1>
 						<p className="text-gray-600 dark:text-gray-400">
 							Here's an overview of your clearance status
@@ -647,8 +834,10 @@ export default function RequesterDashboard() {
 												onClick={() => setNotificationPanelOpen(true)}
 											>
 												<Bell className="h-4 w-4" />
-												{notifications.filter((n) => !n.read).length > 0 && (
-													<span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500" />
+												{unreadCount > 0 && (
+													<span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+														{unreadCount}
+													</span>
 												)}
 											</Button>
 										</TooltipTrigger>
@@ -667,20 +856,51 @@ export default function RequesterDashboard() {
 						</div>
 					</div>
 
-					{/* Main Dashboard Content */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						{/* Left Column - Progress Overview */}
-
 						<Card className="p-6 bg-white dark:bg-gray-800 shadow-sm">
 							<div className="flex items-center justify-between mb-4">
 								<h2 className="text-lg font-semibold">Clearance Progress</h2>
 								{userClearanceRequests.length > 0 && (
-									<Badge className="bg-red-500 text-white px-3 py-1 rounded-full">
-										{overallProgress}% Complete
-									</Badge>
+									<div className="flex items-center gap-2">
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() =>
+												setCurrentRequestIndex((prev) => Math.max(prev - 1, 0))
+											}
+											disabled={currentRequestIndex === 0}
+										>
+											Previous
+										</Button>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() =>
+												setCurrentRequestIndex((prev) =>
+													Math.min(prev + 1, userClearanceRequests.length - 1)
+												)
+											}
+											disabled={
+												currentRequestIndex === userClearanceRequests.length - 1
+											}
+										>
+											Next
+										</Button>
+										<Badge className="bg-blue-500 text-white px-3 py-1 rounded-full">
+											{overallProgress}% Complete
+										</Badge>
+									</div>
 								)}
 							</div>
-
+							{userClearanceRequests.length > 0 && (
+								<p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+									Request Type:{" "}
+									{userClearanceRequests[currentRequestIndex].formType.replace(
+										/_/g,
+										" "
+									)}
+								</p>
+							)}
 							<div className="space-y-4">
 								{userClearanceRequests.length > 0 ? (
 									<>
@@ -691,71 +911,93 @@ export default function RequesterDashboard() {
 												</span>
 												<span className="font-medium">{overallProgress}%</span>
 											</div>
-											<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-												<div
-													className="bg-blue-600 h-2 rounded-full"
-													style={{ width: `${overallProgress}%` }}
-												></div>
-											</div>
+											<Progress value={overallProgress} className="h-2" />
 										</div>
 
 										<div className="space-y-4 mt-4">
-											{clearanceStages.map((stage) => (
-												<div key={stage.id} className="flex items-center gap-3">
+											{clearanceStages.map((stage, index) => {
+												const OfficeIcon =
+													officeIconMap[stage.officeName] || FileText;
+												const isFirstPending =
+													index === 0 && stage.status === "PENDING";
+												const statusLabel = isFirstPending
+													? "Pending"
+													: stage.status === "APPROVED"
+													? "Completed"
+													: stage.status === "REJECTED"
+													? "Rejected"
+													: "Waiting";
+												const statusIcon =
+													stage.status === "APPROVED" ? (
+														<Check className="h-5 w-5" />
+													) : stage.status === "REJECTED" ? (
+														<X className="h-5 w-5" />
+													) : stage.status === "PENDING" ? (
+														<Clock className="h-5 w-5" />
+													) : (
+														<Clock className="h-5 w-5" />
+													);
+
+												return (
 													<div
-														className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-															stage.status === "APPROVED"
-																? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-																: stage.status === "PENDING"
-																? "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-																: "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-														}`}
+														key={stage.stepOrder}
+														className="flex items-center gap-3"
 													>
-														{stage.status === "APPROVED" ? (
-															<Check className="h-5 w-5" />
-														) : stage.status === "PENDING" ? (
-															<Clock className="h-5 w-5" />
-														) : (
-															<FileText className="h-5 w-5" />
-														)}
-													</div>
-													<div className="flex-1 min-w-0">
-														<div className="flex justify-between">
-															<p className="font-medium">{stage.officeName}</p>
-															<Badge
-																variant={
-																	stage.status === "APPROVED"
-																		? "success"
-																		: stage.status === "PENDING"
-																		? "outline"
-																		: "secondary"
-																}
-																className={
-																	stage.status === "APPROVED"
-																		? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-																		: stage.status === "PENDING"
-																		? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
-																		: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
-																}
-															>
-																{stage.status === "APPROVED"
-																	? "Approved"
+														<div
+															className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+																stage.status === "APPROVED"
+																	? "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+																	: stage.status === "REJECTED"
+																	? "bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400"
 																	: stage.status === "PENDING"
-																	? "In Progress"
-																	: "Waiting"}
-															</Badge>
+																	? "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+																	: "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400"
+															}`}
+														>
+															{statusIcon}
 														</div>
-														<p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-															{stage.description ||
-																`${stage.officeName} clearance`}
-														</p>
+														<div className="flex-1 min-w-0">
+															<div className="flex justify-between">
+																<p className="font-medium">
+																	{stage.officeName}
+																</p>
+																<Badge
+																	variant={
+																		stage.status === "APPROVED"
+																			? "success"
+																			: stage.status === "REJECTED"
+																			? "destructive"
+																			: stage.status === "PENDING"
+																			? "outline"
+																			: "secondary"
+																	}
+																	className={
+																		stage.status === "APPROVED"
+																			? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+																			: stage.status === "REJECTED"
+																			? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+																			: stage.status === "PENDING"
+																			? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+																			: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+																	}
+																>
+																	{statusLabel}
+																</Badge>
+															</div>
+															<p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+																{stage.approverName
+																	? `Approver: ${stage.approverName}`
+																	: stage.description ||
+																	  `${stage.officeName} clearance`}
+															</p>
+														</div>
 													</div>
-												</div>
-											))}
+												);
+											})}
 										</div>
 
 										<Link
-											href="/dashboard/check-status"
+											href={`/dashboard/check-status?requestId=${userClearanceRequests[currentRequestIndex].id}`}
 											className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center mt-2"
 										>
 											<span>View Detailed Progress</span>
@@ -780,7 +1022,6 @@ export default function RequesterDashboard() {
 							</div>
 						</Card>
 
-						{/* Right Column - Quick Actions */}
 						<Card className="p-6 bg-white dark:bg-gray-800 shadow-sm">
 							<h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
 							<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -824,7 +1065,6 @@ export default function RequesterDashboard() {
 						</Card>
 					</div>
 
-					{/* Notifications & Documents Section */}
 					<Card className="mt-6 p-6 bg-white dark:bg-gray-800 shadow-sm">
 						<Tabs defaultValue="notifications">
 							<div className="flex items-center justify-between mb-4">
@@ -832,6 +1072,11 @@ export default function RequesterDashboard() {
 									<TabsTrigger value="documents">Pending Documents</TabsTrigger>
 									<TabsTrigger value="notifications">
 										Recent Notifications
+										{unreadCount > 0 && (
+											<Badge className="ml-2 bg-red-500 text-white">
+												{unreadCount}
+											</Badge>
+										)}
 									</TabsTrigger>
 									<TabsTrigger value="schedule">Upcoming Deadlines</TabsTrigger>
 								</TabsList>
@@ -868,7 +1113,10 @@ export default function RequesterDashboard() {
 												<Button
 													size="sm"
 													className="gap-1"
-													onClick={() => setUploadModalOpen(true)}
+													onClick={() => {
+														setSelectedRequestId(doc.requestId || "");
+														setUploadModalOpen(true);
+													}}
 												>
 													<Upload className="h-3 w-3" />
 													Upload
@@ -892,45 +1140,61 @@ export default function RequesterDashboard() {
 
 							<TabsContent value="notifications" className="space-y-4">
 								{notifications.length > 0 ? (
-									notifications.map((notification) => (
+									notifications.slice(0, 5).map((notification) => (
 										<div
 											key={notification.id}
-											className={`p-4 rounded-lg ${
+											className={`p-4 rounded-lg cursor-pointer ${
 												notification.read
 													? "bg-gray-50 dark:bg-gray-800"
 													: "bg-blue-50 dark:bg-blue-900/10"
 											} border border-gray-200 dark:border-gray-700`}
+											onClick={() => {
+												if (!notification.read) {
+													markNotificationAsRead(notification.id);
+												}
+												if (notification.clearanceRequestId) {
+													router.push(
+														`/dashboard/check-status?requestId=${notification.clearanceRequestId}`
+													);
+												}
+											}}
 										>
 											<div className="flex gap-3">
 												<div
 													className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-														notification.type === "success"
-															? "bg-green-100 dark:bg-green-900/20"
-															: notification.type === "warning"
+														notification.type === "INFO"
+															? "bg-blue-100 dark:bg-blue-900/20"
+															: notification.type === "ACTION_REQUIRED"
 															? "bg-yellow-100 dark:bg-yellow-900/20"
-															: "bg-blue-100 dark:bg-blue-900/20"
+															: "bg-green-100 dark:bg-green-900/20"
 													}`}
 												>
-													{notification.type === "success" && (
-														<Check className="h-5 w-5 text-green-600 dark:text-green-400" />
-													)}
-													{notification.type === "warning" && (
-														<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-													)}
-													{notification.type === "pending" && (
-														<Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-													)}
-													{notification.type === "info" && (
+													{notification.type === "INFO" && (
 														<Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
 													)}
+													{notification.type === "ACTION_REQUIRED" && (
+														<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+													)}
+													{notification.type === "SYSTEM" && (
+														<Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+													)}
 												</div>
-												<div>
-													<h4 className="font-medium">{notification.title}</h4>
+												<div className="flex-1">
+													<div className="flex justify-between">
+														<h4 className="font-medium">
+															{notification.title}
+														</h4>
+														{!notification.read && (
+															<Badge className="bg-blue-500 text-white">
+																New
+															</Badge>
+														)}
+													</div>
 													<p className="text-sm text-gray-600 dark:text-gray-400">
 														{notification.message}
 													</p>
 													<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-														{notification.time}
+														{new Date(notification.sentAt).toLocaleString()}
 													</p>
 												</div>
 											</div>
@@ -947,54 +1211,43 @@ export default function RequesterDashboard() {
 							</TabsContent>
 
 							<TabsContent value="schedule" className="space-y-4">
-								<div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-									<div className="flex items-center gap-3">
-										<div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-											<Calendar className="h-5 w-5 text-red-600 dark:text-red-400" />
-										</div>
-										<div>
-											<h4 className="font-medium">
-												Graduation Clearance Deadline
-											</h4>
-											<p className="text-sm text-gray-600 dark:text-gray-400">
-												May 15, 2024 (14 days left)
-											</p>
-										</div>
+								{upcomingDeadlines.length > 0 ? (
+									upcomingDeadlines.map((deadline) => {
+										const daysLeft = Math.ceil(
+											(new Date(deadline.dueDate).getTime() - Date.now()) /
+												(1000 * 60 * 60 * 24)
+										);
+										return (
+											<div
+												key={deadline.id}
+												className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+											>
+												<div className="flex items-center gap-3">
+													<div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+														<Calendar className="h-5 w-5 text-red-600 dark:text-red-400" />
+													</div>
+													<div>
+														<h4 className="font-medium">{deadline.title}</h4>
+														<p className="text-sm text-gray-600 dark:text-gray-400">
+															{new Date(deadline.dueDate).toLocaleDateString()}{" "}
+															({daysLeft} days left)
+														</p>
+													</div>
+												</div>
+											</div>
+										);
+									})
+								) : (
+									<div className="text-center py-6">
+										<p className="text-gray-500 dark:text-gray-400">
+											No upcoming deadlines.
+										</p>
 									</div>
-								</div>
-
-								<div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-									<div className="flex items-center gap-3">
-										<div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-											<Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-										</div>
-										<div>
-											<h4 className="font-medium">Library Returns Deadline</h4>
-											<p className="text-sm text-gray-600 dark:text-gray-400">
-												May 10, 2024 (9 days left)
-											</p>
-										</div>
-									</div>
-								</div>
-
-								<div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-									<div className="flex items-center gap-3">
-										<div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-											<Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-										</div>
-										<div>
-											<h4 className="font-medium">Hostel Checkout</h4>
-											<p className="text-sm text-gray-600 dark:text-gray-400">
-												May 20, 2024 (19 days left)
-											</p>
-										</div>
-									</div>
-								</div>
+								)}
 							</TabsContent>
 						</Tabs>
 					</Card>
 
-					{/* Clearance Requests */}
 					<Card className="mt-6 p-6 bg-white dark:bg-gray-800 shadow-sm">
 						<div className="flex items-center justify-between mb-4">
 							<h2 className="text-lg font-semibold">My Clearance Requests</h2>
@@ -1032,7 +1285,6 @@ export default function RequesterDashboard() {
 					</Card>
 				</div>
 
-				{/* Upload Document Modal */}
 				<Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
 					<DialogContent>
 						<DialogHeader>
@@ -1143,7 +1395,86 @@ export default function RequesterDashboard() {
 					</DialogContent>
 				</Dialog>
 
-				{/* New Request Form Dialog */}
+				<Dialog
+					open={notificationPanelOpen}
+					onOpenChange={setNotificationPanelOpen}
+				>
+					<DialogContent className="sm:max-w-[500px]">
+						<DialogHeader>
+							<DialogTitle>Notifications</DialogTitle>
+						</DialogHeader>
+						<div className="max-h-[60vh] overflow-y-auto space-y-4">
+							{notifications.length > 0 ? (
+								notifications.map((notification) => (
+									<div
+										key={notification.id}
+										className={`p-4 rounded-lg cursor-pointer ${
+											notification.read
+												? "bg-gray-50 dark:bg-gray-800"
+												: "bg-blue-50 dark:bg-blue-900/10"
+										} border border-gray-200 dark:border-gray-700`}
+										onClick={() => {
+											if (!notification.read) {
+												markNotificationAsRead(notification.id);
+											}
+											if (notification.clearanceRequestId) {
+												router.push(
+													`/dashboard/check-status?requestId=${notification.clearanceRequestId}`
+												);
+												setNotificationPanelOpen(false);
+											}
+										}}
+									>
+										<div className="flex gap-3">
+											<div
+												className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+													notification.type === "INFO"
+														? "bg-blue-100 dark:bg-blue-900/20"
+														: notification.type === "ACTION_REQUIRED"
+														? "bg-yellow-100 dark:bg-yellow-900/20"
+														: "bg-green-100 dark:bg-green-900/20"
+												}`}
+											>
+												{notification.type === "INFO" && (
+													<Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+												)}
+												{notification.type === "ACTION_REQUIRED" && (
+													<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+												)}
+												{notification.type === "SYSTEM" && (
+													<Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+												)}
+											</div>
+											<div className="flex-1">
+												<div className="flex justify-between">
+													<h4 className="font-medium">{notification.title}</h4>
+													{!notification.read && (
+														<Badge className="bg-blue-500 text-white">
+															New
+														</Badge>
+													)}
+												</div>
+												<p className="text-sm text-gray-600 dark:text-gray-400">
+													{notification.message}
+												</p>
+												<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+													{new Date(notification.sentAt).toLocaleString()}
+												</p>
+											</div>
+										</div>
+									</div>
+								))
+							) : (
+								<div className="text-center py-6">
+									<p className="text-gray-500 dark:text-gray-400">
+										No notifications available.
+									</p>
+								</div>
+							)}
+						</div>
+					</DialogContent>
+				</Dialog>
+
 				<Dialog open={showNewRequestForm} onOpenChange={setShowNewRequestForm}>
 					<DialogContent className="max-w-4xl max-h-[95vh] sm:max-h-[90vh] p-0 overflow-hidden">
 						<DialogHeader className="px-4 py-2 sm:px-6 sm:py-4 border-b sticky top-0 z-10 bg-white dark:bg-gray-900 flex flex-row items-center justify-between">
@@ -1160,70 +1491,50 @@ export default function RequesterDashboard() {
 						<div className="overflow-y-auto max-h-[calc(95vh-60px)] sm:max-h-[calc(90vh-70px)]">
 							<ClearanceRequestForm
 								user={user}
-								onSubmit={(data) => {
-									// Add the new request to the list
-									setUserClearanceRequests((prev) => [data, ...prev]);
-
-									// Close the form
+								onSubmit={async (data) => {
+									setUserClearanceRequests((prev) => {
+										const exists = prev.some((r) => r.id === data.id);
+										if (exists) return prev;
+										return [data, ...prev];
+									});
 									setShowNewRequestForm(false);
-
-									// Refresh the workflow and documents data for the new request
-									const fetchRequestDetails = async () => {
-										try {
-											const token = localStorage.getItem("authToken");
-											const API_BASE_URL =
-												process.env.NEXT_PUBLIC_API_URL ||
-												"http://localhost:5000/api";
-
-											// Fetch workflow stages for this request
-											const workflowResponse = await axios.get(
-												`${API_BASE_URL}/clearance/workflow/${data.id}`,
-												{
-													headers: {
-														Authorization: `Bearer ${token}`,
-													},
-												}
-											);
-
-											if (workflowResponse.data.status === "success") {
-												const workflow = workflowResponse.data.data;
-												setClearanceStages(workflow.steps);
-												setOverallProgress(workflow.progress);
+									await fetchRequestDetails(data.id);
+									// Fetch updated notifications
+									try {
+										const token = localStorage.getItem("authToken");
+										const API_BASE_URL =
+											process.env.NEXT_PUBLIC_API_URL ||
+											"http://localhost:5000/api";
+										const notificationsResponse = await axios.get(
+											`${API_BASE_URL}/clearance/notifications`,
+											{
+												headers: { Authorization: `Bearer ${token}` },
 											}
-
-											// Fetch pending documents for this request
-											const documentsResponse = await axios.get(
-												`${API_BASE_URL}/clearance/documents/${data.id}`,
-												{
-													headers: {
-														Authorization: `Bearer ${token}`,
-													},
-												}
+										);
+										if (notificationsResponse.data.status === "success") {
+											const fetchedNotifications =
+												notificationsResponse.data.data || [];
+											const uniqueNotifications = fetchedNotifications.filter(
+												(n, index, self) =>
+													index === self.findIndex((t) => t.id === n.id)
 											);
-
-											if (documentsResponse.data.status === "success") {
-												setPendingDocuments(documentsResponse.data.data || []);
-											}
-
-											// Refresh notifications
-											const notificationsResponse = await axios.get(
-												`${API_BASE_URL}/users/notifications`,
-												{
-													headers: {
-														Authorization: `Bearer ${token}`,
-													},
-												}
+											setNotifications(
+												uniqueNotifications.map((n) => ({
+													...n,
+													clearanceRequestId: n.clearanceRequestId || null,
+													read: n.read ?? false,
+												}))
 											);
-
-											if (notificationsResponse.data.status === "success") {
-												setNotifications(notificationsResponse.data.data || []);
-											}
-										} catch (error) {
-											console.error("Error fetching request details:", error);
+											setUnreadCount(
+												uniqueNotifications.filter((n) => !n.read).length
+											);
 										}
-									};
-
-									fetchRequestDetails();
+									} catch (error) {
+										console.error(
+											"Error fetching notifications after submission:",
+											error
+										);
+									}
 								}}
 								onCancel={() => setShowNewRequestForm(false)}
 							/>

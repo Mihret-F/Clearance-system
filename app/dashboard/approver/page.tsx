@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ApproverDashboard from "@/components/dashboard/ApproverDashboard";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 
 export default function ApproverPage() {
 	const router = useRouter();
-	const searchParams = useSearchParams();
 	const [user, setUser] = useState(null);
 	const [clearanceRequests, setClearanceRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -41,14 +40,12 @@ export default function ApproverPage() {
 
 					// Check if user is an approver
 					if (
-						userData.role !== "APPROVER" &&
-						userData.role !== "DepartmentHead"
+						userData.role === "APPROVER" ||
+						userData.role === "DepartmentHead"
 					) {
-						if (userData.role === "ADMIN") {
-							router.push("/dashboard/admin");
-						} else {
-							router.push("/dashboard/requester");
-						}
+						router.push("/dashboard/approver");
+					} else {
+						router.push("/login");
 						return;
 					}
 
@@ -135,12 +132,9 @@ export default function ApproverPage() {
 			try {
 				const userData = JSON.parse(storedUser);
 
-				// Check if user is an approver
-				if (
-					userData.role !== "DepartmentHead" &&
-					userData.role !== "Approver"
-				) {
-					router.push("/dashboard/requester");
+				// Redirect if the role is not APPROVER
+				if (userData.role !== "APPROVER") {
+					router.replace("/dashboard/requester");
 					return;
 				}
 
@@ -193,11 +187,6 @@ export default function ApproverPage() {
 		}
 	}, [router]);
 
-	const handleClearanceRequestsUpdate = (updatedRequests) => {
-		setClearanceRequests(updatedRequests);
-		localStorage.setItem("clearanceRequests", JSON.stringify(updatedRequests));
-	};
-
 	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -227,7 +216,13 @@ export default function ApproverPage() {
 		<ApproverDashboard
 			user={user}
 			clearanceRequests={clearanceRequests}
-			setClearanceRequests={handleClearanceRequestsUpdate}
+			setClearanceRequests={(updatedRequests) => {
+				setClearanceRequests(updatedRequests);
+				localStorage.setItem(
+					"clearanceRequests",
+					JSON.stringify(updatedRequests)
+				);
+			}}
 		/>
 	);
 }

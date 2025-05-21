@@ -10,6 +10,11 @@ import {
 	uploadDocument,
 	handleApprovalAction,
 	getRequestWorkflow,
+	getDeadlines,
+	markNotificationAsRead,
+	markAllNotificationsAsRead,
+	sendSystemMaintenanceNotification,
+	getNotifications,
 } from "../controllers/clearance.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { upload } from "../middleware/upload.middleware";
@@ -19,6 +24,7 @@ const router = Router();
 // const upload = multer({ dest: "uploads/" });
 
 router.get("/form-types", authenticate, getFormTypes);
+
 router.get("/document-types", authenticate, getDocumentTypes);
 router.get("/reasons/:formType", authenticate, getReasons);
 router.post("/workflow", authenticate, getWorkflow);
@@ -38,5 +44,18 @@ router.post(
 	uploadDocument
 );
 router.post("/approve-reject", authenticate, handleApprovalAction);
+router.get("/deadlines", authenticate, getDeadlines);
+router.post("/notifications/read", authenticate, markNotificationAsRead);
+router.post(
+	"/notifications/read-all",
+	authenticate,
+	markAllNotificationsAsRead
+);
+router.post(
+	"/system-maintenance",
+	authenticate,
+	sendSystemMaintenanceNotification
+);
+router.get("/notifications", authenticate, getNotifications);
 
 export default router;

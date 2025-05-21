@@ -2760,6 +2760,99 @@ export namespace Prisma {
 
 
   /**
+   * Count Type TerminationReasonCountOutputType
+   */
+
+  export type TerminationReasonCountOutputType = {
+    clearanceRequests: number
+  }
+
+  export type TerminationReasonCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    clearanceRequests?: boolean | TerminationReasonCountOutputTypeCountClearanceRequestsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TerminationReasonCountOutputType without action
+   */
+  export type TerminationReasonCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TerminationReasonCountOutputType
+     */
+    select?: TerminationReasonCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TerminationReasonCountOutputType without action
+   */
+  export type TerminationReasonCountOutputTypeCountClearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClearanceRequestWhereInput
+  }
+
+
+  /**
+   * Count Type IdReplacementReasonCountOutputType
+   */
+
+  export type IdReplacementReasonCountOutputType = {
+    clearanceRequests: number
+  }
+
+  export type IdReplacementReasonCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    clearanceRequests?: boolean | IdReplacementReasonCountOutputTypeCountClearanceRequestsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * IdReplacementReasonCountOutputType without action
+   */
+  export type IdReplacementReasonCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IdReplacementReasonCountOutputType
+     */
+    select?: IdReplacementReasonCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * IdReplacementReasonCountOutputType without action
+   */
+  export type IdReplacementReasonCountOutputTypeCountClearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClearanceRequestWhereInput
+  }
+
+
+  /**
+   * Count Type TeacherClearanceReasonCountOutputType
+   */
+
+  export type TeacherClearanceReasonCountOutputType = {
+    clearanceRequests: number
+  }
+
+  export type TeacherClearanceReasonCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    clearanceRequests?: boolean | TeacherClearanceReasonCountOutputTypeCountClearanceRequestsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TeacherClearanceReasonCountOutputType without action
+   */
+  export type TeacherClearanceReasonCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeacherClearanceReasonCountOutputType
+     */
+    select?: TeacherClearanceReasonCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TeacherClearanceReasonCountOutputType without action
+   */
+  export type TeacherClearanceReasonCountOutputTypeCountClearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClearanceRequestWhereInput
+  }
+
+
+  /**
    * Count Type DocumentTypeCountOutputType
    */
 
@@ -3162,46 +3255,52 @@ export namespace Prisma {
 
   export type TerminationReasonMinAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
     description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type TerminationReasonMaxAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
     description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type TerminationReasonCountAggregateOutputType = {
     id: number
-    clearanceRequestId: number
     reason: number
     description: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type TerminationReasonMinAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type TerminationReasonMaxAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type TerminationReasonCountAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -3279,9 +3378,10 @@ export namespace Prisma {
 
   export type TerminationReasonGroupByOutputType = {
     id: string
-    clearanceRequestId: string
     reason: string
     description: string | null
+    createdAt: Date
+    updatedAt: Date
     _count: TerminationReasonCountAggregateOutputType | null
     _min: TerminationReasonMinAggregateOutputType | null
     _max: TerminationReasonMaxAggregateOutputType | null
@@ -3303,56 +3403,57 @@ export namespace Prisma {
 
   export type TerminationReasonSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
+    clearanceRequests?: boolean | TerminationReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | TerminationReasonCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["terminationReason"]>
 
   export type TerminationReasonSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["terminationReason"]>
 
   export type TerminationReasonSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["terminationReason"]>
 
   export type TerminationReasonSelectScalar = {
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type TerminationReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clearanceRequestId" | "reason" | "description", ExtArgs["result"]["terminationReason"]>
+  export type TerminationReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "reason" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["terminationReason"]>
   export type TerminationReasonInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    clearanceRequests?: boolean | TerminationReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | TerminationReasonCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type TerminationReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
-  export type TerminationReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
+  export type TerminationReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type TerminationReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $TerminationReasonPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "TerminationReason"
     objects: {
-      clearanceRequest: Prisma.$ClearanceRequestPayload<ExtArgs>
+      clearanceRequests: Prisma.$ClearanceRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      clearanceRequestId: string
       reason: string
       description: string | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["terminationReason"]>
     composites: {}
   }
@@ -3747,7 +3848,7 @@ export namespace Prisma {
    */
   export interface Prisma__TerminationReasonClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    clearanceRequest<T extends ClearanceRequestDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClearanceRequestDefaultArgs<ExtArgs>>): Prisma__ClearanceRequestClient<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    clearanceRequests<T extends TerminationReason$clearanceRequestsArgs<ExtArgs> = {}>(args?: Subset<T, TerminationReason$clearanceRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3778,9 +3879,10 @@ export namespace Prisma {
    */
   interface TerminationReasonFieldRefs {
     readonly id: FieldRef<"TerminationReason", 'String'>
-    readonly clearanceRequestId: FieldRef<"TerminationReason", 'String'>
     readonly reason: FieldRef<"TerminationReason", 'String'>
     readonly description: FieldRef<"TerminationReason", 'String'>
+    readonly createdAt: FieldRef<"TerminationReason", 'DateTime'>
+    readonly updatedAt: FieldRef<"TerminationReason", 'DateTime'>
   }
     
 
@@ -4030,10 +4132,6 @@ export namespace Prisma {
      */
     data: TerminationReasonCreateManyInput | TerminationReasonCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TerminationReasonIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -4104,10 +4202,6 @@ export namespace Prisma {
      * Limit how many TerminationReasons to update.
      */
     limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TerminationReasonIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -4177,6 +4271,30 @@ export namespace Prisma {
   }
 
   /**
+   * TerminationReason.clearanceRequests
+   */
+  export type TerminationReason$clearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClearanceRequest
+     */
+    select?: ClearanceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClearanceRequest
+     */
+    omit?: ClearanceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClearanceRequestInclude<ExtArgs> | null
+    where?: ClearanceRequestWhereInput
+    orderBy?: ClearanceRequestOrderByWithRelationInput | ClearanceRequestOrderByWithRelationInput[]
+    cursor?: ClearanceRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClearanceRequestScalarFieldEnum | ClearanceRequestScalarFieldEnum[]
+  }
+
+  /**
    * TerminationReason without action
    */
   export type TerminationReasonDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4207,46 +4325,52 @@ export namespace Prisma {
 
   export type IdReplacementReasonMinAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
     description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type IdReplacementReasonMaxAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
     description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type IdReplacementReasonCountAggregateOutputType = {
     id: number
-    clearanceRequestId: number
     reason: number
     description: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type IdReplacementReasonMinAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type IdReplacementReasonMaxAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type IdReplacementReasonCountAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
     description?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -4324,9 +4448,10 @@ export namespace Prisma {
 
   export type IdReplacementReasonGroupByOutputType = {
     id: string
-    clearanceRequestId: string
     reason: string
     description: string | null
+    createdAt: Date
+    updatedAt: Date
     _count: IdReplacementReasonCountAggregateOutputType | null
     _min: IdReplacementReasonMinAggregateOutputType | null
     _max: IdReplacementReasonMaxAggregateOutputType | null
@@ -4348,56 +4473,57 @@ export namespace Prisma {
 
   export type IdReplacementReasonSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
+    clearanceRequests?: boolean | IdReplacementReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | IdReplacementReasonCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["idReplacementReason"]>
 
   export type IdReplacementReasonSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["idReplacementReason"]>
 
   export type IdReplacementReasonSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["idReplacementReason"]>
 
   export type IdReplacementReasonSelectScalar = {
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
     description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type IdReplacementReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clearanceRequestId" | "reason" | "description", ExtArgs["result"]["idReplacementReason"]>
+  export type IdReplacementReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "reason" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["idReplacementReason"]>
   export type IdReplacementReasonInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    clearanceRequests?: boolean | IdReplacementReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | IdReplacementReasonCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type IdReplacementReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
-  export type IdReplacementReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
+  export type IdReplacementReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type IdReplacementReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $IdReplacementReasonPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "IdReplacementReason"
     objects: {
-      clearanceRequest: Prisma.$ClearanceRequestPayload<ExtArgs>
+      clearanceRequests: Prisma.$ClearanceRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      clearanceRequestId: string
       reason: string
       description: string | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["idReplacementReason"]>
     composites: {}
   }
@@ -4792,7 +4918,7 @@ export namespace Prisma {
    */
   export interface Prisma__IdReplacementReasonClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    clearanceRequest<T extends ClearanceRequestDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClearanceRequestDefaultArgs<ExtArgs>>): Prisma__ClearanceRequestClient<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    clearanceRequests<T extends IdReplacementReason$clearanceRequestsArgs<ExtArgs> = {}>(args?: Subset<T, IdReplacementReason$clearanceRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4823,9 +4949,10 @@ export namespace Prisma {
    */
   interface IdReplacementReasonFieldRefs {
     readonly id: FieldRef<"IdReplacementReason", 'String'>
-    readonly clearanceRequestId: FieldRef<"IdReplacementReason", 'String'>
     readonly reason: FieldRef<"IdReplacementReason", 'String'>
     readonly description: FieldRef<"IdReplacementReason", 'String'>
+    readonly createdAt: FieldRef<"IdReplacementReason", 'DateTime'>
+    readonly updatedAt: FieldRef<"IdReplacementReason", 'DateTime'>
   }
     
 
@@ -5075,10 +5202,6 @@ export namespace Prisma {
      */
     data: IdReplacementReasonCreateManyInput | IdReplacementReasonCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IdReplacementReasonIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -5149,10 +5272,6 @@ export namespace Prisma {
      * Limit how many IdReplacementReasons to update.
      */
     limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IdReplacementReasonIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -5222,6 +5341,30 @@ export namespace Prisma {
   }
 
   /**
+   * IdReplacementReason.clearanceRequests
+   */
+  export type IdReplacementReason$clearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClearanceRequest
+     */
+    select?: ClearanceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClearanceRequest
+     */
+    omit?: ClearanceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClearanceRequestInclude<ExtArgs> | null
+    where?: ClearanceRequestWhereInput
+    orderBy?: ClearanceRequestOrderByWithRelationInput | ClearanceRequestOrderByWithRelationInput[]
+    cursor?: ClearanceRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClearanceRequestScalarFieldEnum | ClearanceRequestScalarFieldEnum[]
+  }
+
+  /**
    * IdReplacementReason without action
    */
   export type IdReplacementReasonDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5252,40 +5395,52 @@ export namespace Prisma {
 
   export type TeacherClearanceReasonMinAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type TeacherClearanceReasonMaxAggregateOutputType = {
     id: string | null
-    clearanceRequestId: string | null
     reason: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type TeacherClearanceReasonCountAggregateOutputType = {
     id: number
-    clearanceRequestId: number
     reason: number
+    description: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type TeacherClearanceReasonMinAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type TeacherClearanceReasonMaxAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type TeacherClearanceReasonCountAggregateInputType = {
     id?: true
-    clearanceRequestId?: true
     reason?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -5363,8 +5518,10 @@ export namespace Prisma {
 
   export type TeacherClearanceReasonGroupByOutputType = {
     id: string
-    clearanceRequestId: string
     reason: string
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
     _count: TeacherClearanceReasonCountAggregateOutputType | null
     _min: TeacherClearanceReasonMinAggregateOutputType | null
     _max: TeacherClearanceReasonMaxAggregateOutputType | null
@@ -5386,51 +5543,57 @@ export namespace Prisma {
 
   export type TeacherClearanceReasonSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    clearanceRequests?: boolean | TeacherClearanceReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | TeacherClearanceReasonCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["teacherClearanceReason"]>
 
   export type TeacherClearanceReasonSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["teacherClearanceReason"]>
 
   export type TeacherClearanceReasonSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["teacherClearanceReason"]>
 
   export type TeacherClearanceReasonSelectScalar = {
     id?: boolean
-    clearanceRequestId?: boolean
     reason?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type TeacherClearanceReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clearanceRequestId" | "reason", ExtArgs["result"]["teacherClearanceReason"]>
+  export type TeacherClearanceReasonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "reason" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["teacherClearanceReason"]>
   export type TeacherClearanceReasonInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
+    clearanceRequests?: boolean | TeacherClearanceReason$clearanceRequestsArgs<ExtArgs>
+    _count?: boolean | TeacherClearanceReasonCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type TeacherClearanceReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
-  export type TeacherClearanceReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clearanceRequest?: boolean | ClearanceRequestDefaultArgs<ExtArgs>
-  }
+  export type TeacherClearanceReasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type TeacherClearanceReasonIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $TeacherClearanceReasonPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "TeacherClearanceReason"
     objects: {
-      clearanceRequest: Prisma.$ClearanceRequestPayload<ExtArgs>
+      clearanceRequests: Prisma.$ClearanceRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      clearanceRequestId: string
       reason: string
+      description: string | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["teacherClearanceReason"]>
     composites: {}
   }
@@ -5825,7 +5988,7 @@ export namespace Prisma {
    */
   export interface Prisma__TeacherClearanceReasonClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    clearanceRequest<T extends ClearanceRequestDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClearanceRequestDefaultArgs<ExtArgs>>): Prisma__ClearanceRequestClient<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    clearanceRequests<T extends TeacherClearanceReason$clearanceRequestsArgs<ExtArgs> = {}>(args?: Subset<T, TeacherClearanceReason$clearanceRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClearanceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5856,8 +6019,10 @@ export namespace Prisma {
    */
   interface TeacherClearanceReasonFieldRefs {
     readonly id: FieldRef<"TeacherClearanceReason", 'String'>
-    readonly clearanceRequestId: FieldRef<"TeacherClearanceReason", 'String'>
     readonly reason: FieldRef<"TeacherClearanceReason", 'String'>
+    readonly description: FieldRef<"TeacherClearanceReason", 'String'>
+    readonly createdAt: FieldRef<"TeacherClearanceReason", 'DateTime'>
+    readonly updatedAt: FieldRef<"TeacherClearanceReason", 'DateTime'>
   }
     
 
@@ -6107,10 +6272,6 @@ export namespace Prisma {
      */
     data: TeacherClearanceReasonCreateManyInput | TeacherClearanceReasonCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TeacherClearanceReasonIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6181,10 +6342,6 @@ export namespace Prisma {
      * Limit how many TeacherClearanceReasons to update.
      */
     limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TeacherClearanceReasonIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6251,6 +6408,30 @@ export namespace Prisma {
      * Limit how many TeacherClearanceReasons to delete.
      */
     limit?: number
+  }
+
+  /**
+   * TeacherClearanceReason.clearanceRequests
+   */
+  export type TeacherClearanceReason$clearanceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClearanceRequest
+     */
+    select?: ClearanceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClearanceRequest
+     */
+    omit?: ClearanceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClearanceRequestInclude<ExtArgs> | null
+    where?: ClearanceRequestWhereInput
+    orderBy?: ClearanceRequestOrderByWithRelationInput | ClearanceRequestOrderByWithRelationInput[]
+    cursor?: ClearanceRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClearanceRequestScalarFieldEnum | ClearanceRequestScalarFieldEnum[]
   }
 
   /**
@@ -24792,6 +24973,9 @@ export namespace Prisma {
     teacherClearanceReasonId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     program?: boolean | ProgramDefaultArgs<ExtArgs>
+    terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
+    idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
+    teacherClearanceReason?: boolean | ClearanceRequest$teacherClearanceReasonArgs<ExtArgs>
   }, ExtArgs["result"]["clearanceRequest"]>
 
   export type ClearanceRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -24810,6 +24994,9 @@ export namespace Prisma {
     teacherClearanceReasonId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     program?: boolean | ProgramDefaultArgs<ExtArgs>
+    terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
+    idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
+    teacherClearanceReason?: boolean | ClearanceRequest$teacherClearanceReasonArgs<ExtArgs>
   }, ExtArgs["result"]["clearanceRequest"]>
 
   export type ClearanceRequestSelectScalar = {
@@ -24845,10 +25032,16 @@ export namespace Prisma {
   export type ClearanceRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     program?: boolean | ProgramDefaultArgs<ExtArgs>
+    terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
+    idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
+    teacherClearanceReason?: boolean | ClearanceRequest$teacherClearanceReasonArgs<ExtArgs>
   }
   export type ClearanceRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     program?: boolean | ProgramDefaultArgs<ExtArgs>
+    terminationReason?: boolean | ClearanceRequest$terminationReasonArgs<ExtArgs>
+    idReplacementReason?: boolean | ClearanceRequest$idReplacementReasonArgs<ExtArgs>
+    teacherClearanceReason?: boolean | ClearanceRequest$teacherClearanceReasonArgs<ExtArgs>
   }
 
   export type $ClearanceRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -25927,9 +26120,10 @@ export namespace Prisma {
 
   export const TerminationReasonScalarFieldEnum: {
     id: 'id',
-    clearanceRequestId: 'clearanceRequestId',
     reason: 'reason',
-    description: 'description'
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type TerminationReasonScalarFieldEnum = (typeof TerminationReasonScalarFieldEnum)[keyof typeof TerminationReasonScalarFieldEnum]
@@ -25937,9 +26131,10 @@ export namespace Prisma {
 
   export const IdReplacementReasonScalarFieldEnum: {
     id: 'id',
-    clearanceRequestId: 'clearanceRequestId',
     reason: 'reason',
-    description: 'description'
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type IdReplacementReasonScalarFieldEnum = (typeof IdReplacementReasonScalarFieldEnum)[keyof typeof IdReplacementReasonScalarFieldEnum]
@@ -25947,8 +26142,10 @@ export namespace Prisma {
 
   export const TeacherClearanceReasonScalarFieldEnum: {
     id: 'id',
-    clearanceRequestId: 'clearanceRequestId',
-    reason: 'reason'
+    reason: 'reason',
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type TeacherClearanceReasonScalarFieldEnum = (typeof TeacherClearanceReasonScalarFieldEnum)[keyof typeof TeacherClearanceReasonScalarFieldEnum]
@@ -26479,36 +26676,40 @@ export namespace Prisma {
     OR?: TerminationReasonWhereInput[]
     NOT?: TerminationReasonWhereInput | TerminationReasonWhereInput[]
     id?: StringFilter<"TerminationReason"> | string
-    clearanceRequestId?: StringFilter<"TerminationReason"> | string
     reason?: StringFilter<"TerminationReason"> | string
     description?: StringNullableFilter<"TerminationReason"> | string | null
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
+    createdAt?: DateTimeFilter<"TerminationReason"> | Date | string
+    updatedAt?: DateTimeFilter<"TerminationReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
   }
 
   export type TerminationReasonOrderByWithRelationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrderInput | SortOrder
-    clearanceRequest?: ClearanceRequestOrderByWithRelationInput
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    clearanceRequests?: ClearanceRequestOrderByRelationAggregateInput
   }
 
   export type TerminationReasonWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    clearanceRequestId?: string
     AND?: TerminationReasonWhereInput | TerminationReasonWhereInput[]
     OR?: TerminationReasonWhereInput[]
     NOT?: TerminationReasonWhereInput | TerminationReasonWhereInput[]
     reason?: StringFilter<"TerminationReason"> | string
     description?: StringNullableFilter<"TerminationReason"> | string | null
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
-  }, "id" | "clearanceRequestId">
+    createdAt?: DateTimeFilter<"TerminationReason"> | Date | string
+    updatedAt?: DateTimeFilter<"TerminationReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
+  }, "id">
 
   export type TerminationReasonOrderByWithAggregationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: TerminationReasonCountOrderByAggregateInput
     _max?: TerminationReasonMaxOrderByAggregateInput
     _min?: TerminationReasonMinOrderByAggregateInput
@@ -26519,9 +26720,10 @@ export namespace Prisma {
     OR?: TerminationReasonScalarWhereWithAggregatesInput[]
     NOT?: TerminationReasonScalarWhereWithAggregatesInput | TerminationReasonScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"TerminationReason"> | string
-    clearanceRequestId?: StringWithAggregatesFilter<"TerminationReason"> | string
     reason?: StringWithAggregatesFilter<"TerminationReason"> | string
     description?: StringNullableWithAggregatesFilter<"TerminationReason"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TerminationReason"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TerminationReason"> | Date | string
   }
 
   export type IdReplacementReasonWhereInput = {
@@ -26529,36 +26731,40 @@ export namespace Prisma {
     OR?: IdReplacementReasonWhereInput[]
     NOT?: IdReplacementReasonWhereInput | IdReplacementReasonWhereInput[]
     id?: StringFilter<"IdReplacementReason"> | string
-    clearanceRequestId?: StringFilter<"IdReplacementReason"> | string
     reason?: StringFilter<"IdReplacementReason"> | string
     description?: StringNullableFilter<"IdReplacementReason"> | string | null
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
+    createdAt?: DateTimeFilter<"IdReplacementReason"> | Date | string
+    updatedAt?: DateTimeFilter<"IdReplacementReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
   }
 
   export type IdReplacementReasonOrderByWithRelationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrderInput | SortOrder
-    clearanceRequest?: ClearanceRequestOrderByWithRelationInput
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    clearanceRequests?: ClearanceRequestOrderByRelationAggregateInput
   }
 
   export type IdReplacementReasonWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    clearanceRequestId?: string
     AND?: IdReplacementReasonWhereInput | IdReplacementReasonWhereInput[]
     OR?: IdReplacementReasonWhereInput[]
     NOT?: IdReplacementReasonWhereInput | IdReplacementReasonWhereInput[]
     reason?: StringFilter<"IdReplacementReason"> | string
     description?: StringNullableFilter<"IdReplacementReason"> | string | null
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
-  }, "id" | "clearanceRequestId">
+    createdAt?: DateTimeFilter<"IdReplacementReason"> | Date | string
+    updatedAt?: DateTimeFilter<"IdReplacementReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
+  }, "id">
 
   export type IdReplacementReasonOrderByWithAggregationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: IdReplacementReasonCountOrderByAggregateInput
     _max?: IdReplacementReasonMaxOrderByAggregateInput
     _min?: IdReplacementReasonMinOrderByAggregateInput
@@ -26569,9 +26775,10 @@ export namespace Prisma {
     OR?: IdReplacementReasonScalarWhereWithAggregatesInput[]
     NOT?: IdReplacementReasonScalarWhereWithAggregatesInput | IdReplacementReasonScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"IdReplacementReason"> | string
-    clearanceRequestId?: StringWithAggregatesFilter<"IdReplacementReason"> | string
     reason?: StringWithAggregatesFilter<"IdReplacementReason"> | string
     description?: StringNullableWithAggregatesFilter<"IdReplacementReason"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"IdReplacementReason"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"IdReplacementReason"> | Date | string
   }
 
   export type TeacherClearanceReasonWhereInput = {
@@ -26579,32 +26786,40 @@ export namespace Prisma {
     OR?: TeacherClearanceReasonWhereInput[]
     NOT?: TeacherClearanceReasonWhereInput | TeacherClearanceReasonWhereInput[]
     id?: StringFilter<"TeacherClearanceReason"> | string
-    clearanceRequestId?: StringFilter<"TeacherClearanceReason"> | string
     reason?: StringFilter<"TeacherClearanceReason"> | string
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
+    description?: StringNullableFilter<"TeacherClearanceReason"> | string | null
+    createdAt?: DateTimeFilter<"TeacherClearanceReason"> | Date | string
+    updatedAt?: DateTimeFilter<"TeacherClearanceReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
   }
 
   export type TeacherClearanceReasonOrderByWithRelationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
-    clearanceRequest?: ClearanceRequestOrderByWithRelationInput
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    clearanceRequests?: ClearanceRequestOrderByRelationAggregateInput
   }
 
   export type TeacherClearanceReasonWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    clearanceRequestId?: string
     AND?: TeacherClearanceReasonWhereInput | TeacherClearanceReasonWhereInput[]
     OR?: TeacherClearanceReasonWhereInput[]
     NOT?: TeacherClearanceReasonWhereInput | TeacherClearanceReasonWhereInput[]
     reason?: StringFilter<"TeacherClearanceReason"> | string
-    clearanceRequest?: XOR<ClearanceRequestScalarRelationFilter, ClearanceRequestWhereInput>
-  }, "id" | "clearanceRequestId">
+    description?: StringNullableFilter<"TeacherClearanceReason"> | string | null
+    createdAt?: DateTimeFilter<"TeacherClearanceReason"> | Date | string
+    updatedAt?: DateTimeFilter<"TeacherClearanceReason"> | Date | string
+    clearanceRequests?: ClearanceRequestListRelationFilter
+  }, "id">
 
   export type TeacherClearanceReasonOrderByWithAggregationInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: TeacherClearanceReasonCountOrderByAggregateInput
     _max?: TeacherClearanceReasonMaxOrderByAggregateInput
     _min?: TeacherClearanceReasonMinOrderByAggregateInput
@@ -26615,8 +26830,10 @@ export namespace Prisma {
     OR?: TeacherClearanceReasonScalarWhereWithAggregatesInput[]
     NOT?: TeacherClearanceReasonScalarWhereWithAggregatesInput | TeacherClearanceReasonScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"TeacherClearanceReason"> | string
-    clearanceRequestId?: StringWithAggregatesFilter<"TeacherClearanceReason"> | string
     reason?: StringWithAggregatesFilter<"TeacherClearanceReason"> | string
+    description?: StringNullableWithAggregatesFilter<"TeacherClearanceReason"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TeacherClearanceReason"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TeacherClearanceReason"> | Date | string
   }
 
   export type DocumentWhereInput = {
@@ -27882,137 +28099,180 @@ export namespace Prisma {
     id?: string
     reason: string
     description?: string | null
-    clearanceRequest: ClearanceRequestCreateNestedOneWithoutTerminationReasonInput
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestCreateNestedManyWithoutTerminationReasonInput
   }
 
   export type TerminationReasonUncheckedCreateInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestUncheckedCreateNestedManyWithoutTerminationReasonInput
   }
 
   export type TerminationReasonUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    clearanceRequest?: ClearanceRequestUpdateOneRequiredWithoutTerminationReasonNestedInput
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUpdateManyWithoutTerminationReasonNestedInput
   }
 
   export type TerminationReasonUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUncheckedUpdateManyWithoutTerminationReasonNestedInput
   }
 
   export type TerminationReasonCreateManyInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type TerminationReasonUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TerminationReasonUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type IdReplacementReasonCreateInput = {
     id?: string
     reason: string
     description?: string | null
-    clearanceRequest: ClearanceRequestCreateNestedOneWithoutIdReplacementReasonInput
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestCreateNestedManyWithoutIdReplacementReasonInput
   }
 
   export type IdReplacementReasonUncheckedCreateInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestUncheckedCreateNestedManyWithoutIdReplacementReasonInput
   }
 
   export type IdReplacementReasonUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    clearanceRequest?: ClearanceRequestUpdateOneRequiredWithoutIdReplacementReasonNestedInput
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUpdateManyWithoutIdReplacementReasonNestedInput
   }
 
   export type IdReplacementReasonUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUncheckedUpdateManyWithoutIdReplacementReasonNestedInput
   }
 
   export type IdReplacementReasonCreateManyInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type IdReplacementReasonUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type IdReplacementReasonUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TeacherClearanceReasonCreateInput = {
     id?: string
     reason: string
-    clearanceRequest: ClearanceRequestCreateNestedOneWithoutTeacherClearanceReasonInput
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestCreateNestedManyWithoutTeacherClearanceReasonInput
   }
 
   export type TeacherClearanceReasonUncheckedCreateInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clearanceRequests?: ClearanceRequestUncheckedCreateNestedManyWithoutTeacherClearanceReasonInput
   }
 
   export type TeacherClearanceReasonUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
-    clearanceRequest?: ClearanceRequestUpdateOneRequiredWithoutTeacherClearanceReasonNestedInput
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUpdateManyWithoutTeacherClearanceReasonNestedInput
   }
 
   export type TeacherClearanceReasonUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clearanceRequests?: ClearanceRequestUncheckedUpdateManyWithoutTeacherClearanceReasonNestedInput
   }
 
   export type TeacherClearanceReasonCreateManyInput = {
     id?: string
-    clearanceRequestId: string
     reason: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type TeacherClearanceReasonUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TeacherClearanceReasonUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clearanceRequestId?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DocumentCreateInput = {
@@ -29197,14 +29457,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -29226,9 +29483,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -29245,14 +29499,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
@@ -29274,9 +29525,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
@@ -29309,9 +29557,6 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ClearanceRequestUncheckedUpdateManyInput = {
@@ -29360,9 +29605,21 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type ClearanceRequestScalarRelationFilter = {
-    is?: ClearanceRequestWhereInput
-    isNot?: ClearanceRequestWhereInput
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type ClearanceRequestListRelationFilter = {
+    every?: ClearanceRequestWhereInput
+    some?: ClearanceRequestWhereInput
+    none?: ClearanceRequestWhereInput
   }
 
   export type SortOrderInput = {
@@ -29370,25 +29627,32 @@ export namespace Prisma {
     nulls?: NullsOrder
   }
 
+  export type ClearanceRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type TerminationReasonCountOrderByAggregateInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type TerminationReasonMaxOrderByAggregateInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type TerminationReasonMinOrderByAggregateInput = {
     id?: SortOrder
-    clearanceRequestId?: SortOrder
     reason?: SortOrder
     description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -29427,46 +29691,7 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type IdReplacementReasonCountOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-    description?: SortOrder
-  }
-
-  export type IdReplacementReasonMaxOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-    description?: SortOrder
-  }
-
-  export type IdReplacementReasonMinOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-    description?: SortOrder
-  }
-
-  export type TeacherClearanceReasonCountOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-  }
-
-  export type TeacherClearanceReasonMaxOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-  }
-
-  export type TeacherClearanceReasonMinOrderByAggregateInput = {
-    id?: SortOrder
-    clearanceRequestId?: SortOrder
-    reason?: SortOrder
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -29474,7 +29699,63 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type IdReplacementReasonCountOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type IdReplacementReasonMaxOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type IdReplacementReasonMinOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeacherClearanceReasonCountOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeacherClearanceReasonMaxOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeacherClearanceReasonMinOrderByAggregateInput = {
+    id?: SortOrder
+    reason?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClearanceRequestScalarRelationFilter = {
+    is?: ClearanceRequestWhereInput
+    isNot?: ClearanceRequestWhereInput
   }
 
   export type DocumentTypeScalarRelationFilter = {
@@ -29504,20 +29785,6 @@ export namespace Prisma {
     documentTypeId?: SortOrder
     filePath?: SortOrder
     uploadedAt?: SortOrder
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type EnumFormTypeNullableListFilter<$PrismaModel = never> = {
@@ -29836,12 +30103,6 @@ export namespace Prisma {
     none?: NotificationWhereInput
   }
 
-  export type ClearanceRequestListRelationFilter = {
-    every?: ClearanceRequestWhereInput
-    some?: ClearanceRequestWhereInput
-    none?: ClearanceRequestWhereInput
-  }
-
   export type AuditLogListRelationFilter = {
     every?: AuditLogWhereInput
     some?: AuditLogWhereInput
@@ -29849,10 +30110,6 @@ export namespace Prisma {
   }
 
   export type NotificationOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ClearanceRequestOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -30604,10 +30861,18 @@ export namespace Prisma {
     _max?: NestedEnumRequestStatusFilter<$PrismaModel>
   }
 
-  export type ClearanceRequestCreateNestedOneWithoutTerminationReasonInput = {
-    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
+  export type ClearanceRequestCreateNestedManyWithoutTerminationReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput> | ClearanceRequestCreateWithoutTerminationReasonInput[] | ClearanceRequestUncheckedCreateWithoutTerminationReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput | ClearanceRequestCreateOrConnectWithoutTerminationReasonInput[]
+    createMany?: ClearanceRequestCreateManyTerminationReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+  }
+
+  export type ClearanceRequestUncheckedCreateNestedManyWithoutTerminationReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput> | ClearanceRequestCreateWithoutTerminationReasonInput[] | ClearanceRequestUncheckedCreateWithoutTerminationReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput | ClearanceRequestCreateOrConnectWithoutTerminationReasonInput[]
+    createMany?: ClearanceRequestCreateManyTerminationReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -30618,40 +30883,120 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type ClearanceRequestUpdateOneRequiredWithoutTerminationReasonNestedInput = {
-    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput
-    upsert?: ClearanceRequestUpsertWithoutTerminationReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
-    update?: XOR<XOR<ClearanceRequestUpdateToOneWithWhereWithoutTerminationReasonInput, ClearanceRequestUpdateWithoutTerminationReasonInput>, ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput>
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
   }
 
-  export type ClearanceRequestCreateNestedOneWithoutIdReplacementReasonInput = {
-    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
+  export type ClearanceRequestUpdateManyWithoutTerminationReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput> | ClearanceRequestCreateWithoutTerminationReasonInput[] | ClearanceRequestUncheckedCreateWithoutTerminationReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput | ClearanceRequestCreateOrConnectWithoutTerminationReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutTerminationReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutTerminationReasonInput[]
+    createMany?: ClearanceRequestCreateManyTerminationReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutTerminationReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutTerminationReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutTerminationReasonInput | ClearanceRequestUpdateManyWithWhereWithoutTerminationReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
   }
 
-  export type ClearanceRequestUpdateOneRequiredWithoutIdReplacementReasonNestedInput = {
-    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput
-    upsert?: ClearanceRequestUpsertWithoutIdReplacementReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
-    update?: XOR<XOR<ClearanceRequestUpdateToOneWithWhereWithoutIdReplacementReasonInput, ClearanceRequestUpdateWithoutIdReplacementReasonInput>, ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput>
+  export type ClearanceRequestUncheckedUpdateManyWithoutTerminationReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput> | ClearanceRequestCreateWithoutTerminationReasonInput[] | ClearanceRequestUncheckedCreateWithoutTerminationReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTerminationReasonInput | ClearanceRequestCreateOrConnectWithoutTerminationReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutTerminationReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutTerminationReasonInput[]
+    createMany?: ClearanceRequestCreateManyTerminationReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutTerminationReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutTerminationReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutTerminationReasonInput | ClearanceRequestUpdateManyWithWhereWithoutTerminationReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
   }
 
-  export type ClearanceRequestCreateNestedOneWithoutTeacherClearanceReasonInput = {
-    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
+  export type ClearanceRequestCreateNestedManyWithoutIdReplacementReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput> | ClearanceRequestCreateWithoutIdReplacementReasonInput[] | ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput | ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput[]
+    createMany?: ClearanceRequestCreateManyIdReplacementReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
   }
 
-  export type ClearanceRequestUpdateOneRequiredWithoutTeacherClearanceReasonNestedInput = {
-    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput>
-    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput
-    upsert?: ClearanceRequestUpsertWithoutTeacherClearanceReasonInput
-    connect?: ClearanceRequestWhereUniqueInput
-    update?: XOR<XOR<ClearanceRequestUpdateToOneWithWhereWithoutTeacherClearanceReasonInput, ClearanceRequestUpdateWithoutTeacherClearanceReasonInput>, ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput>
+  export type ClearanceRequestUncheckedCreateNestedManyWithoutIdReplacementReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput> | ClearanceRequestCreateWithoutIdReplacementReasonInput[] | ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput | ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput[]
+    createMany?: ClearanceRequestCreateManyIdReplacementReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+  }
+
+  export type ClearanceRequestUpdateManyWithoutIdReplacementReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput> | ClearanceRequestCreateWithoutIdReplacementReasonInput[] | ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput | ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutIdReplacementReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutIdReplacementReasonInput[]
+    createMany?: ClearanceRequestCreateManyIdReplacementReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutIdReplacementReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutIdReplacementReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutIdReplacementReasonInput | ClearanceRequestUpdateManyWithWhereWithoutIdReplacementReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
+  }
+
+  export type ClearanceRequestUncheckedUpdateManyWithoutIdReplacementReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput> | ClearanceRequestCreateWithoutIdReplacementReasonInput[] | ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput | ClearanceRequestCreateOrConnectWithoutIdReplacementReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutIdReplacementReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutIdReplacementReasonInput[]
+    createMany?: ClearanceRequestCreateManyIdReplacementReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutIdReplacementReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutIdReplacementReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutIdReplacementReasonInput | ClearanceRequestUpdateManyWithWhereWithoutIdReplacementReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
+  }
+
+  export type ClearanceRequestCreateNestedManyWithoutTeacherClearanceReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput> | ClearanceRequestCreateWithoutTeacherClearanceReasonInput[] | ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput | ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput[]
+    createMany?: ClearanceRequestCreateManyTeacherClearanceReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+  }
+
+  export type ClearanceRequestUncheckedCreateNestedManyWithoutTeacherClearanceReasonInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput> | ClearanceRequestCreateWithoutTeacherClearanceReasonInput[] | ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput | ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput[]
+    createMany?: ClearanceRequestCreateManyTeacherClearanceReasonInputEnvelope
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+  }
+
+  export type ClearanceRequestUpdateManyWithoutTeacherClearanceReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput> | ClearanceRequestCreateWithoutTeacherClearanceReasonInput[] | ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput | ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutTeacherClearanceReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutTeacherClearanceReasonInput[]
+    createMany?: ClearanceRequestCreateManyTeacherClearanceReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutTeacherClearanceReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutTeacherClearanceReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutTeacherClearanceReasonInput | ClearanceRequestUpdateManyWithWhereWithoutTeacherClearanceReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
+  }
+
+  export type ClearanceRequestUncheckedUpdateManyWithoutTeacherClearanceReasonNestedInput = {
+    create?: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput> | ClearanceRequestCreateWithoutTeacherClearanceReasonInput[] | ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput[]
+    connectOrCreate?: ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput | ClearanceRequestCreateOrConnectWithoutTeacherClearanceReasonInput[]
+    upsert?: ClearanceRequestUpsertWithWhereUniqueWithoutTeacherClearanceReasonInput | ClearanceRequestUpsertWithWhereUniqueWithoutTeacherClearanceReasonInput[]
+    createMany?: ClearanceRequestCreateManyTeacherClearanceReasonInputEnvelope
+    set?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    disconnect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    delete?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    connect?: ClearanceRequestWhereUniqueInput | ClearanceRequestWhereUniqueInput[]
+    update?: ClearanceRequestUpdateWithWhereUniqueWithoutTeacherClearanceReasonInput | ClearanceRequestUpdateWithWhereUniqueWithoutTeacherClearanceReasonInput[]
+    updateMany?: ClearanceRequestUpdateManyWithWhereWithoutTeacherClearanceReasonInput | ClearanceRequestUpdateManyWithWhereWithoutTeacherClearanceReasonInput[]
+    deleteMany?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
   }
 
   export type ClearanceRequestCreateNestedOneWithoutDocumentsInput = {
@@ -30664,10 +31009,6 @@ export namespace Prisma {
     create?: XOR<DocumentTypeCreateWithoutDocumentsInput, DocumentTypeUncheckedCreateWithoutDocumentsInput>
     connectOrCreate?: DocumentTypeCreateOrConnectWithoutDocumentsInput
     connect?: DocumentTypeWhereUniqueInput
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type ClearanceRequestUpdateOneRequiredWithoutDocumentsNestedInput = {
@@ -31934,21 +32275,21 @@ export namespace Prisma {
     connect?: ProgramWhereUniqueInput
   }
 
-  export type TerminationReasonCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestInput
+  export type TerminationReasonCreateNestedOneWithoutClearanceRequestsInput = {
+    create?: XOR<TerminationReasonCreateWithoutClearanceRequestsInput, TerminationReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestsInput
     connect?: TerminationReasonWhereUniqueInput
   }
 
-  export type IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestInput
+  export type IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput = {
+    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestsInput
     connect?: IdReplacementReasonWhereUniqueInput
   }
 
-  export type TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestInput
+  export type TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput = {
+    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestsInput
     connect?: TeacherClearanceReasonWhereUniqueInput
   }
 
@@ -31984,24 +32325,6 @@ export namespace Prisma {
     connectOrCreate?: AuditLogCreateOrConnectWithoutClearanceRequestInput | AuditLogCreateOrConnectWithoutClearanceRequestInput[]
     createMany?: AuditLogCreateManyClearanceRequestInputEnvelope
     connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
-  }
-
-  export type TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestInput
-    connect?: TerminationReasonWhereUniqueInput
-  }
-
-  export type IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestInput
-    connect?: IdReplacementReasonWhereUniqueInput
-  }
-
-  export type TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput = {
-    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestInput
-    connect?: TeacherClearanceReasonWhereUniqueInput
   }
 
   export type ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput = {
@@ -32058,34 +32381,34 @@ export namespace Prisma {
     update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutClearanceRequestsInput, ProgramUpdateWithoutClearanceRequestsInput>, ProgramUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type TerminationReasonUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: TerminationReasonUpsertWithoutClearanceRequestInput
+  export type TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput = {
+    create?: XOR<TerminationReasonCreateWithoutClearanceRequestsInput, TerminationReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestsInput
+    upsert?: TerminationReasonUpsertWithoutClearanceRequestsInput
     disconnect?: TerminationReasonWhereInput | boolean
     delete?: TerminationReasonWhereInput | boolean
     connect?: TerminationReasonWhereUniqueInput
-    update?: XOR<XOR<TerminationReasonUpdateToOneWithWhereWithoutClearanceRequestInput, TerminationReasonUpdateWithoutClearanceRequestInput>, TerminationReasonUncheckedUpdateWithoutClearanceRequestInput>
+    update?: XOR<XOR<TerminationReasonUpdateToOneWithWhereWithoutClearanceRequestsInput, TerminationReasonUpdateWithoutClearanceRequestsInput>, TerminationReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: IdReplacementReasonUpsertWithoutClearanceRequestInput
+  export type IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput = {
+    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestsInput
+    upsert?: IdReplacementReasonUpsertWithoutClearanceRequestsInput
     disconnect?: IdReplacementReasonWhereInput | boolean
     delete?: IdReplacementReasonWhereInput | boolean
     connect?: IdReplacementReasonWhereUniqueInput
-    update?: XOR<XOR<IdReplacementReasonUpdateToOneWithWhereWithoutClearanceRequestInput, IdReplacementReasonUpdateWithoutClearanceRequestInput>, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestInput>
+    update?: XOR<XOR<IdReplacementReasonUpdateToOneWithWhereWithoutClearanceRequestsInput, IdReplacementReasonUpdateWithoutClearanceRequestsInput>, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: TeacherClearanceReasonUpsertWithoutClearanceRequestInput
+  export type TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput = {
+    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestsInput>
+    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestsInput
+    upsert?: TeacherClearanceReasonUpsertWithoutClearanceRequestsInput
     disconnect?: TeacherClearanceReasonWhereInput | boolean
     delete?: TeacherClearanceReasonWhereInput | boolean
     connect?: TeacherClearanceReasonWhereUniqueInput
-    update?: XOR<XOR<TeacherClearanceReasonUpdateToOneWithWhereWithoutClearanceRequestInput, TeacherClearanceReasonUpdateWithoutClearanceRequestInput>, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestInput>
+    update?: XOR<XOR<TeacherClearanceReasonUpdateToOneWithWhereWithoutClearanceRequestsInput, TeacherClearanceReasonUpdateWithoutClearanceRequestsInput>, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
   export type ApprovalActionUpdateManyWithoutClearanceRequestNestedInput = {
@@ -32152,36 +32475,6 @@ export namespace Prisma {
     update?: AuditLogUpdateWithWhereUniqueWithoutClearanceRequestInput | AuditLogUpdateWithWhereUniqueWithoutClearanceRequestInput[]
     updateMany?: AuditLogUpdateManyWithWhereWithoutClearanceRequestInput | AuditLogUpdateManyWithWhereWithoutClearanceRequestInput[]
     deleteMany?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
-  }
-
-  export type TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TerminationReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: TerminationReasonUpsertWithoutClearanceRequestInput
-    disconnect?: TerminationReasonWhereInput | boolean
-    delete?: TerminationReasonWhereInput | boolean
-    connect?: TerminationReasonWhereUniqueInput
-    update?: XOR<XOR<TerminationReasonUpdateToOneWithWhereWithoutClearanceRequestInput, TerminationReasonUpdateWithoutClearanceRequestInput>, TerminationReasonUncheckedUpdateWithoutClearanceRequestInput>
-  }
-
-  export type IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: IdReplacementReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: IdReplacementReasonUpsertWithoutClearanceRequestInput
-    disconnect?: IdReplacementReasonWhereInput | boolean
-    delete?: IdReplacementReasonWhereInput | boolean
-    connect?: IdReplacementReasonWhereUniqueInput
-    update?: XOR<XOR<IdReplacementReasonUpdateToOneWithWhereWithoutClearanceRequestInput, IdReplacementReasonUpdateWithoutClearanceRequestInput>, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestInput>
-  }
-
-  export type TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput = {
-    create?: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
-    connectOrCreate?: TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestInput
-    upsert?: TeacherClearanceReasonUpsertWithoutClearanceRequestInput
-    disconnect?: TeacherClearanceReasonWhereInput | boolean
-    delete?: TeacherClearanceReasonWhereInput | boolean
-    connect?: TeacherClearanceReasonWhereUniqueInput
-    update?: XOR<XOR<TeacherClearanceReasonUpdateToOneWithWhereWithoutClearanceRequestInput, TeacherClearanceReasonUpdateWithoutClearanceRequestInput>, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestInput>
   }
 
   export type ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput = {
@@ -32278,6 +32571,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -32332,17 +32636,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -32643,13 +32936,10 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -32668,11 +32958,8 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -32685,61 +32972,44 @@ export namespace Prisma {
     create: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput>
   }
 
-  export type ClearanceRequestUpsertWithoutTerminationReasonInput = {
-    update: XOR<ClearanceRequestUpdateWithoutTerminationReasonInput, ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput>
-    create: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput>
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestCreateManyTerminationReasonInputEnvelope = {
+    data: ClearanceRequestCreateManyTerminationReasonInput | ClearanceRequestCreateManyTerminationReasonInput[]
+    skipDuplicates?: boolean
   }
 
-  export type ClearanceRequestUpdateToOneWithWhereWithoutTerminationReasonInput = {
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestUpsertWithWhereUniqueWithoutTerminationReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
+    update: XOR<ClearanceRequestUpdateWithoutTerminationReasonInput, ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput>
+    create: XOR<ClearanceRequestCreateWithoutTerminationReasonInput, ClearanceRequestUncheckedCreateWithoutTerminationReasonInput>
+  }
+
+  export type ClearanceRequestUpdateWithWhereUniqueWithoutTerminationReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
     data: XOR<ClearanceRequestUpdateWithoutTerminationReasonInput, ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput>
   }
 
-  export type ClearanceRequestUpdateWithoutTerminationReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
+  export type ClearanceRequestUpdateManyWithWhereWithoutTerminationReasonInput = {
+    where: ClearanceRequestScalarWhereInput
+    data: XOR<ClearanceRequestUpdateManyMutationInput, ClearanceRequestUncheckedUpdateManyWithoutTerminationReasonInput>
   }
 
-  export type ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    programId?: StringFieldUpdateOperationsInput | string
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  export type ClearanceRequestScalarWhereInput = {
+    AND?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
+    OR?: ClearanceRequestScalarWhereInput[]
+    NOT?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
+    id?: StringFilter<"ClearanceRequest"> | string
+    userId?: StringFilter<"ClearanceRequest"> | string
+    formType?: EnumFormTypeFilter<"ClearanceRequest"> | $Enums.FormType
+    programId?: StringFilter<"ClearanceRequest"> | string
+    status?: EnumRequestStatusFilter<"ClearanceRequest"> | $Enums.RequestStatus
+    rejectionReason?: StringNullableFilter<"ClearanceRequest"> | string | null
+    resubmissionCount?: IntFilter<"ClearanceRequest"> | number
+    submittedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
+    currentStep?: IntFilter<"ClearanceRequest"> | number
+    terminationReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
+    idReplacementReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
+    teacherClearanceReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
   }
 
   export type ClearanceRequestCreateWithoutIdReplacementReasonInput = {
@@ -32751,13 +33021,10 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -32777,10 +33044,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     currentStep?: number
     terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -32793,61 +33057,25 @@ export namespace Prisma {
     create: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput>
   }
 
-  export type ClearanceRequestUpsertWithoutIdReplacementReasonInput = {
-    update: XOR<ClearanceRequestUpdateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput>
-    create: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput>
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestCreateManyIdReplacementReasonInputEnvelope = {
+    data: ClearanceRequestCreateManyIdReplacementReasonInput | ClearanceRequestCreateManyIdReplacementReasonInput[]
+    skipDuplicates?: boolean
   }
 
-  export type ClearanceRequestUpdateToOneWithWhereWithoutIdReplacementReasonInput = {
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestUpsertWithWhereUniqueWithoutIdReplacementReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
+    update: XOR<ClearanceRequestUpdateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput>
+    create: XOR<ClearanceRequestCreateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedCreateWithoutIdReplacementReasonInput>
+  }
+
+  export type ClearanceRequestUpdateWithWhereUniqueWithoutIdReplacementReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
     data: XOR<ClearanceRequestUpdateWithoutIdReplacementReasonInput, ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput>
   }
 
-  export type ClearanceRequestUpdateWithoutIdReplacementReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
-  }
-
-  export type ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    programId?: StringFieldUpdateOperationsInput | string
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  export type ClearanceRequestUpdateManyWithWhereWithoutIdReplacementReasonInput = {
+    where: ClearanceRequestScalarWhereInput
+    data: XOR<ClearanceRequestUpdateManyMutationInput, ClearanceRequestUncheckedUpdateManyWithoutIdReplacementReasonInput>
   }
 
   export type ClearanceRequestCreateWithoutTeacherClearanceReasonInput = {
@@ -32859,13 +33087,10 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -32886,9 +33111,6 @@ export namespace Prisma {
     currentStep?: number
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -32901,61 +33123,25 @@ export namespace Prisma {
     create: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput>
   }
 
-  export type ClearanceRequestUpsertWithoutTeacherClearanceReasonInput = {
-    update: XOR<ClearanceRequestUpdateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput>
-    create: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput>
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestCreateManyTeacherClearanceReasonInputEnvelope = {
+    data: ClearanceRequestCreateManyTeacherClearanceReasonInput | ClearanceRequestCreateManyTeacherClearanceReasonInput[]
+    skipDuplicates?: boolean
   }
 
-  export type ClearanceRequestUpdateToOneWithWhereWithoutTeacherClearanceReasonInput = {
-    where?: ClearanceRequestWhereInput
+  export type ClearanceRequestUpsertWithWhereUniqueWithoutTeacherClearanceReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
+    update: XOR<ClearanceRequestUpdateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput>
+    create: XOR<ClearanceRequestCreateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedCreateWithoutTeacherClearanceReasonInput>
+  }
+
+  export type ClearanceRequestUpdateWithWhereUniqueWithoutTeacherClearanceReasonInput = {
+    where: ClearanceRequestWhereUniqueInput
     data: XOR<ClearanceRequestUpdateWithoutTeacherClearanceReasonInput, ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput>
   }
 
-  export type ClearanceRequestUpdateWithoutTeacherClearanceReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
-  }
-
-  export type ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
-    programId?: StringFieldUpdateOperationsInput | string
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
-    resubmissionCount?: IntFieldUpdateOperationsInput | number
-    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
-    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  export type ClearanceRequestUpdateManyWithWhereWithoutTeacherClearanceReasonInput = {
+    where: ClearanceRequestScalarWhereInput
+    data: XOR<ClearanceRequestUpdateManyMutationInput, ClearanceRequestUncheckedUpdateManyWithoutTeacherClearanceReasonInput>
   }
 
   export type ClearanceRequestCreateWithoutDocumentsInput = {
@@ -32967,14 +33153,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateCreateNestedOneWithoutClearanceRequestInput
@@ -32995,9 +33178,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateUncheckedCreateNestedOneWithoutClearanceRequestInput
@@ -33048,14 +33228,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
@@ -33076,9 +33253,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
@@ -33170,14 +33344,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -33198,9 +33369,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -33232,14 +33400,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
@@ -33260,9 +33425,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
@@ -33347,14 +33509,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateCreateNestedOneWithoutClearanceRequestInput
@@ -33375,9 +33534,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateUncheckedCreateNestedOneWithoutClearanceRequestInput
@@ -33484,14 +33640,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
@@ -33512,9 +33665,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
@@ -33599,14 +33749,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -33627,9 +33774,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -33753,14 +33897,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
@@ -33781,9 +33922,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
@@ -33946,13 +34084,10 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -33973,9 +34108,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -34180,25 +34312,6 @@ export namespace Prisma {
   export type ClearanceRequestUpdateManyWithWhereWithoutUserInput = {
     where: ClearanceRequestScalarWhereInput
     data: XOR<ClearanceRequestUpdateManyMutationInput, ClearanceRequestUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type ClearanceRequestScalarWhereInput = {
-    AND?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
-    OR?: ClearanceRequestScalarWhereInput[]
-    NOT?: ClearanceRequestScalarWhereInput | ClearanceRequestScalarWhereInput[]
-    id?: StringFilter<"ClearanceRequest"> | string
-    userId?: StringFilter<"ClearanceRequest"> | string
-    formType?: EnumFormTypeFilter<"ClearanceRequest"> | $Enums.FormType
-    programId?: StringFilter<"ClearanceRequest"> | string
-    status?: EnumRequestStatusFilter<"ClearanceRequest"> | $Enums.RequestStatus
-    rejectionReason?: StringNullableFilter<"ClearanceRequest"> | string | null
-    resubmissionCount?: IntFilter<"ClearanceRequest"> | number
-    submittedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
-    updatedAt?: DateTimeFilter<"ClearanceRequest"> | Date | string
-    currentStep?: IntFilter<"ClearanceRequest"> | number
-    terminationReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
-    idReplacementReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
-    teacherClearanceReasonId?: StringNullableFilter<"ClearanceRequest"> | string | null
   }
 
   export type AuditLogUpsertWithWhereUniqueWithoutUserInput = {
@@ -35261,13 +35374,10 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     approvalActions?: ApprovalActionCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
@@ -35288,9 +35398,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     approvalActions?: ApprovalActionUncheckedCreateNestedManyWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
@@ -36067,14 +36174,11 @@ export namespace Prisma {
     submittedAt?: Date | string
     updatedAt?: Date | string
     currentStep?: number
-    terminationReasonId?: string | null
-    idReplacementReasonId?: string | null
-    teacherClearanceReasonId?: string | null
     user: UserCreateNestedOneWithoutClearanceRequestsInput
     program: ProgramCreateNestedOneWithoutClearanceRequestsInput
-    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestInput
+    terminationReason?: TerminationReasonCreateNestedOneWithoutClearanceRequestsInput
+    idReplacementReason?: IdReplacementReasonCreateNestedOneWithoutClearanceRequestsInput
+    teacherClearanceReason?: TeacherClearanceReasonCreateNestedOneWithoutClearanceRequestsInput
     documents?: DocumentCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateCreateNestedOneWithoutClearanceRequestInput
@@ -36095,9 +36199,6 @@ export namespace Prisma {
     terminationReasonId?: string | null
     idReplacementReasonId?: string | null
     teacherClearanceReasonId?: string | null
-    terminationReason?: TerminationReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    idReplacementReason?: IdReplacementReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedCreateNestedOneWithoutClearanceRequestInput
     documents?: DocumentUncheckedCreateNestedManyWithoutClearanceRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutClearanceRequestInput
     certificate?: CertificateUncheckedCreateNestedOneWithoutClearanceRequestInput
@@ -36152,14 +36253,11 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
@@ -36180,9 +36278,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
     certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
@@ -36314,53 +36409,67 @@ export namespace Prisma {
     create: XOR<ProgramCreateWithoutClearanceRequestsInput, ProgramUncheckedCreateWithoutClearanceRequestsInput>
   }
 
-  export type TerminationReasonCreateWithoutClearanceRequestInput = {
+  export type TerminationReasonCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type TerminationReasonUncheckedCreateWithoutClearanceRequestInput = {
+  export type TerminationReasonUncheckedCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type TerminationReasonCreateOrConnectWithoutClearanceRequestInput = {
+  export type TerminationReasonCreateOrConnectWithoutClearanceRequestsInput = {
     where: TerminationReasonWhereUniqueInput
-    create: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
+    create: XOR<TerminationReasonCreateWithoutClearanceRequestsInput, TerminationReasonUncheckedCreateWithoutClearanceRequestsInput>
   }
 
-  export type IdReplacementReasonCreateWithoutClearanceRequestInput = {
+  export type IdReplacementReasonCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput = {
+  export type IdReplacementReasonUncheckedCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
     description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type IdReplacementReasonCreateOrConnectWithoutClearanceRequestInput = {
+  export type IdReplacementReasonCreateOrConnectWithoutClearanceRequestsInput = {
     where: IdReplacementReasonWhereUniqueInput
-    create: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
+    create: XOR<IdReplacementReasonCreateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestsInput>
   }
 
-  export type TeacherClearanceReasonCreateWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestsInput = {
     id?: string
     reason: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonCreateOrConnectWithoutClearanceRequestsInput = {
     where: TeacherClearanceReasonWhereUniqueInput
-    create: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
+    create: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestsInput>
   }
 
   export type ApprovalActionCreateWithoutClearanceRequestInput = {
@@ -36610,71 +36719,85 @@ export namespace Prisma {
     workflowRules?: WorkflowRuleUncheckedUpdateManyWithoutProgramNestedInput
   }
 
-  export type TerminationReasonUpsertWithoutClearanceRequestInput = {
-    update: XOR<TerminationReasonUpdateWithoutClearanceRequestInput, TerminationReasonUncheckedUpdateWithoutClearanceRequestInput>
-    create: XOR<TerminationReasonCreateWithoutClearanceRequestInput, TerminationReasonUncheckedCreateWithoutClearanceRequestInput>
+  export type TerminationReasonUpsertWithoutClearanceRequestsInput = {
+    update: XOR<TerminationReasonUpdateWithoutClearanceRequestsInput, TerminationReasonUncheckedUpdateWithoutClearanceRequestsInput>
+    create: XOR<TerminationReasonCreateWithoutClearanceRequestsInput, TerminationReasonUncheckedCreateWithoutClearanceRequestsInput>
     where?: TerminationReasonWhereInput
   }
 
-  export type TerminationReasonUpdateToOneWithWhereWithoutClearanceRequestInput = {
+  export type TerminationReasonUpdateToOneWithWhereWithoutClearanceRequestsInput = {
     where?: TerminationReasonWhereInput
-    data: XOR<TerminationReasonUpdateWithoutClearanceRequestInput, TerminationReasonUncheckedUpdateWithoutClearanceRequestInput>
+    data: XOR<TerminationReasonUpdateWithoutClearanceRequestsInput, TerminationReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type TerminationReasonUpdateWithoutClearanceRequestInput = {
+  export type TerminationReasonUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TerminationReasonUncheckedUpdateWithoutClearanceRequestInput = {
+  export type TerminationReasonUncheckedUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type IdReplacementReasonUpsertWithoutClearanceRequestInput = {
-    update: XOR<IdReplacementReasonUpdateWithoutClearanceRequestInput, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestInput>
-    create: XOR<IdReplacementReasonCreateWithoutClearanceRequestInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestInput>
+  export type IdReplacementReasonUpsertWithoutClearanceRequestsInput = {
+    update: XOR<IdReplacementReasonUpdateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestsInput>
+    create: XOR<IdReplacementReasonCreateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedCreateWithoutClearanceRequestsInput>
     where?: IdReplacementReasonWhereInput
   }
 
-  export type IdReplacementReasonUpdateToOneWithWhereWithoutClearanceRequestInput = {
+  export type IdReplacementReasonUpdateToOneWithWhereWithoutClearanceRequestsInput = {
     where?: IdReplacementReasonWhereInput
-    data: XOR<IdReplacementReasonUpdateWithoutClearanceRequestInput, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestInput>
+    data: XOR<IdReplacementReasonUpdateWithoutClearanceRequestsInput, IdReplacementReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type IdReplacementReasonUpdateWithoutClearanceRequestInput = {
+  export type IdReplacementReasonUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type IdReplacementReasonUncheckedUpdateWithoutClearanceRequestInput = {
+  export type IdReplacementReasonUncheckedUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TeacherClearanceReasonUpsertWithoutClearanceRequestInput = {
-    update: XOR<TeacherClearanceReasonUpdateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestInput>
-    create: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestInput>
+  export type TeacherClearanceReasonUpsertWithoutClearanceRequestsInput = {
+    update: XOR<TeacherClearanceReasonUpdateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestsInput>
+    create: XOR<TeacherClearanceReasonCreateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedCreateWithoutClearanceRequestsInput>
     where?: TeacherClearanceReasonWhereInput
   }
 
-  export type TeacherClearanceReasonUpdateToOneWithWhereWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonUpdateToOneWithWhereWithoutClearanceRequestsInput = {
     where?: TeacherClearanceReasonWhereInput
-    data: XOR<TeacherClearanceReasonUpdateWithoutClearanceRequestInput, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestInput>
+    data: XOR<TeacherClearanceReasonUpdateWithoutClearanceRequestsInput, TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestsInput>
   }
 
-  export type TeacherClearanceReasonUpdateWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestInput = {
+  export type TeacherClearanceReasonUncheckedUpdateWithoutClearanceRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     reason?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ApprovalActionUpsertWithWhereUniqueWithoutClearanceRequestInput = {
@@ -36766,6 +36889,216 @@ export namespace Prisma {
   export type AuditLogUpdateManyWithWhereWithoutClearanceRequestInput = {
     where: AuditLogScalarWhereInput
     data: XOR<AuditLogUpdateManyMutationInput, AuditLogUncheckedUpdateManyWithoutClearanceRequestInput>
+  }
+
+  export type ClearanceRequestCreateManyTerminationReasonInput = {
+    id?: string
+    userId: string
+    formType: $Enums.FormType
+    programId: string
+    status?: $Enums.RequestStatus
+    rejectionReason?: string | null
+    resubmissionCount?: number
+    submittedAt?: Date | string
+    updatedAt?: Date | string
+    currentStep?: number
+    idReplacementReasonId?: string | null
+    teacherClearanceReasonId?: string | null
+  }
+
+  export type ClearanceRequestUpdateWithoutTerminationReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
+    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateWithoutTerminationReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateManyWithoutTerminationReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ClearanceRequestCreateManyIdReplacementReasonInput = {
+    id?: string
+    userId: string
+    formType: $Enums.FormType
+    programId: string
+    status?: $Enums.RequestStatus
+    rejectionReason?: string | null
+    resubmissionCount?: number
+    submittedAt?: Date | string
+    updatedAt?: Date | string
+    currentStep?: number
+    terminationReasonId?: string | null
+    teacherClearanceReasonId?: string | null
+  }
+
+  export type ClearanceRequestUpdateWithoutIdReplacementReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
+    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateWithoutIdReplacementReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateManyWithoutIdReplacementReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ClearanceRequestCreateManyTeacherClearanceReasonInput = {
+    id?: string
+    userId: string
+    formType: $Enums.FormType
+    programId: string
+    status?: $Enums.RequestStatus
+    rejectionReason?: string | null
+    resubmissionCount?: number
+    submittedAt?: Date | string
+    updatedAt?: Date | string
+    currentStep?: number
+    terminationReasonId?: string | null
+    idReplacementReasonId?: string | null
+  }
+
+  export type ClearanceRequestUpdateWithoutTeacherClearanceReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateWithoutTeacherClearanceReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
+    certificate?: CertificateUncheckedUpdateOneWithoutClearanceRequestNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutClearanceRequestNestedInput
+  }
+
+  export type ClearanceRequestUncheckedUpdateManyWithoutTeacherClearanceReasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    formType?: EnumFormTypeFieldUpdateOperationsInput | $Enums.FormType
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    resubmissionCount?: IntFieldUpdateOperationsInput | number
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
+    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DocumentCreateManyDocumentTypeInput = {
@@ -36881,13 +37214,10 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
@@ -36908,9 +37238,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput
@@ -37262,13 +37589,10 @@ export namespace Prisma {
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currentStep?: IntFieldUpdateOperationsInput | number
-    terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutClearanceRequestsNestedInput
-    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestNestedInput
+    terminationReason?: TerminationReasonUpdateOneWithoutClearanceRequestsNestedInput
+    idReplacementReason?: IdReplacementReasonUpdateOneWithoutClearanceRequestsNestedInput
+    teacherClearanceReason?: TeacherClearanceReasonUpdateOneWithoutClearanceRequestsNestedInput
     approvalActions?: ApprovalActionUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUpdateManyWithoutClearanceRequestNestedInput
@@ -37289,9 +37613,6 @@ export namespace Prisma {
     terminationReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     idReplacementReasonId?: NullableStringFieldUpdateOperationsInput | string | null
     teacherClearanceReasonId?: NullableStringFieldUpdateOperationsInput | string | null
-    terminationReason?: TerminationReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    idReplacementReason?: IdReplacementReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
-    teacherClearanceReason?: TeacherClearanceReasonUncheckedUpdateOneWithoutClearanceRequestNestedInput
     approvalActions?: ApprovalActionUncheckedUpdateManyWithoutClearanceRequestNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutClearanceRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutClearanceRequestNestedInput

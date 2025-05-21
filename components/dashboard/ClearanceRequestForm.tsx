@@ -367,6 +367,7 @@ export function ClearanceRequestForm({
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		console.log("Form data before submission:", formData);
 
 		if (currentStep < steps.length - 1) {
 			handleNext();
@@ -398,6 +399,10 @@ export function ClearanceRequestForm({
 			} else if (formData.requestType === "ID_REPLACEMENT") {
 				if (formData.reasonId) {
 					submitFormData.append("idReplacementReasonId", formData.reasonId);
+				}
+				// Optionally handle "Others" for ID_REPLACEMENT
+				if (formData.reasonId === "Others" && formData.otherReason) {
+					submitFormData.append("idReplacementReason", formData.otherReason);
 				}
 			} else if (formData.requestType === "TEACHER_CLEARANCE") {
 				if (formData.reasonId) {

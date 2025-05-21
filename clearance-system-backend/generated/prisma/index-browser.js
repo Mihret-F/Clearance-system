@@ -119,22 +119,26 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.TerminationReasonScalarFieldEnum = {
   id: 'id',
-  clearanceRequestId: 'clearanceRequestId',
   reason: 'reason',
-  description: 'description'
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.IdReplacementReasonScalarFieldEnum = {
   id: 'id',
-  clearanceRequestId: 'clearanceRequestId',
   reason: 'reason',
-  description: 'description'
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TeacherClearanceReasonScalarFieldEnum = {
   id: 'id',
-  clearanceRequestId: 'clearanceRequestId',
-  reason: 'reason'
+  reason: 'reason',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.DocumentScalarFieldEnum = {

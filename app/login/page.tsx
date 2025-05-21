@@ -703,24 +703,23 @@ export default function Login() {
 		localStorage.setItem("user", JSON.stringify(user));
 		localStorage.setItem("authToken", authToken);
 
-		// Determine redirect path based on role
+		// Determine redirect path based on role (case-insensitive comparison)
+		const role = user.role?.toUpperCase(); // Normalize role to uppercase for comparison
 		let redirectPath = "";
 
-		// Redirect based on user role
-		if (user.role === "ADMIN") {
+		if (role === "ADMIN") {
 			redirectPath = "/dashboard/admin";
-		} else if (user.role === "APPROVER") {
+		} else if (role === "APPROVER") {
 			redirectPath = "/dashboard/approver";
-		} else if (user.role === "STUDENT" || user.role === "TEACHER") {
+		} else if (role === "STUDENT" || role === "TEACHER") {
 			redirectPath = "/dashboard/requester";
 		} else {
-			// Default fallback
-			redirectPath = "/dashboard";
+			redirectPath = "/dashboard"; // Default fallback
 		}
 
-		router.push(redirectPath);
+		// Redirect immediately
+		router.replace(redirectPath);
 	};
-
 	const goBack = () => {
 		if (step === "forgotPassword") {
 			setStep("login");
