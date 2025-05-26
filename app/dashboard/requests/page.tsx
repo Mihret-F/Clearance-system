@@ -72,7 +72,8 @@ export default function RequestsPage() {
 		const matchesFilter =
 			filter === "all" ||
 			(filter === "pending" && request.status === "PENDING") ||
-			(filter === "approved" && request.status === "APPROVED") ||
+			(filter === "approved" &&
+				(request.status === "APPROVED" || request.status === "COMPLETED")) ||
 			(filter === "rejected" && request.status === "REJECTED");
 
 		return matchesSearch && matchesFilter;

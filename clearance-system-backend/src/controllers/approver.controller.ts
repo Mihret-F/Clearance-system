@@ -46,17 +46,29 @@ export const getPendingRequests = async (
 		// Get requests that match the workflow rules and are at the current step
 		const pendingRequests = await prisma.clearanceRequest.findMany({
 			where: {
-				OR: workflowSteps.map(
-					(step: {
-						workflowRule: { formType: FormType; programId: string | null };
-						stepOrder: number;
-					}) => ({
-						formType: step.workflowRule.formType,
-						programId: step.workflowRule.programId || undefined, // Convert null to undefined
-						currentStep: step.stepOrder,
-						status: "PENDING",
-					})
-				),
+				AND: [
+					{
+						OR: workflowSteps.map(
+							(step: {
+								workflowRule: { formType: FormType; programId: string | null };
+								stepOrder: number;
+							}) => ({
+								formType: step.workflowRule.formType,
+								programId: step.workflowRule.programId || undefined,
+								currentStep: step.stepOrder,
+								status: "PENDING",
+							})
+						),
+					},
+					{
+						approvalActions: {
+							some: {
+								approverId: approver.id,
+								status: "PENDING",
+							},
+						},
+					},
+				],
 			},
 			include: {
 				user: {
@@ -66,7 +78,12 @@ export const getPendingRequests = async (
 						firstName: true,
 						fatherName: true,
 						grandfatherName: true,
-						student: true,
+						student: {
+							include: {
+								department: true,
+								program: true,
+							},
+						},
 						teacher: true,
 					},
 				},
@@ -103,6 +120,7 @@ export const getPendingRequests = async (
 	}
 };
 
+// Approve a clearance request
 // Approve a clearance request
 export const approveRequest = async (
 	req: Request,
@@ -189,17 +207,42 @@ export const approveRequest = async (
 			return;
 		}
 
-		// Create approval action
-		await prisma.approvalAction.create({
-			data: {
-				clearanceRequestId: id,
-				approverId: approver.id,
-				status: "APPROVED",
-				comment,
-				actionDate: new Date(),
-				finalizedAt: new Date(),
+		// Check for existing approval action
+		const existingAction = await prisma.approvalAction.findUnique({
+			where: {
+				clearanceRequestId_approverId: {
+					clearanceRequestId: id,
+					approverId: approver.id,
+				},
 			},
 		});
+
+		if (existingAction) {
+			// Update existing approval action
+			await prisma.approvalAction.update({
+				where: {
+					id: existingAction.id,
+				},
+				data: {
+					status: "APPROVED",
+					comment,
+					actionDate: new Date(),
+					finalizedAt: new Date(),
+				},
+			});
+		} else {
+			// Create new approval action
+			await prisma.approvalAction.create({
+				data: {
+					clearanceRequestId: id,
+					approverId: approver.id,
+					status: "APPROVED",
+					comment,
+					actionDate: new Date(),
+					finalizedAt: new Date(),
+				},
+			});
+		}
 
 		// Check if this is the last step
 		const isLastStep =
@@ -234,7 +277,7 @@ export const approveRequest = async (
 			},
 		});
 
-		// If not the last step, notify the next approver(s)
+		// If not the last step, create approval action and notify the next approver(s)
 		if (!isLastStep) {
 			const nextStep = workflowRule.workflowSteps[currentStepIndex + 1];
 
@@ -247,6 +290,30 @@ export const approveRequest = async (
 					user: true,
 				},
 			});
+
+			// Create pending approval actions for next approvers
+			for (const nextApprover of nextApprovers) {
+				const existingNextAction = await prisma.approvalAction.findUnique({
+					where: {
+						clearanceRequestId_approverId: {
+							clearanceRequestId: id,
+							approverId: nextApprover.id,
+						},
+					},
+				});
+
+				if (!existingNextAction) {
+					await prisma.approvalAction.create({
+						data: {
+							clearanceRequestId: id,
+							approverId: nextApprover.id,
+							status: "PENDING",
+							actionDate: null,
+							finalizedAt: null,
+						},
+					});
+				}
+			}
 
 			// Notify all approvers in the next office
 			for (const nextApprover of nextApprovers) {
@@ -373,17 +440,42 @@ export const rejectRequest = async (
 			return;
 		}
 
-		// Create rejection action
-		await prisma.approvalAction.create({
-			data: {
-				clearanceRequestId: id,
-				approverId: approver.id,
-				status: "REJECTED",
-				comment,
-				actionDate: new Date(),
-				finalizedAt: new Date(),
+		// Check for existing approval action
+		const existingAction = await prisma.approvalAction.findUnique({
+			where: {
+				clearanceRequestId_approverId: {
+					clearanceRequestId: id,
+					approverId: approver.id,
+				},
 			},
 		});
+
+		if (existingAction) {
+			// Update existing approval action
+			await prisma.approvalAction.update({
+				where: {
+					id: existingAction.id,
+				},
+				data: {
+					status: "REJECTED",
+					comment,
+					actionDate: new Date(),
+					finalizedAt: new Date(),
+				},
+			});
+		} else {
+			// Create new approval action
+			await prisma.approvalAction.create({
+				data: {
+					clearanceRequestId: id,
+					approverId: approver.id,
+					status: "REJECTED",
+					comment,
+					actionDate: new Date(),
+					finalizedAt: new Date(),
+				},
+			});
+		}
 
 		// Update the request status
 		const updatedRequest = await prisma.clearanceRequest.update({
@@ -419,6 +511,267 @@ export const rejectRequest = async (
 		res.status(500).json({
 			status: "error",
 			message: "An error occurred while rejecting the request",
+		});
+		return;
+	}
+};
+export const getAnalytics = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const userId = req.user.id;
+		const { period = "week" } = req.query;
+
+		const approver = await prisma.approver.findUnique({
+			where: { userId },
+			include: { office: true },
+		});
+
+		if (!approver) {
+			res.status(404).json({
+				status: "error",
+				message: "Approver profile not found",
+			});
+			return;
+		}
+
+		const now = new Date();
+		let startDate: Date;
+		let days: number;
+		if (period === "week") {
+			startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+			days = 7;
+		} else if (period === "month") {
+			startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+			days = 30;
+		} else if (period === "year") {
+			startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+			days = 365;
+		} else {
+			res.status(400).json({
+				status: "error",
+				message: "Invalid period specified",
+			});
+			return;
+		}
+
+		const requests = await prisma.clearanceRequest.findMany({
+			where: {
+				submittedAt: { gte: startDate },
+				approvalActions: {
+					some: { approverId: approver.id },
+				},
+			},
+			include: {
+				approvalActions: {
+					where: { approverId: approver.id },
+				},
+			},
+		});
+
+		const dailyCounts = Array(days).fill(0);
+		requests.forEach((req) => {
+			const submittedDate = new Date(req.submittedAt);
+			const daysDiff = Math.floor(
+				(now.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24)
+			);
+			if (daysDiff >= 0 && daysDiff < days) {
+				dailyCounts[days - 1 - daysDiff]++;
+			}
+		});
+
+		const total = requests.length;
+		const approved = requests.filter((req) =>
+			req.approvalActions.some((action) => action.status === "APPROVED")
+		).length;
+		const rejected = requests.filter((req) =>
+			req.approvalActions.some((action) => action.status === "REJECTED")
+		).length;
+
+		const completed = requests.filter(
+			(req) => req.status === "COMPLETED" || req.status === "REJECTED"
+		);
+		const totalTime = completed.reduce((sum, req) => {
+			const start = new Date(req.submittedAt).getTime();
+			const end = new Date(req.updatedAt || req.submittedAt).getTime();
+			return sum + (end - start) / (1000 * 60 * 60 * 24);
+		}, 0);
+		const avgProcessingTime = completed.length
+			? Number((totalTime / completed.length).toFixed(1))
+			: 0;
+
+		res.status(200).json({
+			status: "success",
+			data: {
+				dailyCounts,
+				approvalRates: {
+					approved: total ? Math.round((approved / total) * 100) : 0,
+					rejected: total ? Math.round((rejected / total) * 100) : 0,
+					total,
+				},
+				processingTime: avgProcessingTime,
+			},
+		});
+	} catch (error) {
+		console.error("Get analytics error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred while fetching analytics",
+		});
+	}
+};
+// Get approved requests for an approver
+export const getApprovedRequests = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const userId = req.user.id;
+
+		// Get approver details
+		const approver = await prisma.approver.findUnique({
+			where: { userId },
+			include: { office: true },
+		});
+
+		if (!approver) {
+			res.status(404).json({
+				status: "error",
+				message: "Approver profile not found",
+			});
+			return;
+		}
+
+		// Get requests where this approver has approved
+		const approvedRequests = await prisma.clearanceRequest.findMany({
+			where: {
+				approvalActions: {
+					some: {
+						approverId: approver.id,
+						status: "APPROVED",
+					},
+				},
+			},
+			include: {
+				user: {
+					select: {
+						id: true,
+						username: true,
+						firstName: true,
+						fatherName: true,
+						grandfatherName: true,
+						student: {
+							include: {
+								department: true,
+								program: true,
+							},
+						},
+						teacher: true,
+					},
+				},
+				terminationReason: true,
+				idReplacementReason: true,
+				teacherClearanceReason: true,
+				approvalActions: {
+					include: {
+						approver: {
+							include: { office: true },
+						},
+					},
+				},
+			},
+			orderBy: { submittedAt: "desc" },
+		});
+
+		res.status(200).json({
+			status: "success",
+			data: approvedRequests,
+		});
+		return;
+	} catch (error) {
+		console.error("Get approved requests error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred while fetching approved requests",
+		});
+		return;
+	}
+};
+
+// Get rejected requests for an approver
+export const getRejectedRequests = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const userId = req.user.id;
+
+		// Get approver details
+		const approver = await prisma.approver.findUnique({
+			where: { userId },
+			include: { office: true },
+		});
+
+		if (!approver) {
+			res.status(404).json({
+				status: "error",
+				message: "Approver profile not found",
+			});
+			return;
+		}
+
+		// Get requests where this approver has rejected
+		const rejectedRequests = await prisma.clearanceRequest.findMany({
+			where: {
+				approvalActions: {
+					some: {
+						approverId: approver.id,
+						status: "REJECTED",
+					},
+				},
+			},
+			include: {
+				user: {
+					select: {
+						id: true,
+						username: true,
+						firstName: true,
+						fatherName: true,
+						grandfatherName: true,
+						student: {
+							include: {
+								department: true,
+								program: true,
+							},
+						},
+						teacher: true,
+					},
+				},
+				terminationReason: true,
+				idReplacementReason: true,
+				teacherClearanceReason: true,
+				approvalActions: {
+					include: {
+						approver: {
+							include: { office: true },
+						},
+					},
+				},
+			},
+			orderBy: { submittedAt: "desc" },
+		});
+
+		res.status(200).json({
+			status: "success",
+			data: rejectedRequests,
+		});
+		return;
+	} catch (error) {
+		console.error("Get rejected requests error:", error);
+		res.status(500).json({
+			status: "error",
+			message: "An error occurred while fetching rejected requests",
 		});
 		return;
 	}

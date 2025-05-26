@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import io from "socket.io-client";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -94,6 +96,7 @@ import {
 	LineChart as RechartsLineChart,
 	Line,
 } from "recharts";
+import axios from "axios";
 
 interface ApproverDashboardProps {
 	user: {
@@ -104,10 +107,16 @@ interface ApproverDashboardProps {
 		name?: string;
 		isFirstLogin?: boolean;
 		email?: string;
+		approver?: {
+			office: {
+				name: string;
+			};
+		};
 	};
 	clearanceRequests: any[];
 	setClearanceRequests: (requests: any[]) => void;
 }
+const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
 
 export default function ApproverDashboard({
 	user,
@@ -195,29 +204,190 @@ export default function ApproverDashboard({
 
 	// Analytics data
 	const analyticsData = {
-		weekly: [12, 19, 8, 15, 12, 8, 16],
-		monthly: [45, 52, 38, 41, 35, 62, 44, 48, 56, 43, 50, 58],
+		weekly: (() => {
+			const last7Days = Array(7).fill(0);
+			const today = new Date();
+			clearanceRequests.forEach((req) => {
+				const submittedDate = new Date(req.submittedAt);
+				const daysDiff = Math.floor(
+					(today.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24)
+				);
+				if (daysDiff >= 0 && daysDiff < 7) {
+					last7Days[6 - daysDiff]++;
+				}
+			});
+			return last7Days;
+		})(),
+		monthly: (() => {
+			const last30Days = Array(30).fill(0);
+			const today = new Date();
+			clearanceRequests.forEach((req) => {
+				const submittedDate = new Date(req.submittedAt);
+				const daysDiff = Math.floor(
+					(today.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24)
+				);
+				if (daysDiff >= 0 && daysDiff < 30) {
+					last30Days[29 - daysDiff]++;
+				}
+			});
+			return last30Days;
+		})(),
 		approvalRates: {
-			week: {
-				approved: 75,
-				rejected: 25,
-				total: 40,
-			},
-			month: {
-				approved: 82,
-				rejected: 18,
-				total: 120,
-			},
-			year: {
-				approved: 88,
-				rejected: 12,
-				total: 450,
-			},
+			week: (() => {
+				const weekRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						7
+					);
+				});
+				const total = weekRequests.length;
+				const approved = weekRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "APPROVED"
+					)
+				).length;
+				const rejected = weekRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "REJECTED"
+					)
+				).length;
+				return {
+					approved: total ? Math.round((approved / total) * 100) : 0,
+					rejected: total ? Math.round((rejected / total) * 100) : 0,
+					total,
+				};
+			})(),
+			month: (() => {
+				const monthRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						30
+					);
+				});
+				const total = monthRequests.length;
+				const approved = monthRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "APPROVED"
+					)
+				).length;
+				const rejected = monthRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "REJECTED"
+					)
+				).length;
+				return {
+					approved: total ? Math.round((approved / total) * 100) : 0,
+					rejected: total ? Math.round((rejected / total) * 100) : 0,
+					total,
+				};
+			})(),
+			year: (() => {
+				const yearRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						365
+					);
+				});
+				const total = yearRequests.length;
+				const approved = yearRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "APPROVED"
+					)
+				).length;
+				const rejected = yearRequests.filter((req) =>
+					req.approvalActions?.some(
+						(action) =>
+							action.approver?.office?.name === user.approver?.office?.name &&
+							action.status === "REJECTED"
+					)
+				).length;
+				return {
+					approved: total ? Math.round((approved / total) * 100) : 0,
+					rejected: total ? Math.round((rejected / total) * 100) : 0,
+					total,
+				};
+			})(),
 		},
 		processingTimes: {
-			week: 1.2, // days
-			month: 1.5,
-			year: 1.8,
+			week: (() => {
+				const weekRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						7
+					);
+				});
+				const completed = weekRequests.filter(
+					(req) => req.status === "COMPLETED" || req.status === "REJECTED"
+				);
+				const totalTime = completed.reduce((sum, req) => {
+					const start = new Date(req.submittedAt).getTime();
+					const end = new Date(req.updatedAt || req.submittedAt).getTime();
+					return sum + (end - start) / (1000 * 60 * 60 * 24);
+				}, 0);
+				return completed.length
+					? Number((totalTime / completed.length).toFixed(1))
+					: 0;
+			})(),
+			month: (() => {
+				const monthRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						30
+					);
+				});
+				const completed = monthRequests.filter(
+					(req) => req.status === "COMPLETED" || req.status === "REJECTED"
+				);
+				const totalTime = completed.reduce((sum, req) => {
+					const start = new Date(req.submittedAt).getTime();
+					const end = new Date(req.updatedAt || req.submittedAt).getTime();
+					return sum + (end - start) / (1000 * 60 * 60 * 24);
+				}, 0);
+				return completed.length
+					? Number((totalTime / completed.length).toFixed(1))
+					: 0;
+			})(),
+			year: (() => {
+				const yearRequests = clearanceRequests.filter((req) => {
+					const submittedDate = new Date(req.submittedAt);
+					return (
+						(new Date().getTime() - submittedDate.getTime()) /
+							(1000 * 60 * 60 * 24) <=
+						365
+					);
+				});
+				const completed = yearRequests.filter(
+					(req) => req.status === "COMPLETED" || req.status === "REJECTED"
+				);
+				const totalTime = completed.reduce((sum, req) => {
+					const start = new Date(req.submittedAt).getTime();
+					const end = new Date(req.updatedAt || req.submittedAt).getTime();
+					return sum + (end - start) / (1000 * 60 * 60 * 24);
+				}, 0);
+				return completed.length
+					? Number((totalTime / completed.length).toFixed(1))
+					: 0;
+			})(),
 		},
 	};
 
@@ -323,11 +493,18 @@ export default function ApproverDashboard({
 			setShowPasswordChangeDialog(true);
 		}
 
+		socket.on("notification:new", (notification) => {
+			// Handle the new notification
+			console.log("New notification:", notification);
+			// Update state or show notification to the user
+		});
+
 		return () => {
 			clearTimeout(timer);
 			if (inactivityTimer) clearTimeout(inactivityTimer);
 			if (undoInterval) clearInterval(undoInterval);
 			document.removeEventListener("keydown", handleKeyboardShortcuts);
+			socket.off("notification:new");
 		};
 	}, [tabParam, user.isFirstLogin]);
 
@@ -445,16 +622,18 @@ export default function ApproverDashboard({
 	};
 
 	// Filter requests based on approver role and search/filter criteria
-	const getPendingRequests = () => {
+	function getPendingRequests() {
 		let filtered = clearanceRequests.filter((request) => {
-			// Check if this approver is the current approver in the chain
+			// Check if this request is assigned to the current approver's office
 			const isCurrentApprover =
-				request.currentApprover === user.role ||
-				(user.department && request.currentApprover === user.department);
-			// Check if the request is pending and hasn't been approved by this role
-			const isPending =
-				request.status === "Pending" &&
-				!request.approvals?.some((approval) => approval.role === user.role);
+				request.currentApprover === user.approver?.office?.name ||
+				request.approvalActions?.some(
+					(action) =>
+						action.approver?.office?.name === user.approver?.office?.name &&
+						action.status === "PENDING"
+				);
+			// Check if the request is pending
+			const isPending = request.status === "PENDING";
 			return isCurrentApprover && isPending;
 		});
 
@@ -463,13 +642,23 @@ export default function ApproverDashboard({
 			filtered = filtered.filter(
 				(req) =>
 					req.userId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					req.type?.toLowerCase().includes(searchQuery.toLowerCase())
+					req.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					req.userInfo?.firstName
+						?.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					req.userInfo?.fatherName
+						?.toLowerCase()
+						.includes(searchQuery.toLowerCase())
 			);
 		}
 
-		// Apply department filter
+		// Apply department filter (using userInfo.department)
 		if (filterDepartment !== "all") {
-			filtered = filtered.filter((req) => req.department === filterDepartment);
+			filtered = filtered.filter(
+				(req) =>
+					req.userInfo?.department?.toLowerCase().trim() ===
+					filterDepartment.toLowerCase().trim()
+			);
 		}
 
 		// Apply request type filter
@@ -503,39 +692,36 @@ export default function ApproverDashboard({
 					new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
 			);
 		} else if (sortOrder === "priority") {
-			// Sort by priority (example implementation)
 			filtered.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 		}
 
 		return filtered;
-	};
+	}
 
 	const getApprovedRequests = () => {
 		return clearanceRequests.filter((request) =>
-			request.approvals?.some(
-				(approval) =>
-					(approval.role === user.role && approval.status === "Approved") ||
-					(user.department &&
-						approval.role === user.department &&
-						approval.status === "Approved")
+			request.approvalActions?.some(
+				(action) =>
+					(action.approver?.office?.name === user.approver?.office?.name ||
+						action.approverId === user.id) &&
+					action.status === "APPROVED"
 			)
 		);
 	};
-
 	const getRejectedRequests = () => {
 		return clearanceRequests.filter((request) =>
-			request.approvals?.some(
-				(approval) =>
-					(approval.role === user.role && approval.status === "Rejected") ||
-					(user.department &&
-						approval.role === user.department &&
-						approval.status === "Rejected")
+			request.approvalActions?.some(
+				(action) =>
+					(action.approver?.office?.name === user.approver?.office?.name ||
+						action.approverId === user.id) &&
+					action.status === "REJECTED"
 			)
 		);
 	};
 
 	const handleReview = (request) => {
 		setSelectedRequest(request);
+		console.log("selectedRequest", selectedRequest);
 		setShowReviewDialog(true);
 		resetInactivityTimer();
 	};
@@ -546,134 +732,178 @@ export default function ApproverDashboard({
 	};
 
 	const handleApprove = async () => {
+		if (!selectedRequest) return;
 		setIsProcessing(true);
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			const updatedRequests = clearanceRequests.map((req) => {
-				if (req.id === selectedRequest.id) {
-					// Find the next approver in the chain
-					const currentIndex = req.approvalChain.indexOf(user.role);
-					const nextApprover =
-						currentIndex < req.approvalChain.length - 1
-							? req.approvalChain[currentIndex + 1]
-							: null;
-
-					return {
-						...req,
-						approvals: [
-							...(req.approvals || []),
-							{
-								role: user.role,
-								status: "Approved",
-								timestamp: new Date().toISOString(),
-								comment: reviewComment,
-							},
-						],
-						currentApprover: nextApprover,
-						status: nextApprover ? "Pending" : "Approved",
-						updatedAt: new Date().toISOString(),
-					};
-				}
-				return req;
-			});
-
-			setClearanceRequests(updatedRequests);
-			setShowReviewDialog(false);
-
-			// Set undo timer
-			setShowUndoApproval(selectedRequest.id);
-
-			// Start countdown for undo
-			if (undoInterval) clearInterval(undoInterval);
-			setUndoCountdown(600); // Reset to 10 minutes
-
-			const interval = setInterval(() => {
-				setUndoCountdown((prev) => {
-					if (prev <= 1) {
-						clearInterval(interval);
-						setShowUndoApproval(null);
-						return 0;
-					}
-					return prev - 1;
-				});
-			}, 1000);
-
-			setUndoInterval(interval);
-
-			// Add notification
-			setNotifications([
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+			const response = await axios.post(
+				`${API_BASE_URL}/approver/request/${selectedRequest.id}/approve`,
+				{ comment: reviewComment },
 				{
-					id: Date.now(),
-					title: "Request Approved",
-					message: `You have approved the ${selectedRequest.type} request.`,
-					time: "Just now",
-					read: false,
-					type: "success",
-				},
-				...notifications,
-			]);
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
 
-			setSelectedRequest(null);
-			setReviewComment("");
+			if (response.data.status === "success") {
+				const updatedRequest = response.data.data;
+				const updatedRequests = clearanceRequests.map((req) =>
+					req.id === selectedRequest.id
+						? {
+								...req,
+								approvalActions: [
+									...(req.approvalActions || []),
+									{
+										approverId: user.id,
+										status: "APPROVED",
+										comment: reviewComment,
+										actionDate: new Date().toISOString(),
+										finalizedAt: new Date().toISOString(),
+									},
+								],
+								currentApprover:
+									updatedRequest.currentStep < req.approvalChain?.length
+										? req.approvalChain[updatedRequest.currentStep]
+										: null,
+								status: updatedRequest.status,
+								currentStep: updatedRequest.currentStep,
+								updatedAt: new Date().toISOString(),
+						  }
+						: req
+				);
+
+				setClearanceRequests(updatedRequests);
+				setShowReviewDialog(false);
+
+				// Set undo timer
+				setShowUndoApproval(selectedRequest.id);
+				setUndoCountdown(600); // Reset to 10 minutes
+
+				if (undoInterval) clearInterval(undoInterval);
+				const interval = setInterval(() => {
+					setUndoCountdown((prev) => {
+						if (prev <= 1) {
+							clearInterval(interval);
+							setShowUndoApproval(null);
+							return 0;
+						}
+						return prev - 1;
+					});
+				}, 1000);
+				setUndoInterval(interval);
+
+				// Add notification
+				setNotifications([
+					{
+						id: Date.now(),
+						title: "Request Approved",
+						message: `You have approved the ${selectedRequest.type} request.`,
+						time: "Just now",
+						read: false,
+						type: "success",
+					},
+					...notifications,
+				]);
+
+				setSelectedRequest(null);
+				setReviewComment("");
+			}
 		} catch (error) {
 			console.error("Error approving request:", error);
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-
-	const handleReject = async () => {
-		if (!reviewComment) {
-			alert("Please provide a reason for rejection");
-			return;
-		}
-
-		setIsProcessing(true);
-		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			const updatedRequests = clearanceRequests.map((req) => {
-				if (req.id === selectedRequest.id) {
-					return {
-						...req,
-						approvals: [
-							...(req.approvals || []),
-							{
-								role: user.role,
-								status: "Rejected",
-								timestamp: new Date().toISOString(),
-								comment: reviewComment,
-							},
-						],
-						status: "Rejected",
-						updatedAt: new Date().toISOString(),
-					};
-				}
-				return req;
-			});
-
-			setClearanceRequests(updatedRequests);
-			setShowReviewDialog(false);
-			setSelectedRequest(null);
-			setReviewComment("");
-
-			// Add notification
 			setNotifications([
 				{
 					id: Date.now(),
-					title: "Request Rejected",
-					message: `You have rejected the ${selectedRequest.type} request.`,
+					title: "Approval Failed",
+					message: "Failed to approve the request. Please try again.",
 					time: "Just now",
 					read: false,
 					type: "error",
 				},
 				...notifications,
 			]);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
+	const handleReject = async () => {
+		if (!selectedRequest || !reviewComment) {
+			alert("Please provide a reason for rejection");
+			return;
+		}
+
+		setIsProcessing(true);
+		try {
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+			const response = await axios.post(
+				`${API_BASE_URL}/approver/request/${selectedRequest.id}/reject`,
+				{ comment: reviewComment },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+
+			if (response.data.status === "success") {
+				const updatedRequest = response.data.data;
+				const updatedRequests = clearanceRequests.map((req) =>
+					req.id === selectedRequest.id
+						? {
+								...req,
+								approvalActions: [
+									...(req.approvalActions || []),
+									{
+										approverId: user.id,
+										status: "REJECTED",
+										comment: reviewComment,
+										actionDate: new Date().toISOString(),
+										finalizedAt: new Date().toISOString(),
+									},
+								],
+								status: "REJECTED",
+								rejectionReason: reviewComment,
+								updatedAt: new Date().toISOString(),
+						  }
+						: req
+				);
+
+				setClearanceRequests(updatedRequests);
+				setShowReviewDialog(false);
+				setSelectedRequest(null);
+				setReviewComment("");
+
+				// Add notification
+				setNotifications([
+					{
+						id: Date.now(),
+						title: "Request Rejected",
+						message: `You have rejected the ${selectedRequest.type} request.`,
+						time: "Just now",
+						read: false,
+						type: "error",
+					},
+					...notifications,
+				]);
+			}
 		} catch (error) {
 			console.error("Error rejecting request:", error);
+			setNotifications([
+				{
+					id: Date.now(),
+					title: "Rejection Failed",
+					message: "Failed to reject the request. Please try again.",
+					time: "Just now",
+					read: false,
+					type: "error",
+				},
+				...notifications,
+			]);
 		} finally {
 			setIsProcessing(false);
 		}
@@ -795,53 +1025,62 @@ export default function ApproverDashboard({
 
 		setIsProcessing(true);
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			const token = localStorage.getItem("authToken");
+			const API_BASE_URL =
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+			const updatedRequests = [...clearanceRequests];
 
-			const updatedRequests = clearanceRequests.map((req) => {
-				if (selectedRequests.includes(req.id)) {
-					if (bulkAction === "approve") {
-						// Find the next approver in the chain
-						const currentIndex = req.approvalChain.indexOf(user.role);
-						const nextApprover =
-							currentIndex < req.approvalChain.length - 1
-								? req.approvalChain[currentIndex + 1]
-								: null;
+			for (const requestId of selectedRequests) {
+				const endpoint =
+					bulkAction === "approve"
+						? `${API_BASE_URL}/approver/request/${requestId}/approve`
+						: `${API_BASE_URL}/approver/request/${requestId}/reject`;
+				const response = await axios.post(
+					endpoint,
+					{ comment: bulkComment },
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
 
-						return {
-							...req,
-							approvals: [
-								...(req.approvals || []),
+				if (response.data.status === "success") {
+					const updatedRequest = response.data.data;
+					const requestIndex = updatedRequests.findIndex(
+						(req) => req.id === requestId
+					);
+					if (requestIndex !== -1) {
+						updatedRequests[requestIndex] = {
+							...updatedRequests[requestIndex],
+							approvalActions: [
+								...(updatedRequests[requestIndex].approvalActions || []),
 								{
-									role: user.role,
-									status: "Approved",
-									timestamp: new Date().toISOString(),
+									approverId: user.id,
+									status: bulkAction === "approve" ? "APPROVED" : "REJECTED",
 									comment: bulkComment,
+									actionDate: new Date().toISOString(),
+									finalizedAt: new Date().toISOString(),
 								},
 							],
-							currentApprover: nextApprover,
-							status: nextApprover ? "Pending" : "Approved",
-							updatedAt: new Date().toISOString(),
-						};
-					} else {
-						return {
-							...req,
-							approvals: [
-								...(req.approvals || []),
-								{
-									role: user.role,
-									status: "Rejected",
-									timestamp: new Date().toISOString(),
-									comment: bulkComment,
-								},
-							],
-							status: "Rejected",
+							status: updatedRequest.status,
+							currentStep: updatedRequest.currentStep,
+							currentApprover:
+								updatedRequest.currentStep <
+								updatedRequests[requestIndex].approvalChain?.length
+									? updatedRequests[requestIndex].approvalChain[
+											updatedRequest.currentStep
+									  ]
+									: null,
+							rejectionReason:
+								bulkAction === "reject"
+									? bulkComment
+									: updatedRequests[requestIndex].rejectionReason,
 							updatedAt: new Date().toISOString(),
 						};
 					}
 				}
-				return req;
-			});
+			}
 
 			setClearanceRequests(updatedRequests);
 			setShowBulkActionDialog(false);
@@ -864,6 +1103,19 @@ export default function ApproverDashboard({
 			]);
 		} catch (error) {
 			console.error(`Error performing bulk ${bulkAction}:`, error);
+			setNotifications([
+				{
+					id: Date.now(),
+					title: `Bulk ${
+						bulkAction === "approve" ? "Approval" : "Rejection"
+					} Failed`,
+					message: `Failed to ${bulkAction} the selected requests. Please try again.`,
+					time: "Just now",
+					read: false,
+					type: "error",
+				},
+				...notifications,
+			]);
 		} finally {
 			setIsProcessing(false);
 		}
@@ -960,8 +1212,13 @@ export default function ApproverDashboard({
 											{selectedRequest.userId}
 										</h3>
 										<p className="text-sm text-gray-500 dark:text-gray-400">
-											{selectedRequest.department || "Department"} •{" "}
-											{selectedRequest.program || "Program"}
+											{selectedRequest.userInfo?.department || "Department"} •
+											{"  "}
+											{selectedRequest.userInfo?.program?.type ||
+												"Program Type"}{" "}
+											-{" "}
+											{selectedRequest.userInfo?.program?.category ||
+												"Program Category"}
 										</p>
 									</div>
 								</div>
@@ -1555,78 +1812,31 @@ export default function ApproverDashboard({
 											<Chart>
 												<ResponsiveContainer width="100%" height="100%">
 													<RechartsBarChart
-														data={[
-															{
-																name: "Mon",
-																approved: 5,
-																rejected: 1,
-																pending: 2,
-															},
-															{
-																name: "Tue",
-																approved: 7,
-																rejected: 2,
-																pending: 3,
-															},
-															{
-																name: "Wed",
-																approved: 4,
-																rejected: 1,
-																pending: 1,
-															},
-															{
-																name: "Thu",
-																approved: 6,
-																rejected: 0,
-																pending: 2,
-															},
-															{
-																name: "Fri",
-																approved: 8,
-																rejected: 1,
-																pending: 3,
-															},
-															{
-																name: "Sat",
-																approved: 3,
-																rejected: 0,
-																pending: 1,
-															},
-															{
-																name: "Sun",
-																approved: 2,
-																rejected: 0,
-																pending: 0,
-															},
-														]}
-														margin={{
-															top: 20,
-															right: 30,
-															left: 20,
-															bottom: 5,
-														}}
-													>
-														<CartesianGrid strokeDasharray="3 3" />
-														<XAxis dataKey="name" />
-														<YAxis />
-														<RechartsTooltip />
-														<Legend />
-														<Bar
-															dataKey="approved"
-															name="Approved"
-															fill="#4ade80"
-														/>
-														<Bar
-															dataKey="rejected"
-															name="Rejected"
-															fill="#f87171"
-														/>
-														<Bar
-															dataKey="pending"
-															name="Pending"
-															fill="#60a5fa"
-														/>
-													</RechartsBarChart>
+														data={analyticsData[
+															dateRange === "week"
+																? "weekly"
+																: dateRange === "month"
+																? "monthly"
+																: "yearly"
+														].map((count, index) => ({
+															name:
+																dateRange === "week"
+																	? [
+																			"Sun",
+																			"Mon",
+																			"Tue",
+																			"Wed",
+																			"Thu",
+																			"Fri",
+																			"Sat",
+																	  ][index % 7]
+																	: `Day ${index + 1}`,
+															approved: Math.round(count * 0.7),
+															rejected: Math.round(count * 0.2),
+															pending: Math.round(count * 0.1),
+														}))}
+														margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+													></RechartsBarChart>
 												</ResponsiveContainer>
 											</Chart>
 										</ChartContainer>
@@ -1785,7 +1995,8 @@ export default function ApproverDashboard({
 														<div>
 															<p className="font-medium">{request.type}</p>
 															<p className="text-sm text-gray-600 dark:text-gray-400">
-																From: {request.userId} •{" "}
+																From: {request.userInfo?.firstName}{" "}
+																{request.userInfo?.fatherName} •{" "}
 																{new Date(
 																	request.submittedAt
 																).toLocaleDateString()}
@@ -2021,7 +2232,8 @@ export default function ApproverDashboard({
 																		{request.userId}
 																	</div>
 																	<div className="text-xs text-gray-500 dark:text-gray-400">
-																		{request.department || "Department"}
+																		{request?.userInfo?.department ||
+																			"Department"}
 																	</div>
 																</div>
 															</div>
@@ -2099,7 +2311,6 @@ export default function ApproverDashboard({
 						</div>
 					</div>
 				</TabsContent>
-
 				{/* Approved Requests Tab */}
 				<TabsContent value="approved" className="space-y-4">
 					<Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -2128,11 +2339,12 @@ export default function ApproverDashboard({
 														<p className="text-sm text-gray-600 dark:text-gray-400">
 															Approved on{" "}
 															{new Date(
-																request.approvals.find(
-																	(a) =>
-																		a.role === user.role ||
-																		a.role === user.department
-																).timestamp
+																request?.approvalActions?.find(
+																	(action) =>
+																		action.status === "APPROVED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.actionDate
 															).toLocaleDateString()}
 														</p>
 													</div>
@@ -2167,11 +2379,12 @@ export default function ApproverDashboard({
 																Your Comment
 															</h4>
 															<p className="text-sm text-gray-600 dark:text-gray-400">
-																{request.approvals.find(
-																	(a) =>
-																		a.role === user.role ||
-																		a.role === user.department
-																).comment || "No comment provided."}
+																{request.approvalActions?.find(
+																	(action) =>
+																		action.status === "APPROVED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.comment || "No comment provided."}
 															</p>
 														</div>
 
@@ -2270,11 +2483,34 @@ export default function ApproverDashboard({
 														<p className="text-sm text-gray-600 dark:text-gray-400">
 															Rejected on{" "}
 															{new Date(
-																request.approvals.find(
-																	(a) =>
-																		a.role === user.role ||
-																		a.role === user.department
-																).timestamp
+																request?.approvalActions?.find(
+																	(action) =>
+																		action.status === "REJECTED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.actionDate
+															).toLocaleDateString()}
+														</p>
+														<p className="text-sm text-gray-600 dark:text-gray-400">
+															Rejected on{" "}
+															{new Date(
+																request?.approvalActions?.find(
+																	(action) =>
+																		action.status === "REJECTED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.actionDate
+															).toLocaleDateString()}
+														</p>
+														<p className="text-sm text-gray-600 dark:text-gray-400">
+															Rejected on{" "}
+															{new Date(
+																request?.approvalActions?.find(
+																	(action) =>
+																		action.status === "REJECTED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.actionDate
 															).toLocaleDateString()}
 														</p>
 													</div>
@@ -2307,11 +2543,12 @@ export default function ApproverDashboard({
 																Rejection Reason
 															</h4>
 															<p className="text-sm text-gray-600 dark:text-gray-400">
-																{request.approvals.find(
-																	(a) =>
-																		a.role === user.role ||
-																		a.role === user.department
-																).comment || "No reason provided."}
+																{request.approvalActions?.find(
+																	(action) =>
+																		action.status === "REJECTED" &&
+																		action.approver?.office?.name ===
+																			user.approver?.office?.name
+																)?.comment || "No reason provided."}
 															</p>
 														</div>
 
@@ -2383,7 +2620,6 @@ export default function ApproverDashboard({
 						</CardContent>
 					</Card>
 				</TabsContent>
-
 				{/* Reports Tab */}
 				<TabsContent value="reports" className="space-y-6">
 					<div className="flex justify-between items-center">
@@ -3407,7 +3643,6 @@ export default function ApproverDashboard({
 							</Card>
 						)}
 					</div>
-
 					<DialogFooter>
 						<Button variant="outline" className="gap-2">
 							<Download className="h-4 w-4" />

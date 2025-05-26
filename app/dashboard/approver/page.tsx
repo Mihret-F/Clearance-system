@@ -14,19 +14,16 @@ export default function ApproverPage() {
 	const [error, setError] = useState("");
 
 	useEffect(() => {
-		// Check if window is available (client-side)
 		if (typeof window === "undefined") return;
 
 		const checkAuth = async () => {
 			try {
-				// Check if user is logged in
 				const token = localStorage.getItem("authToken");
 				if (!token) {
 					router.push("/login");
 					return;
 				}
 
-				// Verify token with backend
 				const API_BASE_URL =
 					process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 				const response = await axios.get(`${API_BASE_URL}/users/profile`, {
@@ -36,15 +33,10 @@ export default function ApproverPage() {
 				});
 
 				if (response.data.status === "success") {
-					const userData = response.data.data.user;
+					const userData = response.data.data;
 
 					// Check if user is an approver
-					if (
-						userData.role === "APPROVER" ||
-						userData.role === "DepartmentHead"
-					) {
-						router.push("/dashboard/approver");
-					} else {
+					if (!userData.approver && userData.role !== "APPROVER") {
 						router.push("/login");
 						return;
 					}
@@ -52,61 +44,77 @@ export default function ApproverPage() {
 					setUser(userData);
 					localStorage.setItem("user", JSON.stringify(userData));
 
-					// Load clearance requests
+					// Fetch all clearance requests (pending, approved, rejected)
 					try {
-						const requestsResponse = await axios.get(
-							`${API_BASE_URL}/approver/requests`,
-							{
-								headers: {
-									Authorization: `Bearer ${token}`,
-								},
-							}
-						);
+						const [pendingResponse, approvedResponse, rejectedResponse] =
+							await Promise.all([
+								axios.get(`${API_BASE_URL}/approver/pending`, {
+									headers: { Authorization: `Bearer ${token}` },
+								}),
+								axios.get(`${API_BASE_URL}/approver/approved`, {
+									headers: { Authorization: `Bearer ${token}` },
+								}),
+								axios.get(`${API_BASE_URL}/approver/rejected`, {
+									headers: { Authorization: `Bearer ${token}` },
+								}),
+							]);
 
-						if (requestsResponse.data.status === "success") {
-							setClearanceRequests(requestsResponse.data.data.requests);
-						}
+						const formatRequest = (req) => ({
+							id: req.id,
+							type: req.formType.replace(/_/g, " "),
+							userId: req.user.id,
+							submittedAt: req.submittedAt,
+							status: req.status,
+							currentApprover:
+								req.approvalActions.find(
+									(action) => action.status === "PENDING"
+								)?.approver.office.name || null,
+							approvalChain: req.approvalActions.map(
+								(action) => action.approver.office.name
+							),
+							approvalActions: req.approvalActions,
+							documents: req.documents?.map((doc) => doc.filePath) || [],
+							description: `${
+								req.terminationReason?.reason ||
+								req.idReplacementReason?.reason ||
+								req.teacherClearanceReason?.reason ||
+								"No reason specified"
+							}`,
+							priority: req.currentStep,
+							userInfo: {
+								firstName: req.user.firstName,
+								fatherName: req.user.fatherName,
+								grandfatherName: req.user.grandfatherName,
+								department: req.user.student?.department?.name || "Unknown",
+								program: req.user.student?.program
+									? {
+											type: req.user.student.program.type || "N/A",
+											category: req.user.student.program.category || "N/A",
+									  }
+									: null,
+							},
+						});
+
+						const allRequests = [
+							...(pendingResponse.data.status === "success"
+								? pendingResponse.data.data.map(formatRequest)
+								: []),
+							...(approvedResponse.data.status === "success"
+								? approvedResponse.data.data.map(formatRequest)
+								: []),
+							...(rejectedResponse.data.status === "success"
+								? rejectedResponse.data.data.map(formatRequest)
+								: []),
+						];
+
+						setClearanceRequests(allRequests);
+						localStorage.setItem(
+							"clearanceRequests",
+							JSON.stringify(allRequests)
+						);
 					} catch (reqErr) {
 						console.error("Error loading clearance requests:", reqErr);
-						// Fallback to sample data if API fails
-						const storedRequests = localStorage.getItem("clearanceRequests");
-						if (storedRequests) {
-							setClearanceRequests(JSON.parse(storedRequests));
-						} else {
-							// Use sample data from the original file
-							const sampleRequests = [
-								{
-									id: "req-001",
-									type: "Graduation Clearance",
-									userId: "STU12345",
-									submittedAt: new Date(
-										Date.now() - 3 * 24 * 60 * 60 * 1000
-									).toISOString(),
-									status: "Pending",
-									currentApprover: "DepartmentHead",
-									approvalChain: [
-										"DepartmentHead",
-										"Library",
-										"Finance",
-										"Registrar",
-									],
-									documents: [
-										"Transcript.pdf",
-										"ID Card.jpg",
-										"Fee Receipt.pdf",
-									],
-									description:
-										"Graduation clearance request for Computer Science department",
-									priority: 2,
-								},
-								// ... other sample requests from the original file
-							];
-							setClearanceRequests(sampleRequests);
-							localStorage.setItem(
-								"clearanceRequests",
-								JSON.stringify(sampleRequests)
-							);
-						}
+						setError("Failed to load clearance requests. Please try again.");
 					}
 				} else {
 					localStorage.removeItem("authToken");
@@ -126,57 +134,18 @@ export default function ApproverPage() {
 			}
 		};
 
-		// Check if user is logged in from localStorage first
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
 			try {
 				const userData = JSON.parse(storedUser);
 
-				// Redirect if the role is not APPROVER
 				if (userData.role !== "APPROVER") {
 					router.replace("/dashboard/requester");
 					return;
 				}
 
 				setUser(userData);
-
-				// Load clearance requests from localStorage
-				const storedRequests = localStorage.getItem("clearanceRequests");
-				if (storedRequests) {
-					setClearanceRequests(JSON.parse(storedRequests));
-				} else {
-					// Sample data (same as in the original file)
-					const sampleRequests = [
-						{
-							id: "req-001",
-							type: "Graduation Clearance",
-							userId: "STU12345",
-							submittedAt: new Date(
-								Date.now() - 3 * 24 * 60 * 60 * 1000
-							).toISOString(),
-							status: "Pending",
-							currentApprover: "DepartmentHead",
-							approvalChain: [
-								"DepartmentHead",
-								"Library",
-								"Finance",
-								"Registrar",
-							],
-							documents: ["Transcript.pdf", "ID Card.jpg", "Fee Receipt.pdf"],
-							description:
-								"Graduation clearance request for Computer Science department",
-							priority: 2,
-						},
-						// ... other sample requests from the original file
-					];
-					setClearanceRequests(sampleRequests);
-					localStorage.setItem(
-						"clearanceRequests",
-						JSON.stringify(sampleRequests)
-					);
-				}
-
-				setLoading(false);
+				checkAuth();
 			} catch (error) {
 				console.error("Error parsing user data:", error);
 				localStorage.removeItem("user");
@@ -200,9 +169,18 @@ export default function ApproverPage() {
 			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
 				<div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
 					<p className="text-red-500 text-center">{error}</p>
-					<p className="text-gray-500 dark:text-gray-400 text-center mt-2">
-						Redirecting to login...
-					</p>
+					{error.includes("authenticate") ? (
+						<p className="text-gray-500 dark:text-gray-400 text-center mt-2">
+							Redirecting to login...
+						</p>
+					) : (
+						<button
+							className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+							onClick={() => window.location.reload()}
+						>
+							Retry
+						</button>
+					)}
 				</div>
 			</div>
 		);

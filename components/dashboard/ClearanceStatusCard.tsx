@@ -273,7 +273,8 @@ export function ClearanceStatusCard({ request }: ClearanceStatusCardProps) {
 											.
 										</p>
 									</div>
-								) : request.status === "APPROVED" ? (
+								) : request.status === "APPROVED" ||
+								  request.status === "COMPLETED" ? (
 									<div className="flex items-center gap-3">
 										<CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
 										<p>
@@ -281,7 +282,7 @@ export function ClearanceStatusCard({ request }: ClearanceStatusCardProps) {
 											your clearance certificate.
 										</p>
 									</div>
-								) : (
+								) : request.status === "REJECTED" ? (
 									<div className="flex items-center gap-3">
 										<XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
 										<p>
@@ -295,6 +296,11 @@ export function ClearanceStatusCard({ request }: ClearanceStatusCardProps) {
 											. Please review the rejection reason and resubmit if
 											necessary.
 										</p>
+									</div>
+								) : (
+									<div className="flex items-center gap-3">
+										<AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+										<p>Request status: {request.status}</p>
 									</div>
 								)}
 							</Card>

@@ -40,7 +40,7 @@ const AnimatedInput = ({
 	return (
 		<div className="relative mb-6">
 			<motion.label
-				className={`absolute left-3 text-sm transition-all duration-200 pointer-events-none ${
+				className={`absolute left-3 text-sm transition-all duration-200 pointer-events-none px-6 ${
 					isFocused || value
 						? "-top-2.5 text-xs bg-white dark:bg-gray-900 px-1 text-blue-600 dark:text-blue-400 z-10"
 						: "top-3.5 text-gray-500 dark:text-gray-400"
@@ -60,7 +60,7 @@ const AnimatedInput = ({
 			</motion.label>
 
 			<div className="relative">
-				<div className="absolute left-3 top-3.5 text-gray-500 dark:text-gray-400">
+				<div className="absolute left-3 top-3.5 flex items-center gap-2 text-gray-500 dark:text-gray-400">
 					<Icon className="h-5 w-5" />
 				</div>
 
@@ -70,7 +70,7 @@ const AnimatedInput = ({
 					onChange={onChange}
 					onFocus={() => setIsFocused(true)}
 					onBlur={() => setIsFocused(false)}
-					className={`w-full px-10 py-3.5 rounded-xl bg-white/10 dark:bg-white/5 backdrop-blur-md border ${
+					className={`w-full px-10 py-3.5 rounded-xl bg-white/10 dark:bg-white/5 border ${
 						error
 							? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
 							: isFocused
