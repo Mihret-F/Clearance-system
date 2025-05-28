@@ -424,7 +424,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\admin\\Downloads\\clearnces_system_dmu\\clearance-system-backend\\generated\\prisma",
+      "value": "C:\\Users\\hp\\Desktop\\pro2\\clearance_system\\clearance-system-backend\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -438,7 +438,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\admin\\Downloads\\clearnces_system_dmu\\clearance-system-backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\hp\\Desktop\\pro2\\clearance_system\\clearance-system-backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -456,7 +456,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres:admin@localhost:5432/clearanceDB?schema=public"
+        "value": "postgresql://postgres:1234@localhost:5432/clearanceDB?schema=public"
       }
     }
   },
